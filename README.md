@@ -1,3 +1,12 @@
+## Getting Started
+
+This project uses Node.js.
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+
 # MongoDB Setup for QuickRide
 
 This guide helps you set up MongoDB for the QuickRide application.
