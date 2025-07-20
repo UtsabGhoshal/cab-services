@@ -186,3 +186,10 @@ db.dropDatabase();
 - Whitelist your IP address in Atlas Network Access
 - Verify username/password in connection string
 - Ensure proper URL encoding of special characters
+
+## Running the Development Server
+
+To start the development server, run the following command:
+
+```bash
+npm run dev
