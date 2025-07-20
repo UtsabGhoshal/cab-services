@@ -7,6 +7,11 @@ This project uses Node.js.
    ```bash
    npm install
 
+   2. Run the Development Server
+
+   ```bash
+   npm run dev
+
 # MongoDB Setup for QuickRide
 
 This guide helps you set up MongoDB for the QuickRide application.
