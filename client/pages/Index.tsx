@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UserAvatar from "@/components/UserAvatar";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Car,
   MapPin,
