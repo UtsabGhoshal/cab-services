@@ -28,7 +28,7 @@ async function startServer() {
       console.log(`🚀 QuickRide server running on port ${port}`);
       console.log(`📱 Frontend: http://localhost:${port}`);
       console.log(`🔧 API: http://localhost:${port}/api`);
-      console.log(`🗃️ Database: MongoDB`);
+      console.log(`🗃️ Database: Firebase`);
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);
