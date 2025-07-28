@@ -448,25 +448,39 @@ export default function Booking() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <Label htmlFor="pickup">Pickup Location</Label>
-                    <Input 
-                      id="pickup"
+                    <Label htmlFor="pickup-autocomplete">Pickup Location</Label>
+                    <Input
+                      id="pickup-autocomplete"
                       value={pickup?.address || ''}
-                      placeholder="Click on map to set pickup"
-                      readOnly
+                      onChange={(e) => {
+                        if (e.target.value === '' && pickup) {
+                          setPickup(undefined);
+                        }
+                      }}
+                      placeholder="Type or click map to set pickup"
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="destination">Destination</Label>
-                    <Input 
-                      id="destination"
+                    <Label htmlFor="destination-autocomplete">Destination</Label>
+                    <Input
+                      id="destination-autocomplete"
                       value={destination?.address || ''}
-                      placeholder="Click on map to set destination"
-                      readOnly
+                      onChange={(e) => {
+                        if (e.target.value === '' && destination) {
+                          setDestination(undefined);
+                        }
+                      }}
+                      placeholder="Type or click map to set destination"
                       className="mt-1"
                     />
                   </div>
+                </div>
+
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-700">
+                    💡 <strong>Tip:</strong> You can either type in the search boxes above or click directly on the map to set locations.
+                  </p>
                 </div>
               </CardContent>
             </Card>
