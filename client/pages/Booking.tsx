@@ -254,11 +254,13 @@ export default function Booking() {
     const finalPrice = basePrice * nightMultiplier * emergencyMultiplier;
 
     setPricing({
-      basePrice,
+      basePrice: Math.round(basePrice),
       emergencyMultiplier,
-      finalPrice,
-      estimatedTime: `${Math.ceil(distance * 2)} min`,
-      distance: `${distance.toFixed(1)} km`
+      finalPrice: Math.round(finalPrice),
+      estimatedTime: `${Math.ceil(distance * 3)} min`, // Adjusted for Indian traffic
+      distance: `${distance.toFixed(1)} km`,
+      nightSurcharge: isNightTime,
+      nightMultiplier
     });
   }, [pickup, destination, carType, purpose]);
 
