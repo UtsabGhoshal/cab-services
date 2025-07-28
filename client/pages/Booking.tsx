@@ -15,6 +15,7 @@ interface GoogleMapsProps {
   onLocationSelect: (location: BookingLocation, isPickup: boolean) => void;
   pickup?: BookingLocation;
   destination?: BookingLocation;
+  locationMode: 'pickup' | 'destination';
 }
 
 const GoogleMapsComponent = ({ onLocationSelect, pickup, destination }: GoogleMapsProps) => {
