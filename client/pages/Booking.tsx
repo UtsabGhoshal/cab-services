@@ -292,7 +292,7 @@ export default function Booking() {
 
   useEffect(() => {
     loadGoogleMaps();
-  }, [loadGoogleMaps]);
+  }, []); // Empty dependency array - only run on mount
 
   const calculatePricing = () => {
     if (!pickup || !destination || !window.google) return;
