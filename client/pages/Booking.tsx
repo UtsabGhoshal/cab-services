@@ -74,7 +74,7 @@ const GoogleMapsComponent = ({ onLocationSelect, pickup, destination, locationMo
         });
       }
     }
-  }, [map, onLocationSelect, pickup]);
+  }, [map, onLocationSelect, pickup, locationMode]);
 
   useEffect(() => {
     if (map && pickup && destination && directionsService && directionsRenderer) {
