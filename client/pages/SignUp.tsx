@@ -165,18 +165,25 @@ export default function SignUp() {
                           return;
                         }
 
-                        const success = await signup({
-                          name: formData.name,
-                          email: formData.email,
-                          phone: formData.phone,
-                          password: formData.password,
-                        });
+                        try {
+                          const success = await signup({
+                            name: formData.name,
+                            email: formData.email,
+                            phone: formData.phone,
+                            password: formData.password,
+                          });
 
-                        if (success) {
-                          navigate("/");
-                        } else {
+                          if (success) {
+                            navigate("/");
+                          } else {
+                            setError(
+                              "Failed to create account. Please check your information and try again.",
+                            );
+                          }
+                        } catch (error) {
+                          console.error("Form submission error:", error);
                           setError(
-                            "Failed to create account. Please try again.",
+                            "An unexpected error occurred. Please try again.",
                           );
                         }
                       }}
