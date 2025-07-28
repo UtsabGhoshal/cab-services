@@ -351,12 +351,12 @@ export default function Booking() {
       basePrice: Math.round(basePrice),
       emergencyMultiplier,
       finalPrice: Math.round(finalPrice),
-      estimatedTime: `${Math.ceil(distance * 3)} min`, // Adjusted for Indian traffic
+      estimatedTime: `${estimatedMinutes} min`,
       distance: `${distance.toFixed(1)} km`,
       nightSurcharge: isNightTime,
       nightMultiplier
     });
-  }, [pickup, destination, carType, purpose]);
+  }, [carType, purpose]);
 
   useEffect(() => {
     calculatePricing();
