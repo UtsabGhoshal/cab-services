@@ -55,3 +55,11 @@ export const getAllRides = async () => {
   const db = await getDatabaseService();
   return db.getAllRides();
 };
+
+export const addSampleRidesForUser = async (userId: string) => {
+  const db = await getDatabaseService();
+  if (db.addSampleRidesForUser) {
+    return db.addSampleRidesForUser(userId);
+  }
+  // MongoDB version doesn't have this function
+};
