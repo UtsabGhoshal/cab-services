@@ -102,7 +102,9 @@ export const signupHandler: RequestHandler<
 
     // Add some sample rides for new user (only for mock database)
     try {
-      const { addSampleRidesForUser } = await import("../database/databaseService");
+      const { addSampleRidesForUser } = await import(
+        "../database/databaseService"
+      );
       if (addSampleRidesForUser) {
         await addSampleRidesForUser(newUser.id);
       }

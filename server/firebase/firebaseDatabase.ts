@@ -27,11 +27,11 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
     const usersRef = collection(db, USERS_COLLECTION);
     const q = query(usersRef, where("email", "==", email));
     const querySnapshot = await getDocs(q);
-    
+
     if (querySnapshot.empty) {
       return null;
     }
-    
+
     const userData = querySnapshot.docs[0].data();
     return {
       id: querySnapshot.docs[0].id,
@@ -48,11 +48,11 @@ export const getUserById = async (id: string): Promise<User | null> => {
   try {
     const userRef = doc(db, USERS_COLLECTION, id);
     const userSnap = await getDoc(userRef);
-    
+
     if (!userSnap.exists()) {
       return null;
     }
-    
+
     const userData = userSnap.data();
     return {
       id: userSnap.id,
@@ -66,12 +66,12 @@ export const getUserById = async (id: string): Promise<User | null> => {
 };
 
 export const createUser = async (
-  userData: Omit<User, "id" | "joinDate" | "memberLevel" | "isActive">
+  userData: Omit<User, "id" | "joinDate" | "memberLevel" | "isActive">,
 ): Promise<User> => {
   try {
     // Filter out undefined values that Firebase doesn't accept
     const cleanedUserData = Object.fromEntries(
-      Object.entries(userData).filter(([_, value]) => value !== undefined)
+      Object.entries(userData).filter(([_, value]) => value !== undefined),
     );
 
     const newUser = {
@@ -96,7 +96,7 @@ export const createUser = async (
 
 export const getUserRides = async (
   userId: string,
-  limitCount: number = 10
+  limitCount: number = 10,
 ): Promise<Ride[]> => {
   try {
     const ridesRef = collection(db, RIDES_COLLECTION);
@@ -104,12 +104,12 @@ export const getUserRides = async (
       ridesRef,
       where("userId", "==", userId),
       orderBy("date", "desc"),
-      limit(limitCount)
+      limit(limitCount),
     );
-    
+
     const querySnapshot = await getDocs(q);
     const rides: Ride[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       const rideData = doc.data();
       rides.push({
@@ -118,7 +118,7 @@ export const getUserRides = async (
         date: rideData.date.toDate(),
       } as Ride);
     });
-    
+
     return rides;
   } catch (error) {
     console.error("Error getting user rides:", error);
@@ -130,15 +130,15 @@ export const getUserStats = async (userId: string): Promise<UserStats> => {
   try {
     const userRides = await getUserRides(userId, 1000); // Get all rides for stats
     const user = await getUserById(userId);
-    
+
     const totalRides = userRides.length;
     const totalSpent = userRides.reduce((sum, ride) => sum + ride.amount, 0);
     const ratingsSum = userRides.reduce(
       (sum, ride) => sum + (ride.rating || 0),
-      0
+      0,
     );
     const averageRating = totalRides > 0 ? ratingsSum / totalRides : 0;
-    
+
     return {
       totalRides,
       totalSpent,
@@ -160,7 +160,7 @@ export const getUserStats = async (userId: string): Promise<UserStats> => {
 
 export const validateUserCredentials = async (
   email: string,
-  password: string
+  password: string,
 ): Promise<User | null> => {
   try {
     const user = await getUserByEmail(email);
@@ -192,7 +192,7 @@ export const addSampleRidesForUser = async (userId: string): Promise<void> => {
         distance: 6.2,
       },
     ];
-    
+
     for (const rideData of sampleRides) {
       await addDoc(collection(db, RIDES_COLLECTION), rideData);
     }
@@ -207,12 +207,12 @@ export const getAllUsers = async (): Promise<any[]> => {
 
     // Add timeout to prevent hanging
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Firebase request timeout')), 5000);
+      setTimeout(() => reject(new Error("Firebase request timeout")), 5000);
     });
 
     const querySnapshot = await Promise.race([
       getDocs(usersRef),
-      timeoutPromise
+      timeoutPromise,
     ]);
 
     const users: any[] = [];
@@ -239,7 +239,7 @@ export const getAllRides = async (): Promise<Ride[]> => {
     const ridesRef = collection(db, RIDES_COLLECTION);
     const querySnapshot = await getDocs(ridesRef);
     const rides: Ride[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       const rideData = doc.data();
       rides.push({
@@ -248,7 +248,7 @@ export const getAllRides = async (): Promise<Ride[]> => {
         date: rideData.date.toDate(),
       } as Ride);
     });
-    
+
     return rides;
   } catch (error) {
     console.error("Error getting all rides:", error);
@@ -261,20 +261,20 @@ export const initializeDatabase = async (): Promise<void> => {
   try {
     // Add timeout to prevent hanging
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Firebase initialization timeout')), 10000);
+      setTimeout(
+        () => reject(new Error("Firebase initialization timeout")),
+        10000,
+      );
     });
 
     // Check if users already exist
-    const existingUsers = await Promise.race([
-      getAllUsers(),
-      timeoutPromise
-    ]);
+    const existingUsers = await Promise.race([getAllUsers(), timeoutPromise]);
 
     if ((existingUsers as any[]).length > 0) {
       console.log("✅ Firebase database already contains data");
       return;
     }
-    
+
     // Create sample users
     const sampleUsers = [
       {
@@ -290,13 +290,13 @@ export const initializeDatabase = async (): Promise<void> => {
         password: "password456",
       },
     ];
-    
+
     const createdUsers: User[] = [];
     for (const userData of sampleUsers) {
       const user = await createUser(userData);
       createdUsers.push(user);
     }
-    
+
     // Create sample rides
     const sampleRides = [
       {
@@ -339,11 +339,11 @@ export const initializeDatabase = async (): Promise<void> => {
         distance: 3.1,
       },
     ];
-    
+
     for (const rideData of sampleRides) {
       await addDoc(collection(db, RIDES_COLLECTION), rideData);
     }
-    
+
     console.log("✅ Firebase database initialized with sample data");
     console.log(`📊 Total users: ${createdUsers.length}`);
     console.log(`🚗 Total rides: ${sampleRides.length}`);

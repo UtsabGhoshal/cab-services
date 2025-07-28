@@ -10,7 +10,7 @@ const firebaseConfig = {
   storageBucket: "uride-cab-service.firebasestorage.app",
   messagingSenderId: "552199078858",
   appId: "1:552199078858:web:c1db2f2429f6b3a3f64533",
-  measurementId: "G-Q14PG2EC6L"
+  measurementId: "G-Q14PG2EC6L",
 };
 
 // Initialize Firebase

@@ -16,10 +16,14 @@ export async function createServer() {
     await initializeDatabase();
     console.log("✅ Firebase database initialized successfully");
   } catch (error) {
-    console.warn("⚠️ Firebase not available, using mock database for development");
+    console.warn(
+      "⚠️ Firebase not available, using mock database for development",
+    );
     console.log("🔧 Error:", error.message);
     // Initialize mock database
-    const { initializeDatabase: initMockDb } = await import("./database/mockDatabase");
+    const { initializeDatabase: initMockDb } = await import(
+      "./database/mockDatabase"
+    );
     initMockDb();
   }
 
@@ -32,8 +36,8 @@ export async function createServer() {
     next();
   });
 
-  app.use(express.json({ limit: '10mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+  app.use(express.json({ limit: "10mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {

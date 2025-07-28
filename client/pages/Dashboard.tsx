@@ -93,11 +93,11 @@ export default function Dashboard() {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      return `Today, ${dateObj.toLocaleTimeString('en-IN', { hour: "2-digit", minute: "2-digit" })}`;
+      return `Today, ${dateObj.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
     } else if (diffDays === 1) {
-      return `Yesterday, ${dateObj.toLocaleTimeString('en-IN', { hour: "2-digit", minute: "2-digit" })}`;
+      return `Yesterday, ${dateObj.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
     } else {
-      return `${dateObj.toLocaleDateString('en-IN')}, ${dateObj.toLocaleTimeString('en-IN', { hour: "2-digit", minute: "2-digit" })}`;
+      return `${dateObj.toLocaleDateString("en-IN")}, ${dateObj.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
     }
   };
 
@@ -318,7 +318,9 @@ export default function Dashboard() {
                     <span className="text-sm">
                       Member since{" "}
                       {userStats?.joinDate
-                        ? new Date(userStats.joinDate).toLocaleDateString('en-IN')
+                        ? new Date(userStats.joinDate).toLocaleDateString(
+                            "en-IN",
+                          )
                         : "Dec 2024"}
                     </span>
                   </div>

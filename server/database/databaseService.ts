@@ -2,10 +2,10 @@
 // This provides a consistent interface for all database operations
 
 // Try Firebase first since it's now enabled
-let databaseType: 'firebase' | 'mock' = 'firebase';
+let databaseType: "firebase" | "mock" = "firebase";
 
 export const getDatabaseService = async () => {
-  if (databaseType === 'firebase') {
+  if (databaseType === "firebase") {
     try {
       const firebaseDb = await import("../firebase/firebaseDatabase");
       // Test Firebase connection by attempting a simple operation
@@ -13,8 +13,10 @@ export const getDatabaseService = async () => {
       return firebaseDb;
     } catch (error) {
       console.warn("⚠️ Firebase not accessible, falling back to mock database");
-      console.log("🔧 To use Firebase, ensure Firestore is enabled in your Firebase console");
-      databaseType = 'mock';
+      console.log(
+        "🔧 To use Firebase, ensure Firestore is enabled in your Firebase console",
+      );
+      databaseType = "mock";
       return await import("./mockDatabase");
     }
   } else {
@@ -49,7 +51,10 @@ export const getUserStats = async (userId: string) => {
   return db.getUserStats(userId);
 };
 
-export const validateUserCredentials = async (email: string, password: string) => {
+export const validateUserCredentials = async (
+  email: string,
+  password: string,
+) => {
   const db = await getDatabaseService();
   return db.validateUserCredentials(email, password);
 };
