@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Car, Clock, DollarSign, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { MapsConfigResponse, BookingLocation, PricingInfo } from "@shared/maps";
 
 interface GoogleMapsProps {
