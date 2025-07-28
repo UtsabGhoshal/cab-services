@@ -64,16 +64,9 @@ const GoogleMapsComponent = ({ onLocationSelect, pickup, destination }: GoogleMa
                   lat: event.latLng!.lat(),
                   lng: event.latLng!.lng()
                 };
-                // Smart selection: if no pickup, set pickup; otherwise set destination
-                // Allow overriding by holding Shift key for pickup, Alt key for destination
-                const isSettingPickup = !pickup || event.domEvent?.shiftKey;
-                const isSettingDestination = event.domEvent?.altKey;
-
-                if (isSettingDestination && !isSettingPickup) {
-                  onLocationSelect(location, false);
-                } else {
-                  onLocationSelect(location, isSettingPickup);
-                }
+                // Use the current location mode (pickup or destination)
+                const isSettingPickup = locationMode === 'pickup';
+                onLocationSelect(location, isSettingPickup);
               }
             });
           }
