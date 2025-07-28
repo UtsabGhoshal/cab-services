@@ -195,7 +195,7 @@ export default function Booking() {
         script.onerror = () => {
           toast({
             title: "Error",
-            description: "Failed to load Google Maps",
+            description: "Failed to load Go Maps Pro",
             variant: "destructive"
           });
           setLoading(false);
