@@ -173,7 +173,9 @@ const CarTypeSelector = ({ selectedType, onTypeChange }: { selectedType: string,
 export default function Booking() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [bookingLoading, setBookingLoading] = useState(false);
   const [pickup, setPickup] = useState<BookingLocation | undefined>();
   const [destination, setDestination] = useState<BookingLocation | undefined>();
   const [carType, setCarType] = useState<string>('economy');
