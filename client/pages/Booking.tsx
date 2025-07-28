@@ -28,7 +28,7 @@ const GoogleMapsComponent = ({ onLocationSelect, pickup, destination }: GoogleMa
       const mapElement = document.getElementById('google-map');
       if (mapElement) {
         const newMap = new google.maps.Map(mapElement, {
-          center: { lat: 37.7749, lng: -122.4194 }, // San Francisco default
+          center: { lat: 22.5726, lng: 88.3639 }, // Kolkata, India default
           zoom: 13,
           styles: [
             {
@@ -135,10 +135,10 @@ const GoogleMapsComponent = ({ onLocationSelect, pickup, destination }: GoogleMa
 
 const CarTypeSelector = ({ selectedType, onTypeChange }: { selectedType: string, onTypeChange: (type: string) => void }) => {
   const carTypes = [
-    { id: 'economy', name: 'Economy', price: '$15', capacity: '4 passengers', description: 'Comfortable and affordable' },
-    { id: 'premium', name: 'Premium', price: '$25', capacity: '4 passengers', description: 'Luxury vehicles with extra comfort' },
-    { id: 'suv', name: 'SUV', price: '$30', capacity: '6 passengers', description: 'Spacious for groups or extra luggage' },
-    { id: 'luxury', name: 'Luxury', price: '$50', capacity: '4 passengers', description: 'High-end vehicles with premium service' }
+    { id: 'economy', name: 'Economy', price: '₹30 base', capacity: '4 passengers', description: 'Comfortable and affordable rides' },
+    { id: 'premium', name: 'Premium', price: '₹45 base', capacity: '4 passengers', description: 'AC vehicles with extra comfort' },
+    { id: 'suv', name: 'SUV', price: '₹60 base', capacity: '6 passengers', description: 'Spacious for groups or luggage' },
+    { id: 'luxury', name: 'Luxury', price: '₹100 base', capacity: '4 passengers', description: 'Premium cars with top service' }
   ];
 
   return (
