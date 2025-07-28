@@ -1,18 +1,9 @@
-import { getConnectionStatus } from "./connection";
-
-// Database service that switches between MongoDB and mock database
-// This allows the app to work with or without MongoDB
+// Database service that uses Firebase Firestore
+// This provides a consistent interface for all database operations
 
 export const getDatabaseService = async () => {
-  const isMongoConnected = getConnectionStatus();
-  
-  if (isMongoConnected) {
-    // Use MongoDB when connected
-    return await import("./mongoDatabase");
-  } else {
-    // Use mock database when MongoDB is not available
-    return await import("./mockDatabase");
-  }
+  // Always use Firebase database
+  return await import("../firebase/firebaseDatabase");
 };
 
 // Re-export common database functions with automatic fallback
