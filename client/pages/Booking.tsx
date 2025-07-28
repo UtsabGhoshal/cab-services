@@ -323,7 +323,7 @@ export default function Booking() {
     });
   }, [pickup, destination, carType, purpose]);
 
-  const calculateFareWithDistance = useCallback((distance: number, estimatedMinutes: number) => {
+  const calculateFareWithDistance = (distance: number, estimatedMinutes: number) => {
 
     // Indian fare structure
     const minimumFare = 30; // ₹30 for first 2 km
@@ -360,7 +360,7 @@ export default function Booking() {
       nightSurcharge: isNightTime,
       nightMultiplier
     });
-  }, [carType, purpose]);
+  };
 
   // Calculate pricing when locations, car type, or purpose changes
   useEffect(() => {
