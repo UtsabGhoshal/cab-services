@@ -1,9 +1,25 @@
-// Database service that uses Firebase Firestore
+// Database service that uses Firebase Firestore with fallback to mock database
 // This provides a consistent interface for all database operations
 
+let databaseType: 'firebase' | 'mock' = 'firebase';
+
 export const getDatabaseService = async () => {
-  // Always use Firebase database
-  return await import("../firebase/firebaseDatabase");
+  if (databaseType === 'firebase') {
+    try {
+      const firebaseDb = await import("../firebase/firebaseDatabase");
+      // Test Firebase connection by attempting a simple operation
+      await firebaseDb.getAllUsers();
+      return firebaseDb;
+    } catch (error) {
+      console.warn("⚠️ Firebase not accessible, falling back to mock database");
+      console.log("🔧 To use Firebase, ensure Firestore is enabled in your Firebase console");
+      databaseType = 'mock';
+      return await import("./mockDatabase");
+    }
+  } else {
+    // Use mock database
+    return await import("./mockDatabase");
+  }
 };
 
 // Re-export common database functions with automatic fallback
