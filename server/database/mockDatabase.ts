@@ -187,12 +187,12 @@ export const initializeDatabase = () => {
     {
       id: "ride_5",
       userId: "user_1",
-      from: "Hotel Plaza",
-      to: "Conference Center",
+      from: "The Oberoi Hotel",
+      to: "Pragati Maidan",
       date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
-      amount: 32.4,
+      amount: 380.0,
       status: "Completed",
-      driverName: "Jennifer Adams",
+      driverName: "Deepak Joshi",
       rating: 4,
       paymentMethod: "Card",
       duration: 28,
@@ -201,12 +201,12 @@ export const initializeDatabase = () => {
     {
       id: "ride_6",
       userId: "user_1",
-      from: "Gym",
-      to: "Grocery Store",
+      from: "Gold's Gym Lajpat Nagar",
+      to: "Big Bazaar CR Park",
       date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-      amount: 16.8,
+      amount: 165.0,
       status: "Completed",
-      driverName: "Robert Kim",
+      driverName: "Meera Patel",
       rating: 5,
       paymentMethod: "Cash",
       duration: 22,
