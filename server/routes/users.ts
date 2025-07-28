@@ -1,6 +1,6 @@
 import express from "express";
 import { getUserDataHandler, getUserRidesHandler } from "./user";
-import { getAllUsers, createUser, getUserById } from "../database/mongoDatabase";
+import { getAllUsers, createUser, getUserById } from "../database/databaseService";
 
 const router = express.Router();
 

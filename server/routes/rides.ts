@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getAllRides } from "../database/mongoDatabase";
+import { getAllRides } from "../database/databaseService";
 
 const router = Router();
 
