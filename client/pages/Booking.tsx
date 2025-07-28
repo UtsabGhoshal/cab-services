@@ -275,6 +275,7 @@ export default function Booking() {
   const handleLocationSelect = (location: BookingLocation, isPickup: boolean) => {
     if (isPickup) {
       setPickup(location);
+      setLocationMode('destination'); // Auto-switch to destination after pickup is set
       toast({
         title: "Pickup Location Set",
         description: location.address,
