@@ -180,19 +180,35 @@ export default function Index() {
                         <Zap className="w-5 h-5 ml-3 group-hover:animate-spin" />
                       </Button>
 
-                      <div className="text-center">
-                        <p className="text-sm text-slate-600 mb-2">
-                          New to URide?
-                        </p>
-                        <Link to="/signup">
-                          <Button
-                            variant="outline"
-                            className="border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400 px-8 py-2 rounded-lg transition-all duration-300 hover:scale-105"
-                          >
-                            Sign Up Now! 🎁
-                          </Button>
-                        </Link>
-                      </div>
+                      {!user ? (
+                        <div className="text-center">
+                          <p className="text-sm text-slate-600 mb-2">
+                            New to URide?
+                          </p>
+                          <Link to="/signup">
+                            <Button
+                              variant="outline"
+                              className="border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400 px-8 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                            >
+                              Sign Up Now! 🎁
+                            </Button>
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <p className="text-sm text-slate-600 mb-2">
+                            Welcome back, {user.name}! 👋
+                          </p>
+                          <Link to="/dashboard">
+                            <Button
+                              variant="outline"
+                              className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 px-8 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                            >
+                              Go to Dashboard 📊
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
