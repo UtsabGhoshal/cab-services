@@ -233,6 +233,7 @@ export default function Booking() {
             lng: place.geometry.location.lng(),
           };
           setDestination(location);
+          setDestinationInputValue(location.address);
           toast({
             title: "Destination Set",
             description: location.address,
