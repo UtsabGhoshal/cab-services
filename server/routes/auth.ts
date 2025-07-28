@@ -58,6 +58,12 @@ export const signupHandler: RequestHandler<
   SignupRequest
 > = async (req, res) => {
   try {
+    // Ensure response hasn't been sent yet
+    if (res.headersSent) {
+      console.warn("Headers already sent in signup handler");
+      return;
+    }
+
     const { name, email, phone, password, dateOfBirth, address } = req.body;
 
     if (!name || !email || !phone || !password) {
@@ -94,20 +100,28 @@ export const signupHandler: RequestHandler<
       }
     } catch (error) {
       // Ignore if function doesn't exist (MongoDB case)
+      console.log("Sample rides not added:", error.message);
     }
 
     // Remove password from response
     const { password: _, ...userObj } = newUser;
 
-    res.status(201).json({
-      success: true,
-      user: userObj,
-    });
+    // Ensure we only send response once
+    if (!res.headersSent) {
+      res.status(201).json({
+        success: true,
+        user: userObj,
+      });
+    }
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json({
-      success: false,
-      error: "An error occurred during signup",
-    });
+
+    // Ensure we only send response once
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: "An error occurred during signup",
+      });
+    }
   }
 };
