@@ -351,10 +351,11 @@ export default function Booking() {
                 <p className="text-sm text-gray-600">Click on the map to set pickup and destination</p>
               </CardHeader>
               <CardContent>
-                <GoogleMapsComponent 
+                <GoogleMapsComponent
                   onLocationSelect={handleLocationSelect}
                   pickup={pickup}
                   destination={destination}
+                  locationMode={locationMode}
                 />
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
