@@ -294,7 +294,7 @@ export default function Booking() {
     loadGoogleMaps();
   }, [loadGoogleMaps]);
 
-  const calculatePricing = useCallback(() => {
+  const calculatePricing = () => {
     if (!pickup || !destination || !window.google) return;
 
     // Use Google Maps Distance Matrix API for accurate distance and duration
@@ -321,7 +321,7 @@ export default function Booking() {
       ) * 111; // rough conversion to km
       calculateFareWithDistance(distance, Math.ceil(distance * 3));
     });
-  }, [pickup, destination, carType, purpose]);
+  };
 
   const calculateFareWithDistance = (distance: number, estimatedMinutes: number) => {
 
