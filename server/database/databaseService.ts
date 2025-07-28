@@ -1,8 +1,8 @@
 // Database service that uses Firebase Firestore with fallback to mock database
 // This provides a consistent interface for all database operations
 
-// Using mock database for now until Firebase Firestore is enabled
-let databaseType: 'firebase' | 'mock' = 'mock';
+// Try Firebase first since it's now enabled
+let databaseType: 'firebase' | 'mock' = 'firebase';
 
 export const getDatabaseService = async () => {
   if (databaseType === 'firebase') {
