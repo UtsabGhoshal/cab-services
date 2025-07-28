@@ -4,7 +4,7 @@ import {
   getUserById,
   getUserRides,
   getUserStats,
-} from "../database/mongoDatabase";
+} from "../database/databaseService";
 
 export const getUserDataHandler: RequestHandler<
   { userId: string },

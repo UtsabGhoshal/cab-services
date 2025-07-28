@@ -9,8 +9,7 @@ import {
   validateUserCredentials,
   createUser,
   getUserByEmail,
-  addSampleRidesForUser,
-} from "../database/mongoDatabase";
+} from "../database/databaseService";
 
 export const loginHandler: RequestHandler<
   {},
@@ -59,6 +58,12 @@ export const signupHandler: RequestHandler<
   SignupRequest
 > = async (req, res) => {
   try {
+    // Ensure response hasn't been sent yet
+    if (res.headersSent) {
+      console.warn("Headers already sent in signup handler");
+      return;
+    }
+
     const { name, email, phone, password, dateOfBirth, address } = req.body;
 
     if (!name || !email || !phone || !password) {
@@ -77,32 +82,56 @@ export const signupHandler: RequestHandler<
       });
     }
 
-    // Create new user
-    const newUser = await createUser({
+    // Create new user - only include defined fields
+    const userCreateData: any = {
       name,
       email,
       phone,
       password, // In real app, hash the password
-      dateOfBirth,
-      address,
-    });
+    };
 
-    // Add some sample rides for new user
-    await addSampleRidesForUser(newUser.id);
+    // Only add optional fields if they're provided
+    if (dateOfBirth !== undefined) {
+      userCreateData.dateOfBirth = dateOfBirth;
+    }
+    if (address !== undefined) {
+      userCreateData.address = address;
+    }
+
+    const newUser = await createUser(userCreateData);
+
+    // Add some sample rides for new user (only for mock database)
+    try {
+      const { addSampleRidesForUser } = await import(
+        "../database/databaseService"
+      );
+      if (addSampleRidesForUser) {
+        await addSampleRidesForUser(newUser.id);
+      }
+    } catch (error) {
+      // Ignore if function doesn't exist (MongoDB case)
+      console.log("Sample rides not added:", error.message);
+    }
 
     // Remove password from response
-    const userObj = newUser.toObject();
-    delete userObj.password;
+    const { password: _, ...userObj } = newUser;
 
-    res.status(201).json({
-      success: true,
-      user: userObj,
-    });
+    // Ensure we only send response once
+    if (!res.headersSent) {
+      res.status(201).json({
+        success: true,
+        user: userObj,
+      });
+    }
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json({
-      success: false,
-      error: "An error occurred during signup",
-    });
+
+    // Ensure we only send response once
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: "An error occurred during signup",
+      });
+    }
   }
 };

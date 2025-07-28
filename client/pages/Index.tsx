@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UserAvatar from "@/components/UserAvatar";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Car,
   MapPin,
@@ -17,6 +18,8 @@ import {
 } from "lucide-react";
 
 export default function Index() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50 overflow-hidden">
       {/* Enhanced Animated Background Elements */}
@@ -150,7 +153,7 @@ export default function Index() {
                         </div>
                         <input
                           type="text"
-                          placeholder="Pickup location"
+                          placeholder="Connaught Place, New Delhi"
                           className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500 text-lg"
                         />
                       </div>
@@ -163,7 +166,7 @@ export default function Index() {
                         </div>
                         <input
                           type="text"
-                          placeholder="Where to?"
+                          placeholder="IGI Airport, Terminal 3"
                           className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500 text-lg"
                         />
                       </div>
@@ -177,19 +180,35 @@ export default function Index() {
                         <Zap className="w-5 h-5 ml-3 group-hover:animate-spin" />
                       </Button>
 
-                      <div className="text-center">
-                        <p className="text-sm text-slate-600 mb-2">
-                          New to URide?
-                        </p>
-                        <Link to="/signup">
-                          <Button
-                            variant="outline"
-                            className="border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400 px-8 py-2 rounded-lg transition-all duration-300 hover:scale-105"
-                          >
-                            Sign Up Now! 🎁
-                          </Button>
-                        </Link>
-                      </div>
+                      {!user ? (
+                        <div className="text-center">
+                          <p className="text-sm text-slate-600 mb-2">
+                            New to URide?
+                          </p>
+                          <Link to="/signup">
+                            <Button
+                              variant="outline"
+                              className="border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400 px-8 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                            >
+                              Sign Up Now! 🎁
+                            </Button>
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <p className="text-sm text-slate-600 mb-2">
+                            Welcome back, {user.name}! 👋
+                          </p>
+                          <Link to="/dashboard">
+                            <Button
+                              variant="outline"
+                              className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 px-8 py-2 rounded-lg transition-all duration-300 hover:scale-105"
+                            >
+                              Go to Dashboard 📊
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

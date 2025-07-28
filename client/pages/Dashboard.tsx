@@ -20,7 +20,7 @@ import {
   Gift,
   TrendingUp,
   ArrowRight,
-  DollarSign,
+  IndianRupee,
   Shield,
   Loader,
 } from "lucide-react";
@@ -93,11 +93,11 @@ export default function Dashboard() {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      return `Today, ${dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      return `Today, ${dateObj.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
     } else if (diffDays === 1) {
-      return `Yesterday, ${dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      return `Yesterday, ${dateObj.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
     } else {
-      return `${dateObj.toLocaleDateString()}, ${dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      return `${dateObj.toLocaleDateString("en-IN")}, ${dateObj.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}`;
     }
   };
 
@@ -134,10 +134,10 @@ export default function Dashboard() {
             </div>
             <div>
               <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                QuickRide
+                URide
               </span>
               <div className="text-xs text-slate-500 font-medium">
-                Premium Cab Service
+                Your Trusted Ride Partner
               </div>
             </div>
           </Link>
@@ -266,7 +266,7 @@ export default function Dashboard() {
                         </div>
                         <div className="text-right">
                           <div className="font-semibold text-slate-800">
-                            ${ride.amount.toFixed(2)}
+                            ₹{ride.amount.toFixed(2)}
                           </div>
                           <div className="text-sm text-green-600">
                             {ride.status}
@@ -318,7 +318,9 @@ export default function Dashboard() {
                     <span className="text-sm">
                       Member since{" "}
                       {userStats?.joinDate
-                        ? new Date(userStats.joinDate).toLocaleDateString()
+                        ? new Date(userStats.joinDate).toLocaleDateString(
+                            "en-IN",
+                          )
                         : "Dec 2024"}
                     </span>
                   </div>
@@ -355,11 +357,11 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                       <div className="flex items-center space-x-3">
-                        <DollarSign className="w-5 h-5 text-green-600" />
+                        <IndianRupee className="w-5 h-5 text-green-600" />
                         <span className="text-slate-700">Total Spent</span>
                       </div>
                       <span className="font-bold text-green-600">
-                        ${userStats?.totalSpent?.toFixed(2) || "0.00"}
+                        ₹{userStats?.totalSpent?.toFixed(2) || "0.00"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">

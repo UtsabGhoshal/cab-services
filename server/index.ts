@@ -5,27 +5,39 @@ import { loginHandler, signupHandler } from "./routes/auth";
 import { getUserDataHandler, getUserRidesHandler } from "./routes/user";
 import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
-import { connectToDatabase } from "./database/connection.ts";
-import { initializeDatabase } from "./database/mongoDatabase";
+import { initializeDatabase } from "./firebase/firebaseDatabase";
 
 export async function createServer() {
   const app = express();
 
-  // Connect to MongoDB
+  // Initialize database (Firebase with fallback to mock)
   try {
-    await connectToDatabase();
-    // Initialize database with sample data (if needed)
+    console.log("🔥 Initializing Firebase database...");
     await initializeDatabase();
+    console.log("✅ Firebase database initialized successfully");
   } catch (error) {
-    console.error("❌ Failed to initialize database:", error);
-    // Optionally, you can choose to exit or continue with limited functionality
-    // process.exit(1);
+    console.warn(
+      "⚠️ Firebase not available, using mock database for development",
+    );
+    console.log("🔧 Error:", error.message);
+    // Initialize mock database
+    const { initializeDatabase: initMockDb } = await import(
+      "./database/mockDatabase"
+    );
+    initMockDb();
   }
 
   // Middleware
   app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+
+  // Add request logging
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+  });
+
+  app.use(express.json({ limit: "10mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
   // Example API routes
   app.get("/api/ping", (_req, res) => {
@@ -51,7 +63,7 @@ export async function createServer() {
   // Admin/Debug routes (for development)
   app.get("/api/admin/users", async (_req, res) => {
     try {
-      const { getAllUsers } = await import("./database/mongoDatabase");
+      const { getAllUsers } = await import("./database/databaseService");
       const users = await getAllUsers();
       res.json({ success: true, users });
     } catch (error) {
@@ -62,7 +74,7 @@ export async function createServer() {
 
   app.get("/api/admin/rides", async (_req, res) => {
     try {
-      const { getAllRides } = await import("./database/mongoDatabase");
+      const { getAllRides } = await import("./database/databaseService");
       const rides = await getAllRides();
       res.json({ success: true, rides });
     } catch (error) {
