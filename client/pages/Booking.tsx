@@ -369,8 +369,18 @@ export default function Booking() {
     }
   }, [pickup?.lat, pickup?.lng, destination?.lat, destination?.lng, carType, purpose]);
 
-  // Note: Input values are updated directly in autocomplete and map click handlers
-  // No need for useEffect sync to prevent infinite loops
+  // Sync input values only when locations are cleared to avoid infinite loops
+  useEffect(() => {
+    if (!pickup && pickupInputValue !== '') {
+      setPickupInputValue('');
+    }
+  }, [pickup, pickupInputValue]);
+
+  useEffect(() => {
+    if (!destination && destinationInputValue !== '') {
+      setDestinationInputValue('');
+    }
+  }, [destination, destinationInputValue]);
 
   const handleLocationSelect = (location: BookingLocation, isPickup: boolean) => {
     if (isPickup) {
