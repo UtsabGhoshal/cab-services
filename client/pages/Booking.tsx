@@ -394,7 +394,7 @@ export default function Booking() {
     }
   };
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     if (!pickup || !destination) {
       toast({
         title: "Missing Information",
@@ -404,19 +404,68 @@ export default function Booking() {
       return;
     }
 
-    toast({
-      title: "Booking Confirmed!",
-      description: `Your ${carType} ride has been booked for ${purpose} purposes.`,
-    });
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to book a ride",
+        variant: "destructive"
+      });
+      navigate('/login');
+      return;
+    }
 
-    // In a real app, you'd send this to your backend
-    console.log({
-      pickup,
-      destination,
-      carType,
-      purpose,
-      pricing
-    });
+    if (!pricing) {
+      toast({
+        title: "Pricing Error",
+        description: "Unable to calculate fare. Please try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setBookingLoading(true);
+
+    try {
+      const response = await fetch('/api/rides', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          pickup,
+          destination,
+          carType,
+          purpose,
+          pricing
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Booking Confirmed! 🎉",
+          description: `Your ${carType} ride from ${pickup.address} to ${destination.address} has been booked successfully.`,
+        });
+
+        // Navigate back to dashboard after successful booking
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
+      } else {
+        throw new Error(data.message || 'Failed to create booking');
+      }
+    } catch (error: any) {
+      console.error('Booking error:', error);
+      toast({
+        title: "Booking Failed",
+        description: error.message || "Unable to complete booking. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setBookingLoading(false);
+    }
   };
 
   if (loading) {
