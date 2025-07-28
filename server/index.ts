@@ -51,6 +51,9 @@ export async function createServer() {
   app.post("/api/auth/login", loginHandler);
   app.post("/api/auth/signup", signupHandler);
 
+  // Maps configuration route (secure API key delivery)
+  app.get("/api/maps/config", getMapsConfigHandler);
+
   // User data routes
   app.get("/api/user/:userId/data", getUserDataHandler);
   app.get("/api/user/:userId/rides", getUserRidesHandler);
