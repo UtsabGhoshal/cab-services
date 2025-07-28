@@ -4,10 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Car, Clock, DollarSign, AlertTriangle } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Car,
+  Clock,
+  DollarSign,
+  AlertTriangle,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { MapsConfigResponse, BookingLocation, PricingInfo } from "@shared/maps";
@@ -16,38 +29,45 @@ interface GoogleMapsProps {
   onLocationSelect: (location: BookingLocation, isPickup: boolean) => void;
   pickup?: BookingLocation;
   destination?: BookingLocation;
-  locationMode: 'pickup' | 'destination';
+  locationMode: "pickup" | "destination";
 }
 
-const GoogleMapsComponent = ({ onLocationSelect, pickup, destination, locationMode }: GoogleMapsProps) => {
+const GoogleMapsComponent = ({
+  onLocationSelect,
+  pickup,
+  destination,
+  locationMode,
+}: GoogleMapsProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
-  const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService | null>(null);
-  const [directionsRenderer, setDirectionsRenderer] = useState<google.maps.DirectionsRenderer | null>(null);
+  const [directionsService, setDirectionsService] =
+    useState<google.maps.DirectionsService | null>(null);
+  const [directionsRenderer, setDirectionsRenderer] =
+    useState<google.maps.DirectionsRenderer | null>(null);
 
   useEffect(() => {
     if (window.google && !map) {
-      const mapElement = document.getElementById('google-map');
+      const mapElement = document.getElementById("google-map");
       if (mapElement) {
         const newMap = new google.maps.Map(mapElement, {
           center: { lat: 22.5726, lng: 88.3639 }, // Kolkata, India default
           zoom: 13,
           styles: [
             {
-              featureType: 'poi',
-              elementType: 'labels',
-              stylers: [{ visibility: 'off' }]
-            }
-          ]
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }],
+            },
+          ],
         });
 
         const newDirectionsService = new google.maps.DirectionsService();
         const newDirectionsRenderer = new google.maps.DirectionsRenderer({
           suppressMarkers: true,
           polylineOptions: {
-            strokeColor: '#f59e0b',
-            strokeWeight: 4
-          }
+            strokeColor: "#f59e0b",
+            strokeWeight: 4,
+          },
         });
 
         newDirectionsRenderer.setMap(newMap);
@@ -56,18 +76,18 @@ const GoogleMapsComponent = ({ onLocationSelect, pickup, destination, locationMo
         setDirectionsRenderer(newDirectionsRenderer);
 
         // Add click listener for location selection
-        newMap.addListener('click', (event: google.maps.MapMouseEvent) => {
+        newMap.addListener("click", (event: google.maps.MapMouseEvent) => {
           if (event.latLng) {
             const geocoder = new google.maps.Geocoder();
             geocoder.geocode({ location: event.latLng }, (results, status) => {
-              if (status === 'OK' && results && results[0]) {
+              if (status === "OK" && results && results[0]) {
                 const location: BookingLocation = {
                   address: results[0].formatted_address,
                   lat: event.latLng!.lat(),
-                  lng: event.latLng!.lng()
+                  lng: event.latLng!.lng(),
                 };
                 // Use the current location mode (pickup or destination)
-                const isSettingPickup = locationMode === 'pickup';
+                const isSettingPickup = locationMode === "pickup";
                 onLocationSelect(location, isSettingPickup);
               }
             });
@@ -78,79 +98,122 @@ const GoogleMapsComponent = ({ onLocationSelect, pickup, destination, locationMo
   }, [map, onLocationSelect, pickup, locationMode]);
 
   useEffect(() => {
-    if (map && pickup && destination && directionsService && directionsRenderer) {
+    if (
+      map &&
+      pickup &&
+      destination &&
+      directionsService &&
+      directionsRenderer
+    ) {
       // Clear existing markers
-      markers.forEach(marker => marker.setMap(null));
+      markers.forEach((marker) => marker.setMap(null));
 
       // Create new markers
       const pickupMarker = new google.maps.Marker({
         position: { lat: pickup.lat, lng: pickup.lng },
         map: map,
-        title: 'Pickup Location',
+        title: "Pickup Location",
         icon: {
-          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+          url:
+            "data:image/svg+xml;charset=UTF-8," +
+            encodeURIComponent(`
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="16" cy="16" r="12" fill="#10b981" stroke="white" stroke-width="3"/>
               <circle cx="16" cy="16" r="4" fill="white"/>
             </svg>
           `),
-          scaledSize: new google.maps.Size(32, 32)
-        }
+          scaledSize: new google.maps.Size(32, 32),
+        },
       });
 
       const destinationMarker = new google.maps.Marker({
         position: { lat: destination.lat, lng: destination.lng },
         map: map,
-        title: 'Destination',
+        title: "Destination",
         icon: {
-          url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+          url:
+            "data:image/svg+xml;charset=UTF-8," +
+            encodeURIComponent(`
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="16" cy="16" r="12" fill="#ef4444" stroke="white" stroke-width="3"/>
               <circle cx="16" cy="16" r="4" fill="white"/>
             </svg>
           `),
-          scaledSize: new google.maps.Size(32, 32)
-        }
+          scaledSize: new google.maps.Size(32, 32),
+        },
       });
 
       setMarkers([pickupMarker, destinationMarker]);
 
       // Draw route
-      directionsService.route({
-        origin: { lat: pickup.lat, lng: pickup.lng },
-        destination: { lat: destination.lat, lng: destination.lng },
-        travelMode: google.maps.TravelMode.DRIVING
-      }, (result, status) => {
-        if (status === 'OK' && result) {
-          directionsRenderer.setDirections(result);
-        }
-      });
+      directionsService.route(
+        {
+          origin: { lat: pickup.lat, lng: pickup.lng },
+          destination: { lat: destination.lat, lng: destination.lng },
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if (status === "OK" && result) {
+            directionsRenderer.setDirections(result);
+          }
+        },
+      );
     }
   }, [map, pickup, destination, directionsService, directionsRenderer]);
 
   return (
-    <div 
-      id="google-map" 
-      style={{ width: '100%', height: '400px', borderRadius: '8px' }}
+    <div
+      id="google-map"
+      style={{ width: "100%", height: "400px", borderRadius: "8px" }}
       className="border border-gray-200"
     />
   );
 };
 
-const CarTypeSelector = ({ selectedType, onTypeChange }: { selectedType: string, onTypeChange: (type: string) => void }) => {
+const CarTypeSelector = ({
+  selectedType,
+  onTypeChange,
+}: {
+  selectedType: string;
+  onTypeChange: (type: string) => void;
+}) => {
   const carTypes = [
-    { id: 'economy', name: 'Economy', price: '₹30 base', capacity: '4 passengers', description: 'Comfortable and affordable rides' },
-    { id: 'premium', name: 'Premium', price: '₹45 base', capacity: '4 passengers', description: 'AC vehicles with extra comfort' },
-    { id: 'suv', name: 'SUV', price: '₹60 base', capacity: '6 passengers', description: 'Spacious for groups or luggage' },
-    { id: 'luxury', name: 'Luxury', price: '₹100 base', capacity: '4 passengers', description: 'Premium cars with top service' }
+    {
+      id: "economy",
+      name: "Economy",
+      price: "₹30 base",
+      capacity: "4 passengers",
+      description: "Comfortable and affordable rides",
+    },
+    {
+      id: "premium",
+      name: "Premium",
+      price: "₹45 base",
+      capacity: "4 passengers",
+      description: "AC vehicles with extra comfort",
+    },
+    {
+      id: "suv",
+      name: "SUV",
+      price: "₹60 base",
+      capacity: "6 passengers",
+      description: "Spacious for groups or luggage",
+    },
+    {
+      id: "luxury",
+      name: "Luxury",
+      price: "₹100 base",
+      capacity: "4 passengers",
+      description: "Premium cars with top service",
+    },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {carTypes.map((car) => (
-        <Card 
+        <Card
           key={car.id}
-          className={`cursor-pointer transition-all ${selectedType === car.id ? 'ring-2 ring-primary border-primary' : 'hover:border-gray-300'}`}
+          className={`cursor-pointer transition-all ${selectedType === car.id ? "ring-2 ring-primary border-primary" : "hover:border-gray-300"}`}
           onClick={() => onTypeChange(car.id)}
         >
           <CardContent className="p-4">
@@ -178,39 +241,47 @@ export default function Booking() {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [pickup, setPickup] = useState<BookingLocation | undefined>();
   const [destination, setDestination] = useState<BookingLocation | undefined>();
-  const [carType, setCarType] = useState<string>('economy');
-  const [purpose, setPurpose] = useState<'general' | 'emergency'>('general');
+  const [carType, setCarType] = useState<string>("economy");
+  const [purpose, setPurpose] = useState<"general" | "emergency">("general");
   const [pricing, setPricing] = useState<PricingInfo | null>(null);
-  const [locationMode, setLocationMode] = useState<'pickup' | 'destination'>('pickup');
-  const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
-  const [destinationAutocomplete, setDestinationAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
-  const [pickupInputValue, setPickupInputValue] = useState('');
-  const [destinationInputValue, setDestinationInputValue] = useState('');
+  const [locationMode, setLocationMode] = useState<"pickup" | "destination">(
+    "pickup",
+  );
+  const [pickupAutocomplete, setPickupAutocomplete] =
+    useState<google.maps.places.Autocomplete | null>(null);
+  const [destinationAutocomplete, setDestinationAutocomplete] =
+    useState<google.maps.places.Autocomplete | null>(null);
+  const [pickupInputValue, setPickupInputValue] = useState("");
+  const [destinationInputValue, setDestinationInputValue] = useState("");
 
   const initializeAutocomplete = useCallback(() => {
     if (!window.google) return;
 
     // Initialize pickup autocomplete
-    const pickupInput = document.getElementById('pickup-autocomplete') as HTMLInputElement;
-    const destinationInput = document.getElementById('destination-autocomplete') as HTMLInputElement;
+    const pickupInput = document.getElementById(
+      "pickup-autocomplete",
+    ) as HTMLInputElement;
+    const destinationInput = document.getElementById(
+      "destination-autocomplete",
+    ) as HTMLInputElement;
 
     if (pickupInput && !pickupAutocomplete) {
       const pickupAuto = new google.maps.places.Autocomplete(pickupInput, {
-        types: ['establishment', 'geocode'],
-        componentRestrictions: { country: 'IN' }, // Restrict to India
+        types: ["establishment", "geocode"],
+        componentRestrictions: { country: "IN" }, // Restrict to India
       });
 
-      pickupAuto.addListener('place_changed', () => {
+      pickupAuto.addListener("place_changed", () => {
         const place = pickupAuto.getPlace();
         if (place.geometry && place.geometry.location) {
           const location: BookingLocation = {
-            address: place.formatted_address || place.name || '',
+            address: place.formatted_address || place.name || "",
             lat: place.geometry.location.lat(),
             lng: place.geometry.location.lng(),
           };
           setPickup(location);
           setPickupInputValue(location.address);
-          setLocationMode('destination');
+          setLocationMode("destination");
           toast({
             title: "Pickup Location Set",
             description: location.address,
@@ -223,15 +294,15 @@ export default function Booking() {
 
     if (destinationInput && !destinationAutocomplete) {
       const destAuto = new google.maps.places.Autocomplete(destinationInput, {
-        types: ['establishment', 'geocode'],
-        componentRestrictions: { country: 'IN' }, // Restrict to India
+        types: ["establishment", "geocode"],
+        componentRestrictions: { country: "IN" }, // Restrict to India
       });
 
-      destAuto.addListener('place_changed', () => {
+      destAuto.addListener("place_changed", () => {
         const place = destAuto.getPlace();
         if (place.geometry && place.geometry.location) {
           const location: BookingLocation = {
-            address: place.formatted_address || place.name || '',
+            address: place.formatted_address || place.name || "",
             lat: place.geometry.location.lat(),
             lng: place.geometry.location.lng(),
           };
@@ -250,16 +321,16 @@ export default function Booking() {
 
   const loadGoogleMaps = useCallback(async () => {
     try {
-      const response = await fetch('/api/maps/config');
+      const response = await fetch("/api/maps/config");
       const data: MapsConfigResponse = await response.json();
-      
+
       if (!data.success) {
-        throw new Error('Failed to get maps configuration');
+        throw new Error("Failed to get maps configuration");
       }
 
       // Load Go Maps Pro script
       if (!window.google) {
-        const script = document.createElement('script');
+        const script = document.createElement("script");
         script.src = `https://maps.gomaps.pro/maps/api/js?key=${data.apiKey}&libraries=places`;
         script.async = true;
         script.defer = true;
@@ -272,7 +343,7 @@ export default function Booking() {
           toast({
             title: "Error",
             description: "Failed to load Go Maps Pro",
-            variant: "destructive"
+            variant: "destructive",
           });
           setLoading(false);
         };
@@ -283,11 +354,11 @@ export default function Booking() {
         setTimeout(initializeAutocomplete, 100);
       }
     } catch (error) {
-      console.error('Error loading Go Maps Pro:', error);
+      console.error("Error loading Go Maps Pro:", error);
       toast({
         title: "Error",
         description: "Failed to initialize Go Maps Pro",
-        variant: "destructive"
+        variant: "destructive",
       });
       setLoading(false);
     }
@@ -302,38 +373,52 @@ export default function Booking() {
 
     // Use Google Maps Distance Matrix API for accurate distance and duration
     const service = new google.maps.DistanceMatrixService();
-    service.getDistanceMatrix({
-      origins: [{ lat: pickup.lat, lng: pickup.lng }],
-      destinations: [{ lat: destination.lat, lng: destination.lng }],
-      travelMode: google.maps.TravelMode.DRIVING,
-      unitSystem: google.maps.UnitSystem.METRIC,
-    }, (response, status) => {
-      if (status === google.maps.DistanceMatrixStatus.OK && response) {
-        const element = response.rows[0].elements[0];
-        if (element.status === 'OK') {
-          const distanceValue = element.distance.value / 1000; // Convert to km
-          const durationValue = element.duration.value / 60; // Convert to minutes
-          calculateFareWithDistance(distanceValue, Math.ceil(durationValue));
-          return;
+    service.getDistanceMatrix(
+      {
+        origins: [{ lat: pickup.lat, lng: pickup.lng }],
+        destinations: [{ lat: destination.lat, lng: destination.lng }],
+        travelMode: google.maps.TravelMode.DRIVING,
+        unitSystem: google.maps.UnitSystem.METRIC,
+      },
+      (response, status) => {
+        if (status === google.maps.DistanceMatrixStatus.OK && response) {
+          const element = response.rows[0].elements[0];
+          if (element.status === "OK") {
+            const distanceValue = element.distance.value / 1000; // Convert to km
+            const durationValue = element.duration.value / 60; // Convert to minutes
+            calculateFareWithDistance(distanceValue, Math.ceil(durationValue));
+            return;
+          }
         }
-      }
 
-      // Fallback to simple calculation if API fails
-      const distance = Math.sqrt(
-        Math.pow(pickup.lat - destination.lat, 2) + Math.pow(pickup.lng - destination.lng, 2)
-      ) * 111; // rough conversion to km
-      calculateFareWithDistance(distance, Math.ceil(distance * 3));
-    });
+        // Fallback to simple calculation if API fails
+        const distance =
+          Math.sqrt(
+            Math.pow(pickup.lat - destination.lat, 2) +
+              Math.pow(pickup.lng - destination.lng, 2),
+          ) * 111; // rough conversion to km
+        calculateFareWithDistance(distance, Math.ceil(distance * 3));
+      },
+    );
   };
 
-  const calculateFareWithDistance = (distance: number, estimatedMinutes: number) => {
-
+  const calculateFareWithDistance = (
+    distance: number,
+    estimatedMinutes: number,
+  ) => {
     // Indian fare structure
     const minimumFare = 30; // ₹30 for first 2 km
     const rateAfter2km = 15; // ₹15 per additional km
 
     // Base rates for different car types (multiplier)
-    const carMultiplier = carType === 'economy' ? 1 : carType === 'premium' ? 1.5 : carType === 'suv' ? 2 : 3.3;
+    const carMultiplier =
+      carType === "economy"
+        ? 1
+        : carType === "premium"
+          ? 1.5
+          : carType === "suv"
+            ? 2
+            : 3.3;
 
     // Calculate fare based on Indian slab system
     let basePrice;
@@ -349,7 +434,7 @@ export default function Booking() {
     const nightMultiplier = isNightTime ? 1.25 : 1;
 
     // Emergency multiplier (50% extra)
-    const emergencyMultiplier = purpose === 'emergency' ? 1.5 : 1;
+    const emergencyMultiplier = purpose === "emergency" ? 1.5 : 1;
 
     // Calculate final price with all surcharges
     const finalPrice = basePrice * nightMultiplier * emergencyMultiplier;
@@ -361,7 +446,7 @@ export default function Booking() {
       estimatedTime: `${estimatedMinutes} min`,
       distance: `${distance.toFixed(1)} km`,
       nightSurcharge: isNightTime,
-      nightMultiplier
+      nightMultiplier,
     });
   };
 
@@ -370,16 +455,26 @@ export default function Booking() {
     if (pickup && destination && window.google) {
       calculatePricing();
     }
-  }, [pickup?.lat, pickup?.lng, destination?.lat, destination?.lng, carType, purpose]);
+  }, [
+    pickup?.lat,
+    pickup?.lng,
+    destination?.lat,
+    destination?.lng,
+    carType,
+    purpose,
+  ]);
 
   // Input values are managed directly by user input and location selection handlers
   // No useEffect needed to prevent infinite loops
 
-  const handleLocationSelect = (location: BookingLocation, isPickup: boolean) => {
+  const handleLocationSelect = (
+    location: BookingLocation,
+    isPickup: boolean,
+  ) => {
     if (isPickup) {
       setPickup(location);
       setPickupInputValue(location.address);
-      setLocationMode('destination'); // Auto-switch to destination after pickup is set
+      setLocationMode("destination"); // Auto-switch to destination after pickup is set
       toast({
         title: "Pickup Location Set",
         description: location.address,
@@ -399,7 +494,7 @@ export default function Booking() {
       toast({
         title: "Missing Information",
         description: "Please select both pickup and destination locations",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -408,9 +503,9 @@ export default function Booking() {
       toast({
         title: "Authentication Required",
         description: "Please log in to book a ride",
-        variant: "destructive"
+        variant: "destructive",
       });
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
@@ -418,7 +513,7 @@ export default function Booking() {
       toast({
         title: "Pricing Error",
         description: "Unable to calculate fare. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -426,10 +521,10 @@ export default function Booking() {
     setBookingLoading(true);
 
     try {
-      const response = await fetch('/api/rides', {
-        method: 'POST',
+      const response = await fetch("/api/rides", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user.id,
@@ -437,7 +532,7 @@ export default function Booking() {
           destination,
           carType,
           purpose,
-          pricing
+          pricing,
         }),
       });
 
@@ -451,17 +546,18 @@ export default function Booking() {
 
         // Navigate back to dashboard after successful booking
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate("/dashboard");
         }, 2000);
       } else {
-        throw new Error(data.message || 'Failed to create booking');
+        throw new Error(data.message || "Failed to create booking");
       }
     } catch (error: any) {
-      console.error('Booking error:', error);
+      console.error("Booking error:", error);
       toast({
         title: "Booking Failed",
-        description: error.message || "Unable to complete booking. Please try again.",
-        variant: "destructive"
+        description:
+          error.message || "Unable to complete booking. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setBookingLoading(false);
@@ -484,10 +580,10 @@ export default function Booking() {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="icon"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate("/dashboard")}
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -505,20 +601,27 @@ export default function Booking() {
                 </CardTitle>
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-600">
-                    Currently setting: <span className="font-medium text-blue-600">{locationMode === 'pickup' ? 'Pickup' : 'Destination'}</span>
+                    Currently setting:{" "}
+                    <span className="font-medium text-blue-600">
+                      {locationMode === "pickup" ? "Pickup" : "Destination"}
+                    </span>
                   </p>
                   <div className="flex gap-2">
                     <Button
-                      variant={locationMode === 'pickup' ? 'default' : 'outline'}
+                      variant={
+                        locationMode === "pickup" ? "default" : "outline"
+                      }
                       size="sm"
-                      onClick={() => setLocationMode('pickup')}
+                      onClick={() => setLocationMode("pickup")}
                     >
                       Set Pickup
                     </Button>
                     <Button
-                      variant={locationMode === 'destination' ? 'default' : 'outline'}
+                      variant={
+                        locationMode === "destination" ? "default" : "outline"
+                      }
                       size="sm"
-                      onClick={() => setLocationMode('destination')}
+                      onClick={() => setLocationMode("destination")}
                     >
                       Set Destination
                     </Button>
@@ -532,7 +635,7 @@ export default function Booking() {
                   destination={destination}
                   locationMode={locationMode}
                 />
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
                     <Label htmlFor="pickup-autocomplete">Pickup Location</Label>
@@ -541,7 +644,7 @@ export default function Booking() {
                       value={pickupInputValue}
                       onChange={(e) => {
                         setPickupInputValue(e.target.value);
-                        if (e.target.value === '') {
+                        if (e.target.value === "") {
                           setPickup(undefined);
                         }
                       }}
@@ -550,13 +653,15 @@ export default function Booking() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="destination-autocomplete">Destination</Label>
+                    <Label htmlFor="destination-autocomplete">
+                      Destination
+                    </Label>
                     <Input
                       id="destination-autocomplete"
                       value={destinationInputValue}
                       onChange={(e) => {
                         setDestinationInputValue(e.target.value);
-                        if (e.target.value === '') {
+                        if (e.target.value === "") {
                           setDestination(undefined);
                         }
                       }}
@@ -568,7 +673,8 @@ export default function Booking() {
 
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                   <p className="text-sm text-blue-700">
-                    💡 <strong>Tip:</strong> You can either type in the search boxes above or click directly on the map to set locations.
+                    💡 <strong>Tip:</strong> You can either type in the search
+                    boxes above or click directly on the map to set locations.
                   </p>
                 </div>
               </CardContent>
@@ -601,7 +707,9 @@ export default function Booking() {
                   </div>
                   <div className="flex justify-between">
                     <span>Night Surcharge</span>
-                    <span className="font-medium">25% extra (10 PM - 5 AM)</span>
+                    <span className="font-medium">
+                      25% extra (10 PM - 5 AM)
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Emergency Booking</span>
@@ -617,7 +725,10 @@ export default function Booking() {
                 <CardTitle>Choose Your Vehicle</CardTitle>
               </CardHeader>
               <CardContent>
-                <CarTypeSelector selectedType={carType} onTypeChange={setCarType} />
+                <CarTypeSelector
+                  selectedType={carType}
+                  onTypeChange={setCarType}
+                />
               </CardContent>
             </Card>
 
@@ -627,26 +738,38 @@ export default function Booking() {
                 <CardTitle>Trip Purpose</CardTitle>
               </CardHeader>
               <CardContent>
-                <RadioGroup value={purpose} onValueChange={(value: 'general' | 'emergency') => setPurpose(value)}>
+                <RadioGroup
+                  value={purpose}
+                  onValueChange={(value: "general" | "emergency") =>
+                    setPurpose(value)
+                  }
+                >
                   <div className="flex items-center space-x-2 p-4 border rounded-lg">
                     <RadioGroupItem value="general" id="general" />
                     <Label htmlFor="general" className="flex-1 cursor-pointer">
                       <div>
                         <p className="font-medium">General Purpose</p>
-                        <p className="text-sm text-gray-600">Standard booking with regular pricing</p>
+                        <p className="text-sm text-gray-600">
+                          Standard booking with regular pricing
+                        </p>
                       </div>
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2 p-4 border rounded-lg">
                     <RadioGroupItem value="emergency" id="emergency" />
-                    <Label htmlFor="emergency" className="flex-1 cursor-pointer">
+                    <Label
+                      htmlFor="emergency"
+                      className="flex-1 cursor-pointer"
+                    >
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium flex items-center gap-2">
                             <AlertTriangle className="h-4 w-4 text-red-500" />
                             Emergency
                           </p>
-                          <p className="text-sm text-gray-600">Priority booking with 50% surcharge</p>
+                          <p className="text-sm text-gray-600">
+                            Priority booking with 50% surcharge
+                          </p>
                         </div>
                         <Badge variant="destructive">+50%</Badge>
                       </div>
@@ -688,10 +811,17 @@ export default function Booking() {
                         <span>+₹{Math.round(pricing.basePrice * 0.25)}</span>
                       </div>
                     )}
-                    {purpose === 'emergency' && (
+                    {purpose === "emergency" && (
                       <div className="flex justify-between text-red-600">
                         <span>Emergency Surcharge (50%):</span>
-                        <span>+₹{Math.round(pricing.basePrice * (pricing.nightMultiplier || 1) * 0.5)}</span>
+                        <span>
+                          +₹
+                          {Math.round(
+                            pricing.basePrice *
+                              (pricing.nightMultiplier || 1) *
+                              0.5,
+                          )}
+                        </span>
                       </div>
                     )}
                     <hr />

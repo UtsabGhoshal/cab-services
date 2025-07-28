@@ -13,7 +13,7 @@ export interface BookingRequest {
   pickup: BookingLocation;
   destination: BookingLocation;
   carType: string;
-  purpose: 'general' | 'emergency';
+  purpose: "general" | "emergency";
   userId: string;
 }
 

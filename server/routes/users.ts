@@ -1,6 +1,10 @@
 import express from "express";
 import { getUserDataHandler, getUserRidesHandler } from "./user";
-import { getAllUsers, createUser, getUserById } from "../database/databaseService";
+import {
+  getAllUsers,
+  createUser,
+  getUserById,
+} from "../database/databaseService";
 
 const router = express.Router();
 
@@ -26,7 +30,13 @@ router.post("/", async (req, res) => {
       res.status(400).json({ success: false, error: error.message });
     } else {
       console.error("Error creating user:", error);
-      res.status(500).json({ success: false, error: "Failed to create user", details: error.message });
+      res
+        .status(500)
+        .json({
+          success: false,
+          error: "Failed to create user",
+          details: error.message,
+        });
     }
   }
 });

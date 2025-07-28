@@ -12,18 +12,18 @@ export const getMapsConfigHandler: RequestHandler = (req, res) => {
   try {
     // In production, you might want to add additional security checks
     // like validating the user session or request origin
-    
+
     const response: MapsConfigResponse = {
       apiKey: GOOGLE_MAPS_API_KEY,
-      success: true
+      success: true,
     };
-    
+
     res.json(response);
   } catch (error) {
     console.error("Error getting maps config:", error);
-    res.status(500).json({ 
-      success: false, 
-      error: "Failed to get maps configuration" 
+    res.status(500).json({
+      success: false,
+      error: "Failed to get maps configuration",
     });
   }
 };

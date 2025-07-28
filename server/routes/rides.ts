@@ -26,10 +26,18 @@ router.post("/", async (req: Request, res: Response) => {
     const { userId, pickup, destination, carType, purpose, pricing } = req.body;
 
     // Validate required fields
-    if (!userId || !pickup || !destination || !carType || !purpose || !pricing) {
+    if (
+      !userId ||
+      !pickup ||
+      !destination ||
+      !carType ||
+      !purpose ||
+      !pricing
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields: userId, pickup, destination, carType, purpose, pricing",
+        message:
+          "Missing required fields: userId, pickup, destination, carType, purpose, pricing",
       });
     }
 
