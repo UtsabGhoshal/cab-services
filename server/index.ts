@@ -5,6 +5,7 @@ import { loginHandler, signupHandler } from "./routes/auth";
 import { getUserDataHandler, getUserRidesHandler } from "./routes/user";
 import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
+import { getMapsConfigHandler } from "./routes/maps";
 import { initializeDatabase } from "./firebase/firebaseDatabase";
 
 export async function createServer() {
@@ -49,6 +50,9 @@ export async function createServer() {
   // Authentication routes
   app.post("/api/auth/login", loginHandler);
   app.post("/api/auth/signup", signupHandler);
+
+  // Maps configuration route (secure API key delivery)
+  app.get("/api/maps/config", getMapsConfigHandler);
 
   // User data routes
   app.get("/api/user/:userId/data", getUserDataHandler);

@@ -69,6 +69,11 @@ export const getAllRides = async () => {
   return db.getAllRides();
 };
 
+export const createRide = async (rideData: any) => {
+  const db = await getDatabaseService();
+  return db.createRide(rideData);
+};
+
 export const addSampleRidesForUser = async (userId: string) => {
   const db = await getDatabaseService();
   if (db.addSampleRidesForUser) {

@@ -180,6 +180,40 @@ export const addSampleRidesForUser = async (userId: string) => {
   }
 };
 
+export const createRide = async (rideData: {
+  userId: string;
+  from: string;
+  to: string;
+  amount: number;
+  carType: string;
+  purpose: string;
+  distance: string;
+  estimatedTime: string;
+}): Promise<Ride | null> => {
+  try {
+    const newRide: Ride = {
+      id: `ride_${Date.now()}_${Math.random()}`,
+      userId: rideData.userId,
+      from: rideData.from,
+      to: rideData.to,
+      date: new Date(),
+      amount: rideData.amount,
+      status: "Completed",
+      driverName: "Driver #" + Math.floor(Math.random() * 1000),
+      rating: Math.floor(Math.random() * 2) + 4, // 4 or 5 stars
+      paymentMethod: "Digital Wallet",
+      duration: parseInt(rideData.estimatedTime) || 20,
+      distance: parseFloat(rideData.distance) || 5,
+    };
+
+    rides.push(newRide);
+    return newRide;
+  } catch (error) {
+    console.error("Error creating ride:", error);
+    return null;
+  }
+};
+
 // Initialize database with additional sample data
 export const initializeDatabase = () => {
   // Add more sample rides for demonstration
