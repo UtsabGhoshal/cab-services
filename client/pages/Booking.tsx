@@ -369,18 +369,8 @@ export default function Booking() {
     }
   }, [pickup?.lat, pickup?.lng, destination?.lat, destination?.lng, carType, purpose]);
 
-  // Clear input values only when locations are cleared (no dependency on input values)
-  useEffect(() => {
-    if (!pickup) {
-      setPickupInputValue('');
-    }
-  }, [pickup]);
-
-  useEffect(() => {
-    if (!destination) {
-      setDestinationInputValue('');
-    }
-  }, [destination]);
+  // Input values are managed directly by user input and location selection handlers
+  // No useEffect needed to prevent infinite loops
 
   const handleLocationSelect = (location: BookingLocation, isPickup: boolean) => {
     if (isPickup) {
