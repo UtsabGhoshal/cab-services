@@ -184,6 +184,7 @@ export default function Booking() {
   const [carType, setCarType] = useState<string>('economy');
   const [purpose, setPurpose] = useState<'general' | 'emergency'>('general');
   const [pricing, setPricing] = useState<PricingInfo | null>(null);
+  const [locationMode, setLocationMode] = useState<'pickup' | 'destination'>('pickup');
 
   const loadGoogleMaps = useCallback(async () => {
     try {
