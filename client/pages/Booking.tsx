@@ -181,6 +181,8 @@ export default function Booking() {
   const [locationMode, setLocationMode] = useState<'pickup' | 'destination'>('pickup');
   const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [destinationAutocomplete, setDestinationAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const [pickupInputValue, setPickupInputValue] = useState('');
+  const [destinationInputValue, setDestinationInputValue] = useState('');
 
   const initializeAutocomplete = useCallback(() => {
     if (!window.google) return;
