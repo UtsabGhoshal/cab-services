@@ -192,7 +192,10 @@ export default function SignUp() {
 
                       {/* Full Name */}
                       <div className="space-y-2">
-                        <label htmlFor="fullName" className="text-sm font-medium text-slate-700">
+                        <label
+                          htmlFor="fullName"
+                          className="text-sm font-medium text-slate-700"
+                        >
                           Full Name *
                         </label>
                         <div className="relative group/input">
@@ -219,7 +222,10 @@ export default function SignUp() {
 
                       {/* Email */}
                       <div className="space-y-2">
-                        <label htmlFor="email" className="text-sm font-medium text-slate-700">
+                        <label
+                          htmlFor="email"
+                          className="text-sm font-medium text-slate-700"
+                        >
                           Email Address *
                         </label>
                         <div className="relative group/input">
@@ -246,7 +252,10 @@ export default function SignUp() {
 
                       {/* Phone Number */}
                       <div className="space-y-2">
-                        <label htmlFor="phone" className="text-sm font-medium text-slate-700">
+                        <label
+                          htmlFor="phone"
+                          className="text-sm font-medium text-slate-700"
+                        >
                           Phone Number *
                         </label>
                         <div className="relative group/input">

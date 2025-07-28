@@ -400,7 +400,9 @@ export default function Login() {
                     <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/20">
                       <div className="text-center">
                         <div className="text-2xl font-bold">25K+</div>
-                        <div className="text-sm text-yellow-100">Happy Users</div>
+                        <div className="text-sm text-yellow-100">
+                          Happy Users
+                        </div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold">1.2M+</div>

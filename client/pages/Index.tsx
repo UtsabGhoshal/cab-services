@@ -239,7 +239,9 @@ export default function Index() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
                   <div className="absolute bottom-6 left-6 text-white">
-                    <h3 className="text-2xl font-bold mb-2">Reliable Service</h3>
+                    <h3 className="text-2xl font-bold mb-2">
+                      Reliable Service
+                    </h3>
                     <p className="text-sm opacity-90">
                       Professional drivers, comfortable rides
                     </p>
@@ -265,7 +267,9 @@ export default function Index() {
                     <div className="p-3 bg-white/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
                       <Clock className="w-8 h-8 group-hover:animate-spin" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">Quick Service</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Quick Service
+                    </h3>
                     <p className="text-yellow-100 text-sm">
                       Average pickup under 3 minutes
                     </p>
@@ -293,7 +297,9 @@ export default function Index() {
                     <div className="p-3 bg-white/20 rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform">
                       <Award className="w-8 h-8 group-hover:animate-bounce" />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">Quality Service</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Quality Service
+                    </h3>
                     <p className="text-yellow-100 text-sm">
                       Consistently high ratings
                     </p>
@@ -364,7 +370,8 @@ export default function Index() {
                     Well-maintained vehicles for your comfort and safety
                   </p>
                   <div className="text-sm text-yellow-600 font-medium">
-                    🚗 Regular maintenance • 🛡️ Fully insured • ⭐ Clean vehicles
+                    🚗 Regular maintenance • 🛡️ Fully insured • ⭐ Clean
+                    vehicles
                   </div>
                 </div>
               </div>
