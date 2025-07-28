@@ -450,18 +450,24 @@ export default function Booking() {
                     </div>
                     <div className="flex justify-between">
                       <span>Base Fare:</span>
-                      <span>${pricing.basePrice.toFixed(2)}</span>
+                      <span>₹{pricing.basePrice}</span>
                     </div>
+                    {pricing.nightSurcharge && (
+                      <div className="flex justify-between text-blue-600">
+                        <span>Night Surcharge (25%):</span>
+                        <span>+₹{Math.round(pricing.basePrice * 0.25)}</span>
+                      </div>
+                    )}
                     {purpose === 'emergency' && (
                       <div className="flex justify-between text-red-600">
                         <span>Emergency Surcharge (50%):</span>
-                        <span>+${(pricing.basePrice * 0.5).toFixed(2)}</span>
+                        <span>+₹{Math.round(pricing.basePrice * (pricing.nightMultiplier || 1) * 0.5)}</span>
                       </div>
                     )}
                     <hr />
                     <div className="flex justify-between font-bold text-lg">
                       <span>Total:</span>
-                      <span>${pricing.finalPrice.toFixed(2)}</span>
+                      <span>₹{pricing.finalPrice}</span>
                     </div>
                   </div>
                 </CardContent>
