@@ -355,11 +355,11 @@ export default function Dashboard() {
                     </div>
                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                       <div className="flex items-center space-x-3">
-                        <DollarSign className="w-5 h-5 text-green-600" />
+                        <IndianRupee className="w-5 h-5 text-green-600" />
                         <span className="text-slate-700">Total Spent</span>
                       </div>
                       <span className="font-bold text-green-600">
-                        ${userStats?.totalSpent?.toFixed(2) || "0.00"}
+                        ₹{userStats?.totalSpent?.toFixed(2) || "0.00"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
