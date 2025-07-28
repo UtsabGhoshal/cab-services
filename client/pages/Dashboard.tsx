@@ -20,7 +20,7 @@ import {
   Gift,
   TrendingUp,
   ArrowRight,
-  DollarSign,
+  IndianRupee,
   Shield,
   Loader,
 } from "lucide-react";
