@@ -367,17 +367,18 @@ export default function Booking() {
   }, [calculatePricing]);
 
   // Sync input values when locations are set via map clicks
+  // Only depend on the location objects, not the input values to prevent infinite loops
   useEffect(() => {
-    if (pickup && pickupInputValue !== pickup.address) {
+    if (pickup) {
       setPickupInputValue(pickup.address);
     }
-  }, [pickup, pickupInputValue]);
+  }, [pickup]);
 
   useEffect(() => {
-    if (destination && destinationInputValue !== destination.address) {
+    if (destination) {
       setDestinationInputValue(destination.address);
     }
-  }, [destination, destinationInputValue]);
+  }, [destination]);
 
   const handleLocationSelect = (location: BookingLocation, isPickup: boolean) => {
     if (isPickup) {
