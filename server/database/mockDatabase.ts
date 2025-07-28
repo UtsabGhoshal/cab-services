@@ -6,9 +6,9 @@ import { User, Ride, UserStats } from "@shared/database";
 let users: User[] = [
   {
     id: "user_1",
-    name: "John Smith",
-    email: "john@example.com",
-    phone: "+1234567890",
+    name: "Rajesh Kumar",
+    email: "rajesh@example.com",
+    phone: "+91 98765 43210",
     password: "password123", // In real app, this would be hashed
     joinDate: new Date("2024-01-15"),
     memberLevel: "Gold",
@@ -16,9 +16,9 @@ let users: User[] = [
   },
   {
     id: "user_2",
-    name: "Sarah Johnson",
-    email: "sarah@example.com",
-    phone: "+1987654321",
+    name: "Priya Sharma",
+    email: "priya@example.com",
+    phone: "+91 87654 32109",
     password: "password456",
     joinDate: new Date("2024-03-20"),
     memberLevel: "Silver",
