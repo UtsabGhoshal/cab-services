@@ -291,12 +291,35 @@ export default function Booking() {
   }, [loadGoogleMaps]);
 
   const calculatePricing = useCallback(() => {
-    if (!pickup || !destination) return;
+    if (!pickup || !destination || !window.google) return;
 
-    // Simple distance calculation (in a real app, you'd use the Go Maps Pro Distance Matrix API)
-    const distance = Math.sqrt(
-      Math.pow(pickup.lat - destination.lat, 2) + Math.pow(pickup.lng - destination.lng, 2)
-    ) * 111; // rough conversion to km
+    // Use Google Maps Distance Matrix API for accurate distance and duration
+    const service = new google.maps.DistanceMatrixService();
+    service.getDistanceMatrix({
+      origins: [{ lat: pickup.lat, lng: pickup.lng }],
+      destinations: [{ lat: destination.lat, lng: destination.lng }],
+      travelMode: google.maps.TravelMode.DRIVING,
+      unitSystem: google.maps.UnitSystem.METRIC,
+    }, (response, status) => {
+      if (status === google.maps.DistanceMatrixStatus.OK && response) {
+        const element = response.rows[0].elements[0];
+        if (element.status === 'OK') {
+          const distanceValue = element.distance.value / 1000; // Convert to km
+          const durationValue = element.duration.value / 60; // Convert to minutes
+          calculateFareWithDistance(distanceValue, Math.ceil(durationValue));
+          return;
+        }
+      }
+
+      // Fallback to simple calculation if API fails
+      const distance = Math.sqrt(
+        Math.pow(pickup.lat - destination.lat, 2) + Math.pow(pickup.lng - destination.lng, 2)
+      ) * 111; // rough conversion to km
+      calculateFareWithDistance(distance, Math.ceil(distance * 3));
+    });
+  }, [pickup, destination, carType, purpose]);
+
+  const calculateFareWithDistance = useCallback((distance: number, estimatedMinutes: number) => {
 
     // Indian fare structure
     const minimumFare = 30; // ₹30 for first 2 km
