@@ -82,15 +82,23 @@ export const signupHandler: RequestHandler<
       });
     }
 
-    // Create new user
-    const newUser = await createUser({
+    // Create new user - only include defined fields
+    const userCreateData: any = {
       name,
       email,
       phone,
       password, // In real app, hash the password
-      dateOfBirth,
-      address,
-    });
+    };
+
+    // Only add optional fields if they're provided
+    if (dateOfBirth !== undefined) {
+      userCreateData.dateOfBirth = dateOfBirth;
+    }
+    if (address !== undefined) {
+      userCreateData.address = address;
+    }
+
+    const newUser = await createUser(userCreateData);
 
     // Add some sample rides for new user (only for mock database)
     try {
