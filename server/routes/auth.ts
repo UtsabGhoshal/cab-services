@@ -9,8 +9,7 @@ import {
   validateUserCredentials,
   createUser,
   getUserByEmail,
-  addSampleRidesForUser,
-} from "../database/mongoDatabase";
+} from "../database/databaseService";
 
 export const loginHandler: RequestHandler<
   {},
