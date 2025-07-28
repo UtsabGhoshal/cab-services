@@ -125,7 +125,7 @@ const GoogleMapsComponent = ({ onLocationSelect, pickup, destination, locationMo
         }
       });
     }
-  }, [map, pickup, destination, directionsService, directionsRenderer, markers]);
+  }, [map, pickup, destination, directionsService, directionsRenderer]);
 
   return (
     <div 
