@@ -362,6 +362,25 @@ export default function Booking() {
     calculatePricing();
   }, [calculatePricing]);
 
+  // Update input field values when locations change
+  useEffect(() => {
+    const pickupInput = document.getElementById('pickup-autocomplete') as HTMLInputElement;
+    if (pickupInput && pickup) {
+      pickupInput.value = pickup.address;
+    } else if (pickupInput && !pickup) {
+      pickupInput.value = '';
+    }
+  }, [pickup]);
+
+  useEffect(() => {
+    const destinationInput = document.getElementById('destination-autocomplete') as HTMLInputElement;
+    if (destinationInput && destination) {
+      destinationInput.value = destination.address;
+    } else if (destinationInput && !destination) {
+      destinationInput.value = '';
+    }
+  }, [destination]);
+
   const handleLocationSelect = (location: BookingLocation, isPickup: boolean) => {
     if (isPickup) {
       setPickup(location);
