@@ -12,8 +12,8 @@ import {
   Zap,
   CheckCircle,
   User,
-  Phone,
   MapPin,
+  IndianRupee,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,21 +29,21 @@ export default function Login() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50 overflow-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400 to-red-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-green-400 to-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse animation-delay-4000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-orange-400 to-red-600 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse animation-delay-4000"></div>
 
         {/* Floating Car Icons */}
-        <div className="absolute top-20 left-20 text-blue-300 opacity-30 animate-float">
+        <div className="absolute top-20 left-20 text-yellow-300 opacity-30 animate-float">
           <Car className="w-8 h-8" />
         </div>
-        <div className="absolute top-40 right-32 text-purple-300 opacity-30 animate-float animation-delay-1000">
+        <div className="absolute top-40 right-32 text-orange-300 opacity-30 animate-float animation-delay-1000">
           <Car className="w-6 h-6" />
         </div>
-        <div className="absolute bottom-32 left-1/4 text-pink-300 opacity-30 animate-float animation-delay-3000">
+        <div className="absolute bottom-32 left-1/4 text-amber-300 opacity-30 animate-float animation-delay-3000">
           <Car className="w-10 h-10" />
         </div>
       </div>
@@ -56,18 +56,18 @@ export default function Login() {
             className="flex items-center space-x-3 group cursor-pointer"
           >
             <div className="relative">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                 <Car className="w-7 h-7 text-white transform group-hover:rotate-12 transition-transform duration-300" />
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-ping"></div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full"></div>
             </div>
             <div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                QuickRide
+              <span className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                URide
               </span>
               <div className="text-xs text-slate-500 font-medium">
-                Premium Cab Service
+                Your Trusted Ride Partner
               </div>
             </div>
           </Link>
@@ -82,7 +82,7 @@ export default function Login() {
             <Link to="/">
               <Button
                 variant="ghost"
-                className="flex items-center space-x-2 hover:bg-blue-50 transition-all duration-300"
+                className="flex items-center space-x-2 hover:bg-yellow-50 transition-all duration-300"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Home</span>
@@ -103,18 +103,18 @@ export default function Login() {
                   <h1 className="text-4xl lg:text-5xl font-bold text-slate-800 mb-4">
                     Welcome Back
                     <br />
-                    <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                      QuickRide
+                    <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                      URide
                     </span>
                   </h1>
                   <p className="text-xl text-slate-600">
-                    Sign in to book your premium rides
+                    Sign in to book your rides
                   </p>
                 </div>
 
                 {/* Login Form */}
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
                   <div className="relative bg-white/90 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/40">
                     {error && (
                       <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
@@ -146,8 +146,8 @@ export default function Login() {
                           Email Address
                         </label>
                         <div className="relative group/input">
-                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200 group-hover/input:border-blue-300 transition-all duration-300">
-                            <Mail className="w-5 h-5 text-blue-600" />
+                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-yellow-50 rounded-xl border border-slate-200 group-hover/input:border-yellow-300 transition-all duration-300">
+                            <Mail className="w-5 h-5 text-yellow-600" />
                             <input
                               type="email"
                               placeholder="Enter your email"
@@ -166,8 +166,8 @@ export default function Login() {
                           Password
                         </label>
                         <div className="relative group/input">
-                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-purple-50 rounded-xl border border-slate-200 group-hover/input:border-purple-300 transition-all duration-300">
-                            <Lock className="w-5 h-5 text-purple-600" />
+                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-orange-50 rounded-xl border border-slate-200 group-hover/input:border-orange-300 transition-all duration-300">
+                            <Lock className="w-5 h-5 text-orange-600" />
                             <input
                               type={showPassword ? "text" : "password"}
                               placeholder="Enter your password"
@@ -179,7 +179,7 @@ export default function Login() {
                             <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
-                              className="text-slate-500 hover:text-purple-600 transition-colors"
+                              className="text-slate-500 hover:text-orange-600 transition-colors"
                             >
                               {showPassword ? (
                                 <EyeOff className="w-5 h-5" />
@@ -196,7 +196,7 @@ export default function Login() {
                         <label className="flex items-center space-x-2 cursor-pointer">
                           <input
                             type="checkbox"
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500"
                           />
                           <span className="text-sm text-slate-600">
                             Remember me
@@ -204,7 +204,7 @@ export default function Login() {
                         </label>
                         <a
                           href="#"
-                          className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                          className="text-sm text-yellow-600 hover:text-yellow-700 transition-colors"
                         >
                           Forgot password?
                         </a>
@@ -214,7 +214,7 @@ export default function Login() {
                       <Button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-6 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-6 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                         {isLoading ? (
@@ -292,7 +292,7 @@ export default function Login() {
                         Don't have an account?{" "}
                         <Link
                           to="/signup"
-                          className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                          className="text-yellow-600 hover:text-yellow-700 font-semibold transition-colors"
                         >
                           Sign up here
                         </Link>
@@ -303,11 +303,11 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Right Column - Features & Testimonial */}
+            {/* Right Column - Features & Benefits */}
             <div className="animate-fade-in-right">
               <div className="relative">
                 {/* Main Feature Card */}
-                <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-8 shadow-2xl overflow-hidden">
+                <div className="bg-gradient-to-br from-yellow-500 via-orange-600 to-amber-600 rounded-3xl p-8 shadow-2xl overflow-hidden">
                   {/* Animated background pattern */}
                   <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-0 left-0 w-full h-full bg-white/10 transform rotate-12 scale-150 animate-pulse"></div>
@@ -317,11 +317,11 @@ export default function Login() {
                   <div className="relative text-white space-y-8">
                     <div>
                       <h2 className="text-3xl font-bold mb-4">
-                        Join the QuickRide Family
+                        Join the URide Family
                       </h2>
-                      <p className="text-xl text-blue-100">
-                        Experience premium transportation with trusted drivers
-                        and luxury vehicles.
+                      <p className="text-xl text-yellow-100">
+                        Experience reliable transportation with trusted drivers
+                        and comfortable vehicles.
                       </p>
                     </div>
 
@@ -334,7 +334,7 @@ export default function Login() {
                           </div>
                           <span className="font-semibold">Verified Safe</span>
                         </div>
-                        <p className="text-sm text-blue-100">
+                        <p className="text-sm text-yellow-100">
                           Background-checked drivers
                         </p>
                       </div>
@@ -344,10 +344,10 @@ export default function Login() {
                           <div className="p-2 bg-white/20 rounded-lg">
                             <Zap className="w-5 h-5" />
                           </div>
-                          <span className="font-semibold">Lightning Fast</span>
+                          <span className="font-semibold">Quick Service</span>
                         </div>
-                        <p className="text-sm text-blue-100">
-                          2-minute pickup time
+                        <p className="text-sm text-yellow-100">
+                          3-minute pickup time
                         </p>
                       </div>
 
@@ -358,8 +358,8 @@ export default function Login() {
                           </div>
                           <span className="font-semibold">Top Rated</span>
                         </div>
-                        <p className="text-sm text-blue-100">
-                          4.9/5 customer rating
+                        <p className="text-sm text-yellow-100">
+                          4.8/5 customer rating
                         </p>
                       </div>
 
@@ -370,7 +370,7 @@ export default function Login() {
                           </div>
                           <span className="font-semibold">Live Tracking</span>
                         </div>
-                        <p className="text-sm text-blue-100">
+                        <p className="text-sm text-yellow-100">
                           Real-time updates
                         </p>
                       </div>
@@ -384,11 +384,11 @@ export default function Login() {
                       </div>
                       <div className="flex items-center space-x-3">
                         <CheckCircle className="w-5 h-5 text-green-300" />
-                        <span>No hidden fees or charges</span>
+                        <span>Transparent pricing in rupees</span>
                       </div>
                       <div className="flex items-center space-x-3">
                         <CheckCircle className="w-5 h-5 text-green-300" />
-                        <span>Premium vehicles only</span>
+                        <span>Clean and comfortable vehicles</span>
                       </div>
                       <div className="flex items-center space-x-3">
                         <CheckCircle className="w-5 h-5 text-green-300" />
@@ -399,16 +399,16 @@ export default function Login() {
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/20">
                       <div className="text-center">
-                        <div className="text-2xl font-bold">50K+</div>
-                        <div className="text-sm text-blue-100">Happy Users</div>
+                        <div className="text-2xl font-bold">25K+</div>
+                        <div className="text-sm text-yellow-100">Happy Users</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold">2.3M+</div>
-                        <div className="text-sm text-blue-100">Rides</div>
+                        <div className="text-2xl font-bold">1.2M+</div>
+                        <div className="text-sm text-yellow-100">Rides</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-2xl font-bold">4.9★</div>
-                        <div className="text-sm text-blue-100">Rating</div>
+                        <div className="text-2xl font-bold">4.8★</div>
+                        <div className="text-sm text-yellow-100">Rating</div>
                       </div>
                     </div>
                   </div>
@@ -416,7 +416,7 @@ export default function Login() {
 
                 {/* Decorative elements */}
                 <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse"></div>
-                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-green-400 to-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse animation-delay-1000"></div>
+                <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse animation-delay-1000"></div>
               </div>
             </div>
           </div>
