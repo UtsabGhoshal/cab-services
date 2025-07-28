@@ -11,15 +11,19 @@ import { initializeDatabase } from "./database/mongoDatabase";
 export async function createServer() {
   const app = express();
 
-  // Connect to MongoDB
+  // Connect to MongoDB or fallback to mock database
+  let usingMockDatabase = false;
   try {
     await connectToDatabase();
     // Initialize database with sample data (if needed)
     await initializeDatabase();
   } catch (error) {
-    console.error("❌ Failed to initialize database:", error);
-    // Optionally, you can choose to exit or continue with limited functionality
-    // process.exit(1);
+    console.warn("⚠️ MongoDB not available, using mock database for development");
+    console.log("🔧 To use MongoDB, ensure it's running and accessible");
+    usingMockDatabase = true;
+    // Initialize mock database
+    const { initializeDatabase: initMockDb } = await import("./database/mockDatabase");
+    initMockDb();
   }
 
   // Middleware
