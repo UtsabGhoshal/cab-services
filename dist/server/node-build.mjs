@@ -278,6 +278,22 @@ router.get("/:userId", async (req, res) => {
     res.status(500).json({ success: false, error: "Failed to fetch user" });
   }
 });
+const GOOGLE_MAPS_API_KEY = "AlzaSyhJspyVs4WcwF7eW1ZS_0FselUQJMsK7jb";
+const getMapsConfigHandler = (req, res) => {
+  try {
+    const response = {
+      apiKey: GOOGLE_MAPS_API_KEY,
+      success: true
+    };
+    res.json(response);
+  } catch (error) {
+    console.error("Error getting maps config:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to get maps configuration"
+    });
+  }
+};
 const firebaseConfig = {
   apiKey: "AIzaSyAmRDzRrbvHH5LqkXv0-5Bxtsw3ynqfm4s",
   authDomain: "uride-cab-service.firebaseapp.com",
@@ -610,6 +626,7 @@ async function createServer() {
   app2.get("/api/demo", handleDemo);
   app2.post("/api/auth/login", loginHandler);
   app2.post("/api/auth/signup", signupHandler);
+  app2.get("/api/maps/config", getMapsConfigHandler);
   app2.get("/api/user/:userId/data", getUserDataHandler);
   app2.get("/api/user/:userId/rides", getUserRidesHandler);
   app2.use("/api/users", router);
