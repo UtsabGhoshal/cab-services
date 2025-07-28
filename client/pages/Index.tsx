@@ -163,7 +163,7 @@ export default function Index() {
                         </div>
                         <input
                           type="text"
-                          placeholder="Where to?"
+                          placeholder="IGI Airport, Terminal 3"
                           className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500 text-lg"
                         />
                       </div>
