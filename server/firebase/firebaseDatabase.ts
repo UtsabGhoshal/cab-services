@@ -254,9 +254,18 @@ export const getAllRides = async (): Promise<Ride[]> => {
 // Initialize database with sample data
 export const initializeDatabase = async (): Promise<void> => {
   try {
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Firebase initialization timeout')), 10000);
+    });
+
     // Check if users already exist
-    const existingUsers = await getAllUsers();
-    if (existingUsers.length > 0) {
+    const existingUsers = await Promise.race([
+      getAllUsers(),
+      timeoutPromise
+    ]);
+
+    if ((existingUsers as any[]).length > 0) {
       console.log("✅ Firebase database already contains data");
       return;
     }
