@@ -18,7 +18,7 @@ interface GoogleMapsProps {
   locationMode: 'pickup' | 'destination';
 }
 
-const GoogleMapsComponent = ({ onLocationSelect, pickup, destination }: GoogleMapsProps) => {
+const GoogleMapsComponent = ({ onLocationSelect, pickup, destination, locationMode }: GoogleMapsProps) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
   const [directionsService, setDirectionsService] = useState<google.maps.DirectionsService | null>(null);
