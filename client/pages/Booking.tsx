@@ -206,6 +206,7 @@ export default function Booking() {
             lng: place.geometry.location.lng(),
           };
           setPickup(location);
+          setPickupInputValue(location.address);
           setLocationMode('destination');
           toast({
             title: "Pickup Location Set",
