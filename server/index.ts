@@ -5,8 +5,7 @@ import { loginHandler, signupHandler } from "./routes/auth";
 import { getUserDataHandler, getUserRidesHandler } from "./routes/user";
 import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
-import { connectToDatabase } from "./database/connection.ts";
-import { initializeDatabase } from "./database/mongoDatabase";
+import { initializeDatabase } from "./firebase/firebaseDatabase";
 
 export async function createServer() {
   const app = express();
