@@ -199,10 +199,20 @@ export const addSampleRidesForUser = async (userId: string): Promise<void> => {
 export const getAllUsers = async (): Promise<any[]> => {
   try {
     const usersRef = collection(db, USERS_COLLECTION);
-    const querySnapshot = await getDocs(usersRef);
+
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Firebase request timeout')), 5000);
+    });
+
+    const querySnapshot = await Promise.race([
+      getDocs(usersRef),
+      timeoutPromise
+    ]);
+
     const users: any[] = [];
-    
-    querySnapshot.forEach((doc) => {
+
+    (querySnapshot as any).forEach((doc: any) => {
       const userData = doc.data();
       const { password, ...userWithoutPassword } = userData;
       users.push({
@@ -211,11 +221,11 @@ export const getAllUsers = async (): Promise<any[]> => {
         joinDate: userData.joinDate.toDate(),
       });
     });
-    
+
     return users;
   } catch (error) {
     console.error("Error getting all users:", error);
-    return [];
+    throw error; // Re-throw to trigger fallback
   }
 };
 
