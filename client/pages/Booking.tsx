@@ -381,6 +381,40 @@ export default function Booking() {
 
           {/* Right Column - Car Selection and Booking */}
           <div className="space-y-6">
+            {/* Fare Structure */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  Fare Structure
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Minimum Fare</span>
+                    <span className="font-medium">₹30 for first 2 km</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Rate After 2 km</span>
+                    <span className="font-medium">₹15 per additional km</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Waiting Charges</span>
+                    <span className="font-medium">₹3 per 2 minutes</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Night Surcharge</span>
+                    <span className="font-medium">25% extra (10 PM - 5 AM)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Emergency Booking</span>
+                    <span className="font-medium text-red-600">50% extra</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Car Type Selection */}
             <Card>
               <CardHeader>
