@@ -24,10 +24,10 @@ const getDatabaseService = async () => {
         "🔧 To use Firebase, ensure Firestore is enabled in your Firebase console"
       );
       databaseType = "mock";
-      return await import("./mockDatabase-CFUBcPxd.js");
+      return await import("./mockDatabase-CXnNXigH.js");
     }
   } else {
-    return await import("./mockDatabase-CFUBcPxd.js");
+    return await import("./mockDatabase-CXnNXigH.js");
   }
 };
 const getUserById$1 = async (id) => {
@@ -62,6 +62,10 @@ const getAllRides$1 = async () => {
   const db2 = await getDatabaseService();
   return db2.getAllRides();
 };
+const createRide$1 = async (rideData) => {
+  const db2 = await getDatabaseService();
+  return db2.createRide(rideData);
+};
 const addSampleRidesForUser$1 = async (userId) => {
   const db2 = await getDatabaseService();
   if (db2.addSampleRidesForUser) {
@@ -71,6 +75,7 @@ const addSampleRidesForUser$1 = async (userId) => {
 const databaseService = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   addSampleRidesForUser: addSampleRidesForUser$1,
+  createRide: createRide$1,
   createUser: createUser$1,
   getAllRides: getAllRides$1,
   getAllUsers: getAllUsers$1,
@@ -238,6 +243,46 @@ router$1.get("/", async (_req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching rides",
+      error: error.message
+    });
+  }
+});
+router$1.post("/", async (req, res) => {
+  try {
+    const { userId, pickup, destination, carType, purpose, pricing } = req.body;
+    if (!userId || !pickup || !destination || !carType || !purpose || !pricing) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields: userId, pickup, destination, carType, purpose, pricing"
+      });
+    }
+    const rideData = {
+      userId,
+      from: pickup.address,
+      to: destination.address,
+      amount: pricing.finalPrice,
+      carType,
+      purpose,
+      distance: pricing.distance,
+      estimatedTime: pricing.estimatedTime
+    };
+    const newRide = await createRide$1(rideData);
+    if (!newRide) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create ride"
+      });
+    }
+    res.status(201).json({
+      success: true,
+      message: "Ride created successfully",
+      data: newRide
+    });
+  } catch (error) {
+    console.error("Error creating ride:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating ride",
       error: error.message
     });
   }
@@ -503,6 +548,34 @@ const getAllRides = async () => {
     return [];
   }
 };
+const createRide = async (rideData) => {
+  try {
+    const newRide = {
+      userId: rideData.userId,
+      from: rideData.from,
+      to: rideData.to,
+      date: Timestamp.fromDate(/* @__PURE__ */ new Date()),
+      amount: rideData.amount,
+      status: "Completed",
+      driverName: "Driver #" + Math.floor(Math.random() * 1e3),
+      rating: Math.floor(Math.random() * 2) + 4,
+      // 4 or 5 stars
+      paymentMethod: "Digital Wallet",
+      duration: parseInt(rideData.estimatedTime) || 20,
+      distance: parseFloat(rideData.distance) || 5
+    };
+    const ridesRef = collection(db, RIDES_COLLECTION);
+    const docRef = await addDoc(ridesRef, newRide);
+    return {
+      id: docRef.id,
+      ...newRide,
+      date: newRide.date.toDate()
+    };
+  } catch (error) {
+    console.error("Error creating ride:", error);
+    return null;
+  }
+};
 const initializeDatabase = async () => {
   try {
     const timeoutPromise = new Promise((_, reject) => {
@@ -589,6 +662,7 @@ const initializeDatabase = async () => {
 const firebaseDatabase = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   addSampleRidesForUser,
+  createRide,
   createUser,
   getAllRides,
   getAllUsers,
@@ -610,7 +684,7 @@ async function createServer() {
       "⚠️ Firebase not available, using mock database for development"
     );
     console.log("🔧 Error:", error.message);
-    const { initializeDatabase: initMockDb } = await import("./mockDatabase-CFUBcPxd.js");
+    const { initializeDatabase: initMockDb } = await import("./mockDatabase-CXnNXigH.js");
     initMockDb();
   }
   app2.use(cors());
