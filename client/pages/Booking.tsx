@@ -222,15 +222,36 @@ export default function Booking() {
   const calculatePricing = useCallback(() => {
     if (!pickup || !destination) return;
 
-    // Simple distance calculation (in a real app, you'd use the Google Maps Distance Matrix API)
+    // Simple distance calculation (in a real app, you'd use the Go Maps Pro Distance Matrix API)
     const distance = Math.sqrt(
       Math.pow(pickup.lat - destination.lat, 2) + Math.pow(pickup.lng - destination.lng, 2)
     ) * 111; // rough conversion to km
 
-    const baseRate = carType === 'economy' ? 15 : carType === 'premium' ? 25 : carType === 'suv' ? 30 : 50;
-    const basePrice = Math.max(baseRate, distance * 2);
+    // Indian fare structure
+    const minimumFare = 30; // ₹30 for first 2 km
+    const rateAfter2km = 15; // ₹15 per additional km
+
+    // Base rates for different car types (multiplier)
+    const carMultiplier = carType === 'economy' ? 1 : carType === 'premium' ? 1.5 : carType === 'suv' ? 2 : 3.3;
+
+    // Calculate fare based on Indian slab system
+    let basePrice;
+    if (distance <= 2) {
+      basePrice = minimumFare * carMultiplier;
+    } else {
+      basePrice = (minimumFare + (distance - 2) * rateAfter2km) * carMultiplier;
+    }
+
+    // Check if it's night time (10 PM to 5 AM) - 25% surcharge
+    const currentHour = new Date().getHours();
+    const isNightTime = currentHour >= 22 || currentHour < 5;
+    const nightMultiplier = isNightTime ? 1.25 : 1;
+
+    // Emergency multiplier (50% extra)
     const emergencyMultiplier = purpose === 'emergency' ? 1.5 : 1;
-    const finalPrice = basePrice * emergencyMultiplier;
+
+    // Calculate final price with all surcharges
+    const finalPrice = basePrice * nightMultiplier * emergencyMultiplier;
 
     setPricing({
       basePrice,
