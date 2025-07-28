@@ -499,9 +499,10 @@ export default function Booking() {
                     <Label htmlFor="pickup-autocomplete">Pickup Location</Label>
                     <Input
                       id="pickup-autocomplete"
-                      value={pickup?.address || ''}
+                      value={pickupInputValue}
                       onChange={(e) => {
-                        if (e.target.value === '' && pickup) {
+                        setPickupInputValue(e.target.value);
+                        if (e.target.value === '') {
                           setPickup(undefined);
                         }
                       }}
@@ -513,9 +514,10 @@ export default function Booking() {
                     <Label htmlFor="destination-autocomplete">Destination</Label>
                     <Input
                       id="destination-autocomplete"
-                      value={destination?.address || ''}
+                      value={destinationInputValue}
                       onChange={(e) => {
-                        if (e.target.value === '' && destination) {
+                        setDestinationInputValue(e.target.value);
+                        if (e.target.value === '') {
                           setDestination(undefined);
                         }
                       }}
