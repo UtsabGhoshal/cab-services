@@ -272,6 +272,8 @@ export default function Booking() {
         document.head.appendChild(script);
       } else {
         setLoading(false);
+        // Initialize autocomplete if Google Maps is already loaded
+        setTimeout(initializeAutocomplete, 100);
       }
     } catch (error) {
       console.error('Error loading Go Maps Pro:', error);
