@@ -318,7 +318,7 @@ export default function Dashboard() {
                     <span className="text-sm">
                       Member since{" "}
                       {userStats?.joinDate
-                        ? new Date(userStats.joinDate).toLocaleDateString()
+                        ? new Date(userStats.joinDate).toLocaleDateString('en-IN')
                         : "Dec 2024"}
                     </span>
                   </div>
