@@ -369,19 +369,8 @@ export default function Booking() {
     }
   }, [pickup?.lat, pickup?.lng, destination?.lat, destination?.lng, carType, purpose]);
 
-  // Sync input values when locations are set via map clicks
-  // Only depend on the location objects, not the input values to prevent infinite loops
-  useEffect(() => {
-    if (pickup) {
-      setPickupInputValue(pickup.address);
-    }
-  }, [pickup]);
-
-  useEffect(() => {
-    if (destination) {
-      setDestinationInputValue(destination.address);
-    }
-  }, [destination]);
+  // Note: Input values are updated directly in autocomplete and map click handlers
+  // No need for useEffect sync to prevent infinite loops
 
   const handleLocationSelect = (location: BookingLocation, isPickup: boolean) => {
     if (isPickup) {
