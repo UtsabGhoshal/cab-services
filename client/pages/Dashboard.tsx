@@ -46,6 +46,7 @@ interface UserStats {
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [recentRides, setRecentRides] = useState<Ride[]>([]);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
