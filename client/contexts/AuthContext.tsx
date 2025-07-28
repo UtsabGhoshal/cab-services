@@ -96,21 +96,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify(userData),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (data.success && data.user) {
         setUser(data.user);
         localStorage.setItem("quickride_user", JSON.stringify(data.user));
-        setIsLoading(false);
         return true;
       } else {
-        setIsLoading(false);
+        console.error("Signup failed:", data.error || "Unknown error");
         return false;
       }
     } catch (error) {
       console.error("Signup error:", error);
-      setIsLoading(false);
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
