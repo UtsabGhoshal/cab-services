@@ -369,18 +369,18 @@ export default function Booking() {
     }
   }, [pickup?.lat, pickup?.lng, destination?.lat, destination?.lng, carType, purpose]);
 
-  // Sync input values only when locations are cleared to avoid infinite loops
+  // Clear input values only when locations are cleared (no dependency on input values)
   useEffect(() => {
-    if (!pickup && pickupInputValue !== '') {
+    if (!pickup) {
       setPickupInputValue('');
     }
-  }, [pickup, pickupInputValue]);
+  }, [pickup]);
 
   useEffect(() => {
-    if (!destination && destinationInputValue !== '') {
+    if (!destination) {
       setDestinationInputValue('');
     }
-  }, [destination, destinationInputValue]);
+  }, [destination]);
 
   const handleLocationSelect = (location: BookingLocation, isPickup: boolean) => {
     if (isPickup) {
