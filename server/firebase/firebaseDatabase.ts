@@ -180,14 +180,14 @@ export const addSampleRidesForUser = async (userId: string): Promise<void> => {
     const sampleRides = [
       {
         userId,
-        from: "Welcome Location",
-        to: "First Destination",
+        from: "Karol Bagh Metro Station",
+        to: "Rajouri Garden",
         date: Timestamp.fromDate(new Date(Date.now() - 2 * 60 * 60 * 1000)), // 2 hours ago
-        amount: 15.75,
+        amount: 120.0,
         status: "Completed",
-        driverName: "Welcome Driver",
+        driverName: "Ravi Sharma",
         rating: 5,
-        paymentMethod: "Card",
+        paymentMethod: "UPI",
         duration: 20,
         distance: 6.2,
       },
