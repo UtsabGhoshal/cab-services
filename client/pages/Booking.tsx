@@ -349,7 +349,27 @@ export default function Booking() {
                   <MapPin className="h-5 w-5" />
                   Select Locations
                 </CardTitle>
-                <p className="text-sm text-gray-600">Click on the map to set pickup and destination</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600">
+                    Currently setting: <span className="font-medium text-blue-600">{locationMode === 'pickup' ? 'Pickup' : 'Destination'}</span>
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={locationMode === 'pickup' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setLocationMode('pickup')}
+                    >
+                      Set Pickup
+                    </Button>
+                    <Button
+                      variant={locationMode === 'destination' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setLocationMode('destination')}
+                    >
+                      Set Destination
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <GoogleMapsComponent
