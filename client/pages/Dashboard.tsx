@@ -134,10 +134,10 @@ export default function Dashboard() {
             </div>
             <div>
               <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                QuickRide
+                URide
               </span>
               <div className="text-xs text-slate-500 font-medium">
-                Premium Cab Service
+                Your Trusted Ride Partner
               </div>
             </div>
           </Link>
