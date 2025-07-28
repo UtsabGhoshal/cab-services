@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 export default function Index() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50 overflow-hidden">
       {/* Enhanced Animated Background Elements */}
