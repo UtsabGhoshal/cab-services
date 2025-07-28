@@ -256,7 +256,11 @@ export default function Booking() {
         script.src = `https://maps.gomaps.pro/maps/api/js?key=${data.apiKey}&libraries=places`;
         script.async = true;
         script.defer = true;
-        script.onload = () => setLoading(false);
+        script.onload = () => {
+          setLoading(false);
+          // Initialize autocomplete after map loads
+          setTimeout(initializeAutocomplete, 100);
+        };
         script.onerror = () => {
           toast({
             title: "Error",
