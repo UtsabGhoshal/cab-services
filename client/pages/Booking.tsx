@@ -179,6 +179,8 @@ export default function Booking() {
   const [purpose, setPurpose] = useState<'general' | 'emergency'>('general');
   const [pricing, setPricing] = useState<PricingInfo | null>(null);
   const [locationMode, setLocationMode] = useState<'pickup' | 'destination'>('pickup');
+  const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const [destinationAutocomplete, setDestinationAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
   const loadGoogleMaps = useCallback(async () => {
     try {
