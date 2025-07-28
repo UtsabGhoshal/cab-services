@@ -362,9 +362,12 @@ export default function Booking() {
     });
   }, [carType, purpose]);
 
+  // Calculate pricing when locations, car type, or purpose changes
   useEffect(() => {
-    calculatePricing();
-  }, [calculatePricing]);
+    if (pickup && destination) {
+      calculatePricing();
+    }
+  }, [pickup, destination, carType, purpose, calculatePricing]);
 
   // Sync input values when locations are set via map clicks
   // Only depend on the location objects, not the input values to prevent infinite loops
