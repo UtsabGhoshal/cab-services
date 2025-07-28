@@ -86,12 +86,18 @@ export const signupHandler: RequestHandler<
       address,
     });
 
-    // Add some sample rides for new user
-    await addSampleRidesForUser(newUser.id);
+    // Add some sample rides for new user (only for mock database)
+    try {
+      const { addSampleRidesForUser } = await import("../database/databaseService");
+      if (addSampleRidesForUser) {
+        await addSampleRidesForUser(newUser.id);
+      }
+    } catch (error) {
+      // Ignore if function doesn't exist (MongoDB case)
+    }
 
     // Remove password from response
-    const userObj = newUser.toObject();
-    delete userObj.password;
+    const { password: _, ...userObj } = newUser;
 
     res.status(201).json({
       success: true,
