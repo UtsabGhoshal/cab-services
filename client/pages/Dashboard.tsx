@@ -93,11 +93,11 @@ export default function Dashboard() {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      return `Today, ${dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      return `Today, ${dateObj.toLocaleTimeString('en-IN', { hour: "2-digit", minute: "2-digit" })}`;
     } else if (diffDays === 1) {
-      return `Yesterday, ${dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      return `Yesterday, ${dateObj.toLocaleTimeString('en-IN', { hour: "2-digit", minute: "2-digit" })}`;
     } else {
-      return `${dateObj.toLocaleDateString()}, ${dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      return `${dateObj.toLocaleDateString('en-IN')}, ${dateObj.toLocaleTimeString('en-IN', { hour: "2-digit", minute: "2-digit" })}`;
     }
   };
 
