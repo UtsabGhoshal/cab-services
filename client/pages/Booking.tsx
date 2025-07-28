@@ -205,10 +205,10 @@ export default function Booking() {
         setLoading(false);
       }
     } catch (error) {
-      console.error('Error loading maps:', error);
+      console.error('Error loading Go Maps Pro:', error);
       toast({
         title: "Error",
-        description: "Failed to initialize maps",
+        description: "Failed to initialize Go Maps Pro",
         variant: "destructive"
       });
       setLoading(false);
