@@ -10,19 +10,15 @@ import { initializeDatabase } from "./firebase/firebaseDatabase";
 export async function createServer() {
   const app = express();
 
-  // Initialize database (Firebase with fallback to mock)
-  try {
-    console.log("🔥 Initializing database...");
-    await initializeDatabase();
-    console.log("✅ Database initialized successfully");
-  } catch (error) {
-    console.warn("⚠️ Firebase not available, using mock database for development");
-    console.log("🔧 To use Firebase, enable Firestore in your Firebase console:");
-    console.log("   https://console.firebase.google.com/project/uride-cab-service/firestore");
-    // Initialize mock database
-    const { initializeDatabase: initMockDb } = await import("./database/mockDatabase");
-    initMockDb();
-  }
+  // Initialize database (Mock database for now until Firebase Firestore is enabled)
+  console.log("🔧 Using mock database for development");
+  console.log("💡 To use Firebase, enable Firestore in your Firebase console:");
+  console.log("   https://console.firebase.google.com/project/uride-cab-service/firestore");
+  console.log("   Then restart the server to automatically switch to Firebase");
+
+  // Initialize mock database
+  const { initializeDatabase: initMockDb } = await import("./database/mockDatabase");
+  initMockDb();
 
   // Middleware
   app.use(cors());
