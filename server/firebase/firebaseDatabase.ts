@@ -69,15 +69,20 @@ export const createUser = async (
   userData: Omit<User, "id" | "joinDate" | "memberLevel" | "isActive">
 ): Promise<User> => {
   try {
+    // Filter out undefined values that Firebase doesn't accept
+    const cleanedUserData = Object.fromEntries(
+      Object.entries(userData).filter(([_, value]) => value !== undefined)
+    );
+
     const newUser = {
-      ...userData,
+      ...cleanedUserData,
       joinDate: Timestamp.now(),
       memberLevel: "Bronze",
       isActive: true,
     };
-    
+
     const docRef = await addDoc(collection(db, USERS_COLLECTION), newUser);
-    
+
     return {
       id: docRef.id,
       ...newUser,
