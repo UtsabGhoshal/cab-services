@@ -182,6 +182,65 @@ export default function Booking() {
   const [pickupAutocomplete, setPickupAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [destinationAutocomplete, setDestinationAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
+  const initializeAutocomplete = useCallback(() => {
+    if (!window.google) return;
+
+    // Initialize pickup autocomplete
+    const pickupInput = document.getElementById('pickup-autocomplete') as HTMLInputElement;
+    const destinationInput = document.getElementById('destination-autocomplete') as HTMLInputElement;
+
+    if (pickupInput && !pickupAutocomplete) {
+      const pickupAuto = new google.maps.places.Autocomplete(pickupInput, {
+        types: ['establishment', 'geocode'],
+        componentRestrictions: { country: 'IN' }, // Restrict to India
+      });
+
+      pickupAuto.addListener('place_changed', () => {
+        const place = pickupAuto.getPlace();
+        if (place.geometry && place.geometry.location) {
+          const location: BookingLocation = {
+            address: place.formatted_address || place.name || '',
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          };
+          setPickup(location);
+          setLocationMode('destination');
+          toast({
+            title: "Pickup Location Set",
+            description: location.address,
+          });
+        }
+      });
+
+      setPickupAutocomplete(pickupAuto);
+    }
+
+    if (destinationInput && !destinationAutocomplete) {
+      const destAuto = new google.maps.places.Autocomplete(destinationInput, {
+        types: ['establishment', 'geocode'],
+        componentRestrictions: { country: 'IN' }, // Restrict to India
+      });
+
+      destAuto.addListener('place_changed', () => {
+        const place = destAuto.getPlace();
+        if (place.geometry && place.geometry.location) {
+          const location: BookingLocation = {
+            address: place.formatted_address || place.name || '',
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          };
+          setDestination(location);
+          toast({
+            title: "Destination Set",
+            description: location.address,
+          });
+        }
+      });
+
+      setDestinationAutocomplete(destAuto);
+    }
+  }, [pickupAutocomplete, destinationAutocomplete, toast]);
+
   const loadGoogleMaps = useCallback(async () => {
     try {
       const response = await fetch('/api/maps/config');
