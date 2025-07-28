@@ -10,19 +10,13 @@ import { initializeDatabase } from "./firebase/firebaseDatabase";
 export async function createServer() {
   const app = express();
 
-  // Connect to MongoDB or fallback to mock database
-  let usingMockDatabase = false;
+  // Initialize Firebase database
   try {
-    await connectToDatabase();
-    // Initialize database with sample data (if needed)
+    console.log("🔥 Initializing Firebase database...");
     await initializeDatabase();
+    console.log("✅ Firebase database initialized successfully");
   } catch (error) {
-    console.warn("⚠️ MongoDB not available, using mock database for development");
-    console.log("🔧 To use MongoDB, ensure it's running and accessible");
-    usingMockDatabase = true;
-    // Initialize mock database
-    const { initializeDatabase: initMockDb } = await import("./database/mockDatabase");
-    initMockDb();
+    console.error("❌ Failed to initialize Firebase database:", error);
   }
 
   // Middleware
