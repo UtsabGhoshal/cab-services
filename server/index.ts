@@ -55,7 +55,7 @@ export async function createServer() {
   // Admin/Debug routes (for development)
   app.get("/api/admin/users", async (_req, res) => {
     try {
-      const { getAllUsers } = await import("./database/mongoDatabase");
+      const { getAllUsers } = await import("./database/databaseService");
       const users = await getAllUsers();
       res.json({ success: true, users });
     } catch (error) {
@@ -66,7 +66,7 @@ export async function createServer() {
 
   app.get("/api/admin/rides", async (_req, res) => {
     try {
-      const { getAllRides } = await import("./database/mongoDatabase");
+      const { getAllRides } = await import("./database/databaseService");
       const rides = await getAllRides();
       res.json({ success: true, rides });
     } catch (error) {
