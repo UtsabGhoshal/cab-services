@@ -15,13 +15,10 @@ import {
   Phone,
   MapPin,
   Calendar,
-  CreditCard,
   Gift,
-  Users,
   Award,
-  Heart,
-  Clock,
   Globe,
+  IndianRupee,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -43,41 +40,26 @@ export default function SignUp() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50 overflow-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400 to-red-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-green-400 to-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse animation-delay-4000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-orange-400 to-red-600 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse animation-delay-4000"></div>
 
         {/* Floating Car Icons */}
-        <div className="absolute top-20 left-20 text-blue-300 opacity-30 animate-float">
+        <div className="absolute top-20 left-20 text-yellow-300 opacity-30 animate-float">
           <Car className="w-8 h-8" />
         </div>
-        <div className="absolute top-40 right-32 text-purple-300 opacity-30 animate-float animation-delay-1000">
+        <div className="absolute top-40 right-32 text-orange-300 opacity-30 animate-float animation-delay-1000">
           <Car className="w-6 h-6" />
         </div>
-        <div className="absolute bottom-32 left-1/4 text-pink-300 opacity-30 animate-float animation-delay-3000">
+        <div className="absolute bottom-32 left-1/4 text-amber-300 opacity-30 animate-float animation-delay-3000">
           <Car className="w-10 h-10" />
         </div>
-        <div className="absolute top-1/3 right-1/4 text-green-300 opacity-30 animate-float animation-delay-2000">
+        <div className="absolute top-1/3 right-1/4 text-yellow-300 opacity-30 animate-float animation-delay-2000">
           <Gift className="w-7 h-7" />
         </div>
-      </div>
-
-      {/* Special Offer Banner */}
-      <div className="relative z-20 bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 px-4 text-center overflow-hidden">
-        <div className="relative z-10">
-          <div className="flex items-center justify-center space-x-4 text-sm font-medium animate-bounce">
-            <Gift className="w-4 h-4" />
-            <span>
-              🎉 NEW USER SPECIAL: Sign up now and get 3 FREE rides + 50% off
-              your next 5 bookings!
-            </span>
-            <Gift className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="absolute inset-0 bg-white/10 transform -skew-y-1 animate-pulse"></div>
       </div>
 
       {/* Header */}
@@ -88,18 +70,18 @@ export default function SignUp() {
             className="flex items-center space-x-3 group cursor-pointer"
           >
             <div className="relative">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                 <Car className="w-7 h-7 text-white transform group-hover:rotate-12 transition-transform duration-300" />
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-ping"></div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full"></div>
             </div>
             <div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                QuickRide
+              <span className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                URide
               </span>
               <div className="text-xs text-slate-500 font-medium">
-                Premium Cab Service
+                Your Trusted Ride Partner
               </div>
             </div>
           </Link>
@@ -108,7 +90,7 @@ export default function SignUp() {
             <Link to="/login">
               <Button
                 variant="ghost"
-                className="flex items-center space-x-2 hover:bg-blue-50 transition-all duration-300"
+                className="flex items-center space-x-2 hover:bg-yellow-50 transition-all duration-300"
               >
                 <User className="w-4 h-4" />
                 <span>Sign In</span>
@@ -117,7 +99,7 @@ export default function SignUp() {
             <Link to="/">
               <Button
                 variant="ghost"
-                className="flex items-center space-x-2 hover:bg-blue-50 transition-all duration-300"
+                className="flex items-center space-x-2 hover:bg-yellow-50 transition-all duration-300"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Home</span>
@@ -137,21 +119,20 @@ export default function SignUp() {
                 <div className="text-center mb-8">
                   <h1 className="text-4xl lg:text-5xl font-bold text-slate-800 mb-4">
                     Join{" "}
-                    <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                      QuickRide
+                    <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                      URide
                     </span>
                     <br />
                     <span className="text-3xl">Today!</span>
                   </h1>
                   <p className="text-xl text-slate-600">
-                    Create your account and start enjoying premium rides with
-                    exclusive member benefits
+                    Create your account and start enjoying reliable rides
                   </p>
                 </div>
 
                 {/* Sign Up Form */}
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-yellow-600 to-orange-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
                   <div className="relative bg-white/90 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/40">
                     {error && (
                       <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
@@ -215,8 +196,8 @@ export default function SignUp() {
                           Full Name *
                         </label>
                         <div className="relative group/input">
-                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200 group-hover/input:border-blue-300 transition-all duration-300">
-                            <User className="w-5 h-5 text-blue-600" />
+                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-yellow-50 rounded-xl border border-slate-200 group-hover/input:border-yellow-300 transition-all duration-300">
+                            <User className="w-5 h-5 text-yellow-600" />
                             <input
                               id="fullName"
                               name="fullName"
@@ -242,8 +223,8 @@ export default function SignUp() {
                           Email Address *
                         </label>
                         <div className="relative group/input">
-                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200 group-hover/input:border-blue-300 transition-all duration-300">
-                            <Mail className="w-5 h-5 text-blue-600" />
+                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-orange-50 rounded-xl border border-slate-200 group-hover/input:border-orange-300 transition-all duration-300">
+                            <Mail className="w-5 h-5 text-orange-600" />
                             <input
                               id="email"
                               name="email"
@@ -269,8 +250,8 @@ export default function SignUp() {
                           Phone Number *
                         </label>
                         <div className="relative group/input">
-                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-green-50 rounded-xl border border-slate-200 group-hover/input:border-green-300 transition-all duration-300">
-                            <Phone className="w-5 h-5 text-green-600" />
+                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-amber-50 rounded-xl border border-slate-200 group-hover/input:border-amber-300 transition-all duration-300">
+                            <Phone className="w-5 h-5 text-amber-600" />
                             <input
                               id="phone"
                               name="phone"
@@ -285,43 +266,6 @@ export default function SignUp() {
                               }
                               className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500"
                               required
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Date of Birth */}
-                      <div className="space-y-2">
-                        <label htmlFor="dateOfBirth" className="text-sm font-medium text-slate-700">
-                          Date of Birth *
-                        </label>
-                        <div className="relative group/input">
-                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-purple-50 rounded-xl border border-slate-200 group-hover/input:border-purple-300 transition-all duration-300">
-                            <Calendar className="w-5 h-5 text-purple-600" />
-                            <input
-                              id="dateOfBirth"
-                              name="dateOfBirth"
-                              type="date"
-                              className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Home Address */}
-                      <div className="space-y-2">
-                        <label htmlFor="address" className="text-sm font-medium text-slate-700">
-                          Home Address (Optional)
-                        </label>
-                        <div className="relative group/input">
-                          <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-pink-50 rounded-xl border border-slate-200 group-hover/input:border-pink-300 transition-all duration-300">
-                            <MapPin className="w-5 h-5 text-pink-600" />
-                            <input
-                              id="address"
-                              name="address"
-                              type="text"
-                              placeholder="Enter your home address"
-                              className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500"
                             />
                           </div>
                         </div>
@@ -406,20 +350,20 @@ export default function SignUp() {
                         <div className="flex items-start space-x-3">
                           <input
                             type="checkbox"
-                            className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-1"
+                            className="w-5 h-5 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500 mt-1"
                           />
                           <span className="text-sm text-slate-600">
                             I agree to the{" "}
                             <a
                               href="#"
-                              className="text-blue-600 hover:underline font-medium"
+                              className="text-yellow-600 hover:underline font-medium"
                             >
                               Terms of Service
                             </a>{" "}
                             and{" "}
                             <a
                               href="#"
-                              className="text-blue-600 hover:underline font-medium"
+                              className="text-yellow-600 hover:underline font-medium"
                             >
                               Privacy Policy
                             </a>
@@ -432,8 +376,8 @@ export default function SignUp() {
                             className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 mt-1"
                           />
                           <span className="text-sm text-slate-600">
-                            I want to receive promotional offers, ride updates,
-                            and exclusive deals via email and SMS
+                            I want to receive ride updates and offers via email
+                            and SMS
                           </span>
                         </div>
                       </div>
@@ -442,7 +386,7 @@ export default function SignUp() {
                       <Button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white py-6 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-6 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                         {isLoading ? (
@@ -453,7 +397,7 @@ export default function SignUp() {
                         ) : (
                           <>
                             <CheckCircle className="w-5 h-5 mr-3 group-hover:animate-bounce" />
-                            Create My Account & Get FREE Rides!
+                            Create My Account
                             <Gift className="w-5 h-5 ml-3" />
                           </>
                         )}
@@ -520,7 +464,7 @@ export default function SignUp() {
                         Already have an account?{" "}
                         <Link
                           to="/login"
-                          className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                          className="text-yellow-600 hover:text-yellow-700 font-semibold transition-colors"
                         >
                           Sign in here
                         </Link>
@@ -531,70 +475,18 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/* Right Column - Benefits & Offers */}
+            {/* Right Column - Benefits & Features */}
             <div className="animate-fade-in-right">
               <div className="space-y-8">
-                {/* Welcome Benefits Card */}
-                <div className="bg-gradient-to-br from-green-600 via-teal-600 to-cyan-600 rounded-3xl p-8 shadow-2xl overflow-hidden relative">
-                  <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-0 left-0 w-full h-full bg-white/10 transform rotate-12 scale-150 animate-pulse"></div>
-                  </div>
-
-                  <div className="relative text-white space-y-6">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <Gift className="w-8 h-8" />
-                      <h2 className="text-2xl font-bold">Welcome Rewards</h2>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-3 p-3 bg-white/15 rounded-xl">
-                        <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-                          <Gift className="w-4 h-4 text-yellow-800" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">3 FREE Rides</p>
-                          <p className="text-sm opacity-90">
-                            For new members only
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 bg-white/15 rounded-xl">
-                        <div className="w-8 h-8 bg-orange-400 rounded-full flex items-center justify-center">
-                          <Star className="w-4 h-4 text-orange-800" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">50% OFF Next 5 Rides</p>
-                          <p className="text-sm opacity-90">
-                            Valid for 30 days
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3 p-3 bg-white/15 rounded-xl">
-                        <div className="w-8 h-8 bg-purple-400 rounded-full flex items-center justify-center">
-                          <Award className="w-4 h-4 text-purple-800" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">Premium Member Status</p>
-                          <p className="text-sm opacity-90">
-                            Instant access to luxury cars
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Service Features */}
-                <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-8 shadow-2xl overflow-hidden relative">
+                <div className="bg-gradient-to-br from-yellow-500 via-orange-600 to-amber-600 rounded-3xl p-8 shadow-2xl overflow-hidden relative">
                   <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-0 left-0 w-full h-full bg-white/5 transform -rotate-12 scale-150 animate-pulse animation-delay-2000"></div>
                   </div>
 
                   <div className="relative text-white space-y-6">
                     <h2 className="text-2xl font-bold mb-6">
-                      Why Choose QuickRide?
+                      Why Choose URide?
                     </h2>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -608,9 +500,9 @@ export default function SignUp() {
 
                       <div className="space-y-2">
                         <Zap className="w-6 h-6 mb-2" />
-                        <h4 className="font-semibold">Lightning Fast</h4>
+                        <h4 className="font-semibold">Quick Service</h4>
                         <p className="text-sm opacity-90">
-                          2-minute average pickup
+                          3-minute average pickup
                         </p>
                       </div>
 
@@ -623,10 +515,10 @@ export default function SignUp() {
                       </div>
 
                       <div className="space-y-2">
-                        <CreditCard className="w-6 h-6 mb-2" />
-                        <h4 className="font-semibold">Cashless Rides</h4>
+                        <IndianRupee className="w-6 h-6 mb-2" />
+                        <h4 className="font-semibold">Fair Pricing</h4>
                         <p className="text-sm opacity-90">
-                          Multiple payment options
+                          Transparent rates in rupees
                         </p>
                       </div>
                     </div>
@@ -634,15 +526,15 @@ export default function SignUp() {
                     <div className="pt-4 border-t border-white/20">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <div className="text-2xl font-bold">50K+</div>
+                          <div className="text-2xl font-bold">25K+</div>
                           <div className="text-sm opacity-90">Happy Users</div>
                         </div>
                         <div>
-                          <div className="text-2xl font-bold">2.3M+</div>
+                          <div className="text-2xl font-bold">1.2M+</div>
                           <div className="text-sm opacity-90">Rides</div>
                         </div>
                         <div>
-                          <div className="text-2xl font-bold">4.9★</div>
+                          <div className="text-2xl font-bold">4.8★</div>
                           <div className="text-sm opacity-90">Rating</div>
                         </div>
                       </div>
@@ -660,7 +552,7 @@ export default function SignUp() {
                     />
                     <div>
                       <h4 className="font-semibold text-slate-800">
-                        Sarah Johnson
+                        Priya Sharma
                       </h4>
                       <div className="flex text-yellow-400">
                         {[1, 2, 3, 4, 5].map((star) => (
@@ -670,16 +562,16 @@ export default function SignUp() {
                     </div>
                   </div>
                   <p className="text-slate-600 italic">
-                    "Signing up with QuickRide was the best decision! The
-                    welcome bonuses were amazing and I use the service daily
-                    now. Highly recommended!"
+                    "URide has made my daily commute so much easier! The drivers
+                    are professional, cars are clean, and the pricing is very
+                    reasonable. Highly recommended!"
                   </p>
                 </div>
               </div>
 
               {/* Decorative elements */}
               <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse"></div>
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-green-400 to-teal-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse animation-delay-1000"></div>
+              <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full mix-blend-multiply filter blur-xl opacity-60 animate-pulse animation-delay-1000"></div>
             </div>
           </div>
         </div>
