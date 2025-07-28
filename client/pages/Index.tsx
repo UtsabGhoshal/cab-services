@@ -150,7 +150,7 @@ export default function Index() {
                         </div>
                         <input
                           type="text"
-                          placeholder="Pickup location"
+                          placeholder="Connaught Place, New Delhi"
                           className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500 text-lg"
                         />
                       </div>
