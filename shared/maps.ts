@@ -23,4 +23,6 @@ export interface PricingInfo {
   finalPrice: number;
   estimatedTime: string;
   distance: string;
+  nightSurcharge?: boolean;
+  nightMultiplier?: number;
 }
