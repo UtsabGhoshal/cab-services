@@ -705,12 +705,19 @@ export default function Booking() {
             )}
 
             {/* Book Now Button */}
-            <Button 
+            <Button
               className="w-full h-12 text-lg"
               onClick={handleBooking}
-              disabled={!pickup || !destination}
+              disabled={!pickup || !destination || bookingLoading}
             >
-              Confirm Booking
+              {bookingLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Booking...
+                </>
+              ) : (
+                "Confirm Booking"
+              )}
             </Button>
           </div>
         </div>
