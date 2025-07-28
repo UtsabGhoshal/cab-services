@@ -266,7 +266,7 @@ export default function Dashboard() {
                         </div>
                         <div className="text-right">
                           <div className="font-semibold text-slate-800">
-                            ${ride.amount.toFixed(2)}
+                            ₹{ride.amount.toFixed(2)}
                           </div>
                           <div className="text-sm text-green-600">
                             {ride.status}
