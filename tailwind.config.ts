@@ -20,12 +20,12 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         brand: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
-          900: "#1e3a8a",
+          50: "#fefce8",
+          100: "#fef3c7",
+          500: "#f59e0b",
+          600: "#d97706",
+          700: "#b45309",
+          900: "#78350f",
         },
         gradient: {
           primary: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
