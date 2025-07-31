@@ -67,7 +67,12 @@ export const useDriverService = ({
     if (driverId) {
       driverService.current = createDriverService(driverId);
       setIsConnected(true);
-      
+
+      // Initialize Firebase collections
+      initializeFirebaseCollections(driverId).catch(err => {
+        console.warn('Firebase initialization failed:', err);
+      });
+
       if (autoStart) {
         startListening();
       }
