@@ -475,11 +475,13 @@ export default function Index() {
                 experience the URide difference!
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-12 py-6 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
-                  <Car className="w-6 h-6 mr-3 group-hover:animate-bounce" />
-                  Book Your Ride
-                  <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <Link to="/booking">
+                  <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-12 py-6 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+                    <Car className="w-6 h-6 mr-3 group-hover:animate-bounce" />
+                    Book Your Ride
+                    <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
               </div>
               <div className="text-sm text-yellow-200">
                 ⭐ Rated 4.8/5 by 25,000+ riders • 🚗 Available 24/7
