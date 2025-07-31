@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { firebaseDriverService } from "@/services/firebaseDriverService";
+import { fallbackAuthService } from "@/services/fallbackAuthService";
 import {
   Car,
   Mail,
