@@ -316,22 +316,86 @@ export default function DriverDashboard() {
         : [];
   const isOnline = driverService.isOnline;
 
+  // Get driver's current location
+  const getCurrentLocation = (): Promise<{lat: number, lng: number}> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported by this browser"));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000 // Cache for 1 minute
+        }
+      );
+    });
+  };
+
   // Handle online/offline toggle
   const handleOnlineToggle = async (checked: boolean) => {
     try {
-      await driverService.toggleOnlineStatus();
+      if (checked) {
+        // Going online - need location
+        const location = await getCurrentLocation();
+        setCurrentLocation(location);
+
+        await driverMatchingService.updateDriverLocation(
+          user?.id || "driver_123",
+          location.lat,
+          location.lng,
+          true,
+          true
+        );
+
+        setIsOnlineState(true);
+        setLocationError(null);
+
+        toast({
+          title: "You're now online! 🟢",
+          description: "You'll start receiving ride requests",
+        });
+      } else {
+        // Going offline
+        await driverMatchingService.setDriverOffline(user?.id || "driver_123");
+        setIsOnlineState(false);
+
+        toast({
+          title: "You're now offline 🔴",
+          description: "You won't receive new ride requests",
+        });
+      }
+    } catch (error: any) {
+      console.error("Location error:", error);
+
+      if (error.code === 1) {
+        setLocationError("Location access denied. Please enable location services to go online.");
+      } else if (error.code === 2) {
+        setLocationError("Location unavailable. Please check your GPS settings.");
+      } else if (error.code === 3) {
+        setLocationError("Location request timeout. Please try again.");
+      } else {
+        setLocationError("Failed to get location. Please try again.");
+      }
+
       toast({
-        title: checked ? "You're now online!" : "You're now offline",
-        description: checked
-          ? "You'll start receiving ride requests"
-          : "You won't receive new ride requests",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update online status. Please try again.",
+        title: "Location Error",
+        description: error.message || "Failed to update online status. Location access required.",
         variant: "destructive",
       });
+
+      setIsOnlineState(false);
     }
   };
 
