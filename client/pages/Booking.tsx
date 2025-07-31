@@ -20,10 +20,13 @@ import {
   Clock,
   DollarSign,
   AlertTriangle,
+  AlertCircle,
+  Map,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { MapsConfigResponse, BookingLocation, PricingInfo } from "@shared/maps";
+import { SimpleFallbackMap } from "@/components/SimpleFallbackMap";
 
 interface GoogleMapsProps {
   onLocationSelect: (location: BookingLocation, isPickup: boolean) => void;
@@ -195,7 +198,7 @@ const CarTypeSelector = ({
     {
       id: "suv",
       name: "SUV",
-      price: "₹60 base",
+      price: "���60 base",
       capacity: "6 passengers",
       description: "Spacious for groups or luggage",
     },
@@ -247,6 +250,8 @@ export default function Booking() {
   const [locationMode, setLocationMode] = useState<"pickup" | "destination">(
     "pickup",
   );
+  const [useFallbackMap, setUseFallbackMap] = useState(false);
+  const [mapsError, setMapsError] = useState<string | null>(null);
   const [pickupAutocomplete, setPickupAutocomplete] =
     useState<google.maps.places.Autocomplete | null>(null);
   const [destinationAutocomplete, setDestinationAutocomplete] =
@@ -328,78 +333,192 @@ export default function Booking() {
         throw new Error("Failed to get maps configuration");
       }
 
-      // Load Go Maps Pro script
+      // Load GoMaps Pro script
       if (!window.google) {
         const script = document.createElement("script");
         script.src = `https://maps.gomaps.pro/maps/api/js?key=${data.apiKey}&libraries=places`;
         script.async = true;
         script.defer = true;
         script.onload = () => {
-          setLoading(false);
-          // Initialize autocomplete after map loads
-          setTimeout(initializeAutocomplete, 100);
+          // Check for Google Maps API errors after loading
+          if (window.google && window.google.maps) {
+            // Listen for Google Maps API errors
+            window.google.maps.event.addDomListener(
+              window,
+              "gm_authFailure",
+              () => {
+                console.error("Google Maps API authentication failed");
+                setMapsError(
+                  "Google Maps API authentication failed. Using fallback map.",
+                );
+                setUseFallbackMap(true);
+                setLoading(false);
+              },
+            );
+
+            // Check for billing issues by attempting to create a simple map
+            try {
+              const testDiv = document.createElement("div");
+              testDiv.style.width = "1px";
+              testDiv.style.height = "1px";
+              testDiv.style.visibility = "hidden";
+              document.body.appendChild(testDiv);
+
+              const testMap = new window.google.maps.Map(testDiv, {
+                center: { lat: 0, lng: 0 },
+                zoom: 1,
+              });
+
+              // Clean up test div
+              document.body.removeChild(testDiv);
+
+              // If we get here without error, GoMaps Pro is working
+              console.log("✅ GoMaps Pro is working correctly");
+              setLoading(false);
+              setTimeout(initializeAutocomplete, 100);
+            } catch (error: any) {
+              console.error("❌ GoMaps Pro initialization error:", error);
+
+              // Check for specific error types
+              if (error.message) {
+                if (error.message.includes("BillingNotEnabledMapError")) {
+                  setMapsError(
+                    "Google Maps billing not enabled. Please enable billing in Google Cloud Console or use the free alternative below.",
+                  );
+                  console.warn(
+                    "🔔 Solution: Enable billing at https://console.cloud.google.com/",
+                  );
+                } else if (error.message.includes("ApiNotActivatedMapError")) {
+                  setMapsError(
+                    "Google Maps API not activated. Please enable the Maps JavaScript API in Google Cloud Console.",
+                  );
+                } else if (error.message.includes("InvalidKeyMapError")) {
+                  setMapsError(
+                    "Invalid Google Maps API key. Please check your API key configuration.",
+                  );
+                } else if (
+                  error.message.includes("RefererNotAllowedMapError")
+                ) {
+                  setMapsError(
+                    "Google Maps API key not authorized for this domain. Please update API key restrictions.",
+                  );
+                } else {
+                  setMapsError(
+                    `Google Maps error: ${error.message}. Using alternative map service.`,
+                  );
+                }
+              } else {
+                setMapsError(
+                  "Google Maps not available. Using alternative map service.",
+                );
+              }
+
+              setUseFallbackMap(true);
+              setLoading(false);
+            }
+          } else {
+            throw new Error("Google Maps API failed to load properly");
+          }
         };
         script.onerror = () => {
-          toast({
-            title: "Error",
-            description: "Failed to load Go Maps Pro",
-            variant: "destructive",
-          });
+          console.error("Failed to load GoMaps Pro script");
+          setMapsError("GoMaps Pro unavailable. Using fallback map.");
+          setUseFallbackMap(true);
           setLoading(false);
         };
         document.head.appendChild(script);
+
+        // Add a timeout fallback
+        setTimeout(() => {
+          if (loading && !window.google) {
+            console.warn("GoMaps Pro loading timeout");
+            setMapsError("GoMaps Pro loading timeout. Using fallback map.");
+            setUseFallbackMap(true);
+            setLoading(false);
+          }
+        }, 10000);
       } else {
         setLoading(false);
         // Initialize autocomplete if Google Maps is already loaded
         setTimeout(initializeAutocomplete, 100);
       }
     } catch (error) {
-      console.error("Error loading Go Maps Pro:", error);
-      toast({
-        title: "Error",
-        description: "Failed to initialize Go Maps Pro",
-        variant: "destructive",
-      });
+      console.error("Error loading GoMaps Pro:", error);
+      setMapsError("Failed to initialize maps. Using fallback map.");
+      setUseFallbackMap(true);
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, loading]);
 
   useEffect(() => {
     loadGoogleMaps();
   }, []); // Empty dependency array - only run on mount
 
   const calculatePricing = () => {
-    if (!pickup || !destination || !window.google) return;
+    if (!pickup || !destination) return;
 
-    // Use Google Maps Distance Matrix API for accurate distance and duration
-    const service = new google.maps.DistanceMatrixService();
-    service.getDistanceMatrix(
-      {
-        origins: [{ lat: pickup.lat, lng: pickup.lng }],
-        destinations: [{ lat: destination.lat, lng: destination.lng }],
-        travelMode: google.maps.TravelMode.DRIVING,
-        unitSystem: google.maps.UnitSystem.METRIC,
-      },
-      (response, status) => {
-        if (status === google.maps.DistanceMatrixStatus.OK && response) {
-          const element = response.rows[0].elements[0];
-          if (element.status === "OK") {
-            const distanceValue = element.distance.value / 1000; // Convert to km
-            const durationValue = element.duration.value / 60; // Convert to minutes
-            calculateFareWithDistance(distanceValue, Math.ceil(durationValue));
-            return;
-          }
-        }
+    // If Google Maps is available and working, use it for accurate calculations
+    if (window.google && !useFallbackMap) {
+      try {
+        const service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix(
+          {
+            origins: [{ lat: pickup.lat, lng: pickup.lng }],
+            destinations: [{ lat: destination.lat, lng: destination.lng }],
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC,
+          },
+          (response, status) => {
+            if (status === google.maps.DistanceMatrixStatus.OK && response) {
+              const element = response.rows[0].elements[0];
+              if (element.status === "OK") {
+                const distanceValue = element.distance.value / 1000; // Convert to km
+                const durationValue = element.duration.value / 60; // Convert to minutes
+                calculateFareWithDistance(
+                  distanceValue,
+                  Math.ceil(durationValue),
+                );
+                return;
+              }
+            }
+            // If Google Maps fails, fallback to simple calculation
+            fallbackDistanceCalculation();
+          },
+        );
+      } catch (error) {
+        console.error("Google Maps Distance Matrix error:", error);
+        fallbackDistanceCalculation();
+      }
+    } else {
+      // Use fallback distance calculation
+      fallbackDistanceCalculation();
+    }
+  };
 
-        // Fallback to simple calculation if API fails
-        const distance =
-          Math.sqrt(
-            Math.pow(pickup.lat - destination.lat, 2) +
-              Math.pow(pickup.lng - destination.lng, 2),
-          ) * 111; // rough conversion to km
-        calculateFareWithDistance(distance, Math.ceil(distance * 3));
-      },
-    );
+  const fallbackDistanceCalculation = () => {
+    if (!pickup || !destination) return;
+
+    // Haversine formula for distance calculation
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = toRadians(destination.lat - pickup.lat);
+    const dLng = toRadians(destination.lng - pickup.lng);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRadians(pickup.lat)) *
+        Math.cos(toRadians(destination.lat)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    // Estimate time based on average city speed (25 km/h)
+    const estimatedMinutes = Math.ceil((distance / 25) * 60);
+
+    calculateFareWithDistance(distance, estimatedMinutes);
+  };
+
+  const toRadians = (degrees: number) => {
+    return degrees * (Math.PI / 180);
   };
 
   const calculateFareWithDistance = (
@@ -569,7 +688,7 @@ export default function Booking() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading Go Maps Pro...</p>
+          <p>Loading GoMaps Pro...</p>
         </div>
       </div>
     );
@@ -629,47 +748,80 @@ export default function Booking() {
                 </div>
               </CardHeader>
               <CardContent>
-                <GoogleMapsComponent
-                  onLocationSelect={handleLocationSelect}
-                  pickup={pickup}
-                  destination={destination}
-                  locationMode={locationMode}
-                />
+                {/* Maps Error Warning */}
+                {mapsError && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-amber-800">
+                          Map Service Notice
+                        </p>
+                        <p className="text-xs text-amber-700 mt-1">
+                          {mapsError} Location selection is still fully
+                          functional.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <Label htmlFor="pickup-autocomplete">Pickup Location</Label>
-                    <Input
-                      id="pickup-autocomplete"
-                      value={pickupInputValue}
-                      onChange={(e) => {
-                        setPickupInputValue(e.target.value);
-                        if (e.target.value === "") {
-                          setPickup(undefined);
-                        }
-                      }}
-                      placeholder="Type or click map to set pickup"
-                      className="mt-1"
-                    />
+                {/* Conditional Map Rendering */}
+                {useFallbackMap ? (
+                  <SimpleFallbackMap
+                    onLocationSelect={handleLocationSelect}
+                    pickup={pickup}
+                    destination={destination}
+                    locationMode={locationMode}
+                  />
+                ) : (
+                  <GoogleMapsComponent
+                    onLocationSelect={handleLocationSelect}
+                    pickup={pickup}
+                    destination={destination}
+                    locationMode={locationMode}
+                  />
+                )}
+
+                {/* Show autocomplete inputs only for Google Maps */}
+                {!useFallbackMap && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Label htmlFor="pickup-autocomplete">
+                        Pickup Location
+                      </Label>
+                      <Input
+                        id="pickup-autocomplete"
+                        value={pickupInputValue}
+                        onChange={(e) => {
+                          setPickupInputValue(e.target.value);
+                          if (e.target.value === "") {
+                            setPickup(undefined);
+                          }
+                        }}
+                        placeholder="Type or click map to set pickup"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="destination-autocomplete">
+                        Destination
+                      </Label>
+                      <Input
+                        id="destination-autocomplete"
+                        value={destinationInputValue}
+                        onChange={(e) => {
+                          setDestinationInputValue(e.target.value);
+                          if (e.target.value === "") {
+                            setDestination(undefined);
+                          }
+                        }}
+                        placeholder="Type or click map to set destination"
+                        className="mt-1"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="destination-autocomplete">
-                      Destination
-                    </Label>
-                    <Input
-                      id="destination-autocomplete"
-                      value={destinationInputValue}
-                      onChange={(e) => {
-                        setDestinationInputValue(e.target.value);
-                        if (e.target.value === "") {
-                          setDestination(undefined);
-                        }
-                      }}
-                      placeholder="Type or click map to set destination"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
+                )}
 
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                   <p className="text-sm text-blue-700">

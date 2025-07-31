@@ -10,6 +10,7 @@ import {
   createUser,
   getUserByEmail,
 } from "../database/databaseService";
+import { migratePasswordsToHashed } from "../firebase/firebaseDatabase";
 
 export const loginHandler: RequestHandler<
   {},
@@ -133,5 +134,22 @@ export const signupHandler: RequestHandler<
         error: "An error occurred during signup",
       });
     }
+  }
+};
+
+export const migratePasswordsHandler: RequestHandler = async (req, res) => {
+  try {
+    await migratePasswordsToHashed();
+
+    res.json({
+      success: true,
+      message: "Passwords migrated to hashed format successfully",
+    });
+  } catch (error) {
+    console.error("Migration error:", error);
+    res.status(500).json({
+      success: false,
+      error: "An error occurred during password migration",
+    });
   }
 };

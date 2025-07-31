@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 
-// Store the API key securely on the server
+// Store the GoMaps Pro API key securely on the server
 const GOOGLE_MAPS_API_KEY = "AlzaSyhJspyVs4WcwF7eW1ZS_0FselUQJMsK7jb";
 
 export interface MapsConfigResponse {

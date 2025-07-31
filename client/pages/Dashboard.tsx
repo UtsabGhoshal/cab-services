@@ -190,44 +190,25 @@ export default function Dashboard() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Left Column - Quick Actions */}
+            {/* Left Column - Recent Rides */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Quick Book Section */}
-              <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/50">
-                <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center">
-                  <Car className="w-6 h-6 mr-3 text-blue-600" />
-                  Quick Book a Ride
+              {/* Quick Book Action */}
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 shadow-lg text-white">
+                <h2 className="text-2xl font-bold mb-4 flex items-center">
+                  <Car className="w-6 h-6 mr-3" />
+                  Ready for a ride?
                 </h2>
-                <div className="space-y-4">
-                  <div className="relative group">
-                    <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200 group-hover:border-blue-300 transition-all duration-300">
-                      <MapPin className="w-5 h-5 text-blue-600" />
-                      <input
-                        type="text"
-                        placeholder="Where are you?"
-                        className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500"
-                      />
-                    </div>
-                  </div>
-                  <div className="relative group">
-                    <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-green-50 rounded-xl border border-slate-200 group-hover:border-green-300 transition-all duration-300">
-                      <MapPin className="w-5 h-5 text-green-600" />
-                      <input
-                        type="text"
-                        placeholder="Where to?"
-                        className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500"
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => navigate("/booking")}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold rounded-xl"
-                  >
-                    <Car className="w-5 h-5 mr-3" />
-                    Book Now
-                    <ArrowRight className="w-5 h-5 ml-3" />
-                  </Button>
-                </div>
+                <p className="text-blue-100 mb-6">
+                  Book your next premium ride in just a few clicks
+                </p>
+                <Button
+                  onClick={() => navigate("/booking")}
+                  className="bg-white text-blue-600 hover:bg-blue-50 py-3 px-6 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  <Car className="w-5 h-5 mr-3" />
+                  Book a Ride Now
+                  <ArrowRight className="w-5 h-5 ml-3" />
+                </Button>
               </div>
 
               {/* Recent Rides */}

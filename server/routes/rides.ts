@@ -24,6 +24,8 @@ router.get("/", async (_req: Request, res: Response) => {
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { userId, pickup, destination, carType, purpose, pricing } = req.body;
+    console.log(`🚗 Creating ride for userId: ${userId}`);
+    console.log(`📍 From: ${pickup?.address} To: ${destination?.address}`);
 
     // Validate required fields
     if (
@@ -34,6 +36,7 @@ router.post("/", async (req: Request, res: Response) => {
       !purpose ||
       !pricing
     ) {
+      console.log("❌ Missing required fields for ride creation");
       return res.status(400).json({
         success: false,
         message:
@@ -53,15 +56,18 @@ router.post("/", async (req: Request, res: Response) => {
       estimatedTime: pricing.estimatedTime,
     };
 
+    console.log(`💾 Saving ride data:`, rideData);
     const newRide = await createRide(rideData);
 
     if (!newRide) {
+      console.log("❌ Failed to create ride in database");
       return res.status(500).json({
         success: false,
         message: "Failed to create ride",
       });
     }
 
+    console.log(`✅ Ride created successfully with ID: ${newRide.id}`);
     res.status(201).json({
       success: true,
       message: "Ride created successfully",
