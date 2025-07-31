@@ -455,6 +455,27 @@ export default function DriverDashboard() {
             </Button>
           </div>
 
+          {/* Connection Status */}
+          {driverService.error && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center space-x-2 text-red-700">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm">Connection Error: {driverService.error}</span>
+              </div>
+            </div>
+          )}
+
+          {driverService.isConnected && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center space-x-2 text-green-700">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-sm">
+                  Connected to Firebase • Last update: {driverService.lastUpdate ? formatTime(driverService.lastUpdate) : 'Never'}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Mobile Header Info */}
           <div className="md:hidden mt-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
