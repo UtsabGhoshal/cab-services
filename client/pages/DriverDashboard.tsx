@@ -314,7 +314,9 @@ export default function DriverDashboard() {
       : isDevelopmentMode
         ? fallbackRequests
         : [];
-  const isOnline = driverService.isOnline;
+
+  // Use local online state instead of service state
+  const isOnline = isOnlineState;
 
   // Get driver's current location
   const getCurrentLocation = (): Promise<{lat: number, lng: number}> => {
