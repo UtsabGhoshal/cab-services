@@ -579,8 +579,8 @@ export default function DriverDashboard() {
             </TabsTrigger>
             <TabsTrigger value="ongoing" className="text-xs sm:text-sm">
               Ongoing
-              {ongoingRides.length > 0 && (
-                <Badge className="ml-2 bg-blue-500 text-white">{ongoingRides.length}</Badge>
+              {displayOngoingRides.length > 0 && (
+                <Badge className="ml-2 bg-blue-500 text-white">{displayOngoingRides.length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
