@@ -216,25 +216,31 @@ export class DriverService {
 
       const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
         const rides: OngoingRide[] = [];
-        
+
         snapshot.forEach((doc: DocumentSnapshot<DocumentData>) => {
           const data = doc.data();
           if (data) {
-            rides.push({
-              id: doc.id,
-              passengerName: data.passengerName,
-              passengerPhone: data.passengerPhone,
-              pickup: data.pickup,
-              destination: data.destination,
-              earnings: data.estimatedEarnings,
-              status: data.status,
-              startTime: data.startTime.toDate(),
-              estimatedArrival: data.estimatedArrival.toDate(),
-              driverId: data.driverId,
-            });
+            // Filter for active statuses in JavaScript
+            const activeStatuses = ['picking_up', 'en_route', 'arrived'];
+            if (activeStatuses.includes(data.status)) {
+              rides.push({
+                id: doc.id,
+                passengerName: data.passengerName,
+                passengerPhone: data.passengerPhone,
+                pickup: data.pickup,
+                destination: data.destination,
+                earnings: data.estimatedEarnings || data.earnings,
+                status: data.status,
+                startTime: data.startTime?.toDate() || new Date(),
+                estimatedArrival: data.estimatedArrival?.toDate() || new Date(),
+                driverId: data.driverId,
+              });
+            }
           }
         });
 
+        // Sort by start time in JavaScript
+        rides.sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
         callback(rides);
       });
 
