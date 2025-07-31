@@ -116,6 +116,12 @@ export class DriverService {
     radiusKm: number,
     callback: (requests: RideRequest[]) => void
   ): () => void {
+    if (!this.checkFirebaseConnection()) {
+      console.warn('Firebase connection not available for ride requests');
+      callback([]); // Return empty array as fallback
+      return () => {}; // Return empty unsubscribe function
+    }
+
     try {
       const ridesRef = collection(db, 'rideRequests');
       // Simplified query to avoid index requirements
