@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 
 export default function Places() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("map");
   const [selectedPlace, setSelectedPlace] = useState<FoursquarePlace | null>(
