@@ -6,6 +6,7 @@ import { getUserDataHandler, getUserRidesHandler } from "./routes/user";
 import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
 import { getMapsConfigHandler } from "./routes/maps";
+import { addSampleRidesHandler } from "./routes/test";
 import { initializeDatabase } from "./firebase/firebaseDatabase";
 
 export async function createServer() {
