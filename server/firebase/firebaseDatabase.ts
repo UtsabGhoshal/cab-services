@@ -317,7 +317,7 @@ export const initializeDatabase = async (): Promise<void> => {
       return;
     }
 
-    // Create sample users
+    // Create sample users with hashed passwords
     const sampleUsers = [
       {
         name: "Rajesh Kumar",
