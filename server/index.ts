@@ -115,6 +115,37 @@ export async function createServer() {
     }
   });
 
+  // Test endpoint to reset user password
+  app.post("/api/test/reset-password", async (req, res) => {
+    try {
+      const { email, newPassword } = req.body;
+      if (!email || !newPassword) {
+        return res.json({ success: false, error: "Email and new password required" });
+      }
+
+      const { getUserByEmail, db } = await import("./firebase/firebaseDatabase");
+      const { doc, updateDoc, collection } = await import("firebase/firestore");
+      const bcrypt = await import("bcryptjs");
+
+      const user = await getUserByEmail(email);
+      if (!user) {
+        return res.json({ success: false, error: "User not found" });
+      }
+
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+      // Update user password in Firebase
+      const userRef = doc(collection(db, "users"), user.id);
+      await updateDoc(userRef, { password: hashedPassword });
+
+      res.json({ success: true, message: `Password updated for ${email}` });
+    } catch (error) {
+      console.error("Password reset error:", error);
+      res.json({ success: false, error: "Failed to reset password" });
+    }
+  });
+
   // Admin/Debug routes (for development)
   app.get("/api/admin/users", async (_req, res) => {
     try {
