@@ -420,6 +420,7 @@ export default function DriverDashboard() {
                 <Switch
                   checked={isOnline}
                   onCheckedChange={handleOnlineToggle}
+                  disabled={driverService.loading.toggleStatus}
                   className="data-[state=checked]:bg-green-600"
                 />
                 <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
