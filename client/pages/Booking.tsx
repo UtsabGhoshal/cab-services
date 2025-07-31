@@ -697,12 +697,39 @@ export default function Booking() {
                 </div>
               </CardHeader>
               <CardContent>
-                <GoogleMapsComponent
-                  onLocationSelect={handleLocationSelect}
-                  pickup={pickup}
-                  destination={destination}
-                  locationMode={locationMode}
-                />
+                {/* Maps Error Warning */}
+                {mapsError && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-amber-800">
+                          Map Service Notice
+                        </p>
+                        <p className="text-xs text-amber-700 mt-1">
+                          {mapsError} Location selection is still fully functional.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Conditional Map Rendering */}
+                {useFallbackMap ? (
+                  <FallbackMap
+                    onLocationSelect={handleLocationSelect}
+                    pickup={pickup}
+                    destination={destination}
+                    locationMode={locationMode}
+                  />
+                ) : (
+                  <GoogleMapsComponent
+                    onLocationSelect={handleLocationSelect}
+                    pickup={pickup}
+                    destination={destination}
+                    locationMode={locationMode}
+                  />
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div>
