@@ -180,6 +180,17 @@ export default function Index() {
                         <Zap className="w-5 h-5 ml-3 group-hover:animate-spin" />
                       </Button>
 
+                      <Link to="/places">
+                        <Button
+                          variant="outline"
+                          className="w-full bg-white/80 backdrop-blur-md border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group"
+                        >
+                          <MapPin className="w-5 h-5 mr-3 group-hover:animate-pulse" />
+                          Explore Nearby Places
+                          <ArrowRight className="w-4 h-4 ml-3 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
+
                       {!user ? (
                         <div className="text-center">
                           <p className="text-sm text-slate-600 mb-2">
