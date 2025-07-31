@@ -806,7 +806,7 @@ export default function DriverDashboard() {
                 </Card>
               ) : (
                 <div className="grid gap-4">
-                  {rideHistory.map((ride) => (
+                  {displayRideHistory.map((ride) => (
                     <Card key={ride.id}>
                       <CardContent className="p-6">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
