@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useDriverService } from "@/hooks/useDriverService";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,6 +34,13 @@ import {
   Award,
   Activity,
   LogOut,
+  Crown,
+  Building,
+  Fuel,
+  Shield,
+  Calculator,
+  PieChart,
+  BarChart3,
 } from "lucide-react";
 
 // Types for driver data
