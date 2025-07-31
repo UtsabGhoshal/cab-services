@@ -208,14 +208,40 @@ export const validateUserCredentials = async (
         'test123'
       ];
 
-      for (const variation of variations) {
-        if (user.password === variation) {
-          console.log(`🎯 Password match found with variation: "${variation}"`);
-          return user;
+      let matchedPassword = null;
+      if (isValid) {
+        matchedPassword = password;
+      } else {
+        for (const variation of variations) {
+          if (user.password === variation) {
+            console.log(`🎯 Password match found with variation: "${variation}"`);
+            matchedPassword = variation;
+            break;
+          }
         }
       }
 
-      return isValid ? user : null;
+      if (matchedPassword) {
+        // Auto-migrate the password to hashed format
+        try {
+          console.log(`🔐 Auto-migrating password for user: ${user.email}`);
+          const hashedPassword = await bcrypt.hash(matchedPassword, 12);
+
+          const userRef = doc(db, USERS_COLLECTION, user.id);
+          await updateDoc(userRef, { password: hashedPassword });
+
+          console.log(`✅ Password auto-migrated to hashed format for: ${user.email}`);
+
+          // Return user with updated password hash (for consistency)
+          user.password = hashedPassword;
+        } catch (migrationError) {
+          console.error(`❌ Failed to auto-migrate password for ${user.email}:`, migrationError);
+          // Still return the user since login was successful
+        }
+        return user;
+      }
+
+      return null;
     }
   } catch (error) {
     console.error("Error validating credentials:", error);
