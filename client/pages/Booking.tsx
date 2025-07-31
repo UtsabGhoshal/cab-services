@@ -731,40 +731,43 @@ export default function Booking() {
                   />
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <Label htmlFor="pickup-autocomplete">Pickup Location</Label>
-                    <Input
-                      id="pickup-autocomplete"
-                      value={pickupInputValue}
-                      onChange={(e) => {
-                        setPickupInputValue(e.target.value);
-                        if (e.target.value === "") {
-                          setPickup(undefined);
-                        }
-                      }}
-                      placeholder="Type or click map to set pickup"
-                      className="mt-1"
-                    />
+                {/* Show autocomplete inputs only for Google Maps */}
+                {!useFallbackMap && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Label htmlFor="pickup-autocomplete">Pickup Location</Label>
+                      <Input
+                        id="pickup-autocomplete"
+                        value={pickupInputValue}
+                        onChange={(e) => {
+                          setPickupInputValue(e.target.value);
+                          if (e.target.value === "") {
+                            setPickup(undefined);
+                          }
+                        }}
+                        placeholder="Type or click map to set pickup"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="destination-autocomplete">
+                        Destination
+                      </Label>
+                      <Input
+                        id="destination-autocomplete"
+                        value={destinationInputValue}
+                        onChange={(e) => {
+                          setDestinationInputValue(e.target.value);
+                          if (e.target.value === "") {
+                            setDestination(undefined);
+                          }
+                        }}
+                        placeholder="Type or click map to set destination"
+                        className="mt-1"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="destination-autocomplete">
-                      Destination
-                    </Label>
-                    <Input
-                      id="destination-autocomplete"
-                      value={destinationInputValue}
-                      onChange={(e) => {
-                        setDestinationInputValue(e.target.value);
-                        if (e.target.value === "") {
-                          setDestination(undefined);
-                        }
-                      }}
-                      placeholder="Type or click map to set destination"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
+                )}
 
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                   <p className="text-sm text-blue-700">
