@@ -173,12 +173,14 @@ export default function Index() {
                     </div>
 
                     <div className="space-y-3">
-                      <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-7 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                        <Car className="w-6 h-6 mr-3 group-hover:animate-bounce" />
-                        Book Your Ride Now!
-                        <Zap className="w-5 h-5 ml-3 group-hover:animate-spin" />
-                      </Button>
+                      <Link to="/booking">
+                        <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-7 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                          <Car className="w-6 h-6 mr-3 group-hover:animate-bounce" />
+                          Book Your Ride Now!
+                          <Zap className="w-5 h-5 ml-3 group-hover:animate-spin" />
+                        </Button>
+                      </Link>
 
                       <Link to="/places">
                         <Button
