@@ -409,8 +409,8 @@ export default function Booking() {
         // Add a timeout fallback
         setTimeout(() => {
           if (loading && !window.google) {
-            console.warn('Google Maps loading timeout');
-            setMapsError('Google Maps loading timeout. Using fallback map.');
+            console.warn('GoMaps Pro loading timeout');
+            setMapsError('GoMaps Pro loading timeout. Using fallback map.');
             setUseFallbackMap(true);
             setLoading(false);
           }
