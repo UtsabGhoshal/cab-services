@@ -146,79 +146,108 @@ export default function DriverLogin() {
     }
   };
 
-  const handleDemoLogin = (type: "owner" | "fleet") => {
+  const handleDemoLogin = async (type: "owner" | "fleet") => {
     const demoCredentials = {
       owner: {
         email: "rajesh.driver@uride.com",
         password: "demo123",
         type: "Vehicle Owner Driver",
-        profile: {
-          id: "demo_owner_123",
-          name: "Rajesh Kumar",
-          email: "rajesh.driver@uride.com",
-          phone: "+91 99999 12345",
-          driverType: {
-            type: "owner",
-            commissionRate: 0.05,
-          },
-          vehicleNumber: "DL 01 AB 1234",
-          vehicleModel: "Honda City 2022",
-          licenseNumber: "DL1420110012345",
-          averageRating: 4.8,
-          totalRides: 487,
-          totalEarnings: 42180,
-          totalKmDriven: 1890,
-          acceptanceRate: 92,
-          completionRate: 98,
-          onlineHours: 250,
-          status: "active",
-          joinDate: "2024-01-15T00:00:00.000Z",
-          createdAt: "2024-01-15T00:00:00.000Z"
-        }
       },
       fleet: {
         email: "amit.fleet@uride.com",
         password: "demo123",
         type: "Fleet Driver",
-        profile: {
-          id: "demo_fleet_456",
-          name: "Amit Singh",
-          email: "amit.fleet@uride.com",
-          phone: "+91 88888 12345",
-          driverType: {
-            type: "fleet",
-            salaryPerKm: 12,
-          },
-          vehicleModel: "URide Fleet Vehicle",
-          licenseNumber: "DL1420110054321",
-          averageRating: 4.7,
-          totalRides: 392,
-          totalEarnings: 28450,
-          totalKmDriven: 2025,
-          acceptanceRate: 89,
-          completionRate: 95,
-          onlineHours: 180,
-          status: "active",
-          joinDate: "2024-02-20T00:00:00.000Z",
-          createdAt: "2024-02-20T00:00:00.000Z"
-        }
       }
     };
 
     const demo = demoCredentials[type];
     setFormData(prev => ({ ...prev, email: demo.email, password: demo.password }));
 
-    // Store demo profile directly
-    localStorage.setItem("uride_driver", JSON.stringify(demo.profile));
+    try {
+      setIsLoading(true);
 
-    toast({
-      title: "Demo Login Successful! 🚗",
-      description: `Logged in as ${demo.type}`,
-    });
+      // Sign in with demo credentials using Firebase
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        demo.email,
+        demo.password
+      );
 
-    setTimeout(() => {
-      navigate("/driver-dashboard");
-    }, 1000);
+      const user = userCredential.user;
+
+      // Get driver profile from Firestore
+      const driver = await firebaseDriverService.getDriverByEmail(demo.email);
+
+      if (!driver) {
+        toast({
+          title: "Demo Driver Not Found",
+          description: "Demo driver profile not found. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (driver.status !== "active") {
+        toast({
+          title: "Demo Account Inactive",
+          description: "Demo driver account is not active. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Store driver info in localStorage
+      const driverSession = {
+        id: driver.id,
+        uid: user.uid,
+        email: user.email,
+        name: driver.name,
+        phone: driver.phone,
+        driverType: driver.driverType,
+        status: driver.status,
+        vehicleNumber: driver.vehicleNumber,
+        vehicleModel: driver.vehicleModel,
+        licenseNumber: driver.licenseNumber,
+        averageRating: driver.averageRating,
+        totalRides: driver.totalRides,
+        totalEarnings: driver.totalEarnings,
+        totalKmDriven: driver.totalKmDriven,
+        acceptanceRate: driver.acceptanceRate,
+        completionRate: driver.completionRate,
+        onlineHours: driver.onlineHours,
+        joinDate: driver.joinDate,
+        createdAt: driver.createdAt
+      };
+
+      localStorage.setItem("uride_driver", JSON.stringify(driverSession));
+      localStorage.setItem("uride_driver_token", await user.getIdToken());
+
+      toast({
+        title: "Demo Login Successful! 🚗",
+        description: `Logged in as ${demo.type}`,
+      });
+
+      setTimeout(() => {
+        navigate("/driver-dashboard");
+      }, 1000);
+
+    } catch (error: any) {
+      console.error("Demo login error:", error);
+
+      let errorMessage = "Demo login failed. Please try again.";
+
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        errorMessage = "Demo user not found. Please contact support to set up demo accounts.";
+      }
+
+      toast({
+        title: "Demo Login Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
