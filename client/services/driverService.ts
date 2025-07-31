@@ -93,6 +93,10 @@ export class DriverService {
 
   // Update driver online status
   async updateOnlineStatus(isOnline: boolean, location?: DriverLocation): Promise<void> {
+    if (!this.checkFirebaseConnection()) {
+      throw new Error('Firebase connection not available');
+    }
+
     try {
       const driverRef = doc(db, 'drivers', this.driverId);
       await updateDoc(driverRef, {
