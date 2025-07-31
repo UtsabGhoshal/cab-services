@@ -170,7 +170,8 @@ export default function DriverDashboard() {
   ]);
 
   // Use Firebase data or fallback to demo data
-  const rideRequests = driverService.rideRequests.length > 0 ? driverService.rideRequests : fallbackRequests;
+  const isDevelopmentMode = import.meta.env.DEV || !driverService.isConnected;
+  const rideRequests = driverService.rideRequests.length > 0 ? driverService.rideRequests : (isDevelopmentMode ? fallbackRequests : []);
   const ongoingRides = driverService.ongoingRides;
   const rideHistory = driverService.rideHistory;
   const isOnline = driverService.isOnline;
