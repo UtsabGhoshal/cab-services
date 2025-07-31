@@ -250,6 +250,8 @@ export default function Booking() {
   const [locationMode, setLocationMode] = useState<"pickup" | "destination">(
     "pickup",
   );
+  const [useFallbackMap, setUseFallbackMap] = useState(false);
+  const [mapsError, setMapsError] = useState<string | null>(null);
   const [pickupAutocomplete, setPickupAutocomplete] =
     useState<google.maps.places.Autocomplete | null>(null);
   const [destinationAutocomplete, setDestinationAutocomplete] =
