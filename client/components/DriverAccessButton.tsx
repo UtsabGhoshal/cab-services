@@ -22,10 +22,10 @@ export default function DriverAccessButton() {
         </Button>
 
         {/* Main driver button */}
-        <Link to="/driver">
+        <Link to="/driver-login">
           <Button
             size="lg"
-            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 rounded-full w-16 h-16 p-0"
+            className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 rounded-full w-16 h-16 p-0"
           >
             <Car className="w-8 h-8" />
           </Button>
