@@ -1,7 +1,7 @@
 import "./global.css";
 
 import { Toaster } from "@/components/ui/toaster";
-import { createRoot } from "react-dom/client";
+import { createRoot, type Root } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,6 +15,9 @@ import Dashboard from "./pages/Dashboard";
 import Booking from "./pages/Booking";
 import Places from "./pages/Places";
 import DriverDashboard from "./pages/DriverDashboard";
+import DriverLogin from "./pages/DriverLogin";
+import DriverSignup from "./pages/DriverSignup";
+import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +36,10 @@ const AppContent = () => {
         <Route path="/booking" element={<Booking />} />
         <Route path="/places" element={<Places />} />
         <Route path="/driver" element={<DriverDashboard />} />
+        <Route path="/driver-login" element={<DriverLogin />} />
+        <Route path="/driver-signup" element={<DriverSignup />} />
+        <Route path="/driver-dashboard" element={<DriverDashboard />} />
+        <Route path="/admin" element={<AdminPanel />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -55,4 +62,21 @@ const App = () => (
   </QueryClientProvider>
 );
 
-createRoot(document.getElementById("root")!).render(<App />);
+// Prevent multiple roots during development hot reloads
+const container = document.getElementById("root")!;
+
+// Create or reuse root - using a simple module-level variable
+let root: Root;
+
+if (import.meta.hot) {
+  // In development, store root in import.meta.hot.data to persist across HMR
+  if (!import.meta.hot.data.root) {
+    import.meta.hot.data.root = createRoot(container);
+  }
+  root = import.meta.hot.data.root;
+} else {
+  // In production, create root normally
+  root = createRoot(container);
+}
+
+root.render(<App />);

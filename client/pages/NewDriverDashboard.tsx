@@ -8,10 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useDriverService } from "@/hooks/useDriverService";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "@/firebase/config";
-import { firebaseDriverService } from "@/services/firebaseDriverService";
-import { driverMatchingService } from "@/services/driverMatchingService";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Car,
   MapPin,
@@ -168,57 +165,12 @@ interface DriverProfile {
   };
 }
 
-export default function DriverDashboard() {
+export default function NewDriverDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("requests");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isOnlineState, setIsOnlineState] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
-  const [driverData, setDriverData] = useState<any>(null);
-
-  // Firebase auth state and driver data loading
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          // Get driver profile from Firestore using email
-          const driver = await firebaseDriverService.getDriverByEmail(
-            user.email!,
-          );
-          if (driver) {
-            setDriverData(driver);
-            // Update localStorage for quick access
-            localStorage.setItem("uride_driver", JSON.stringify(driver));
-          } else {
-            toast({
-              title: "Driver Profile Not Found",
-              description: "No driver profile found. Please contact support.",
-              variant: "destructive",
-            });
-            navigate("/driver-login");
-          }
-        } catch (error) {
-          console.error("Error loading driver profile:", error);
-          toast({
-            title: "Error Loading Profile",
-            description: "Failed to load driver profile. Please try again.",
-            variant: "destructive",
-          });
-        }
-      } else {
-        // No authenticated user, redirect to login
-        navigate("/driver-login");
-      }
-    });
-
-    return () => unsubscribe();
-  }, [navigate, toast]);
 
   // Use Firebase driver service
   const driverService = useDriverService({
@@ -226,63 +178,28 @@ export default function DriverDashboard() {
     autoStart: true,
   });
 
-  // Real driver profile from database
-  const [driverProfile, setDriverProfile] = useState<DriverProfile>({
-    id: driverData?.id || user?.id || "driver_123",
-    name: driverData?.name || user?.name || "New Driver",
-    phone: driverData?.phone || user?.phone || "",
-    email: driverData?.email || user?.email || "",
-    driverType: driverData?.driverType || {
-      type: "owner", // Will be loaded from database
+  // Enhanced demo data with new earnings model
+  const [driverProfile] = useState<DriverProfile>({
+    id: "driver_123",
+    name: "Rajesh Kumar",
+    phone: "+91 99999 12345",
+    email: "rajesh.driver@uride.com",
+    driverType: {
+      type: "owner", // Can be "owner" or "fleet"
       commissionRate: 0.05, // 5% for vehicle owners
       salaryPerKm: undefined,
     },
-    vehicleNumber: driverData?.vehicleNumber || "",
-    vehicleModel: driverData?.vehicleModel || "",
-    licenseNumber: driverData?.licenseNumber || "",
-    rating: driverData?.averageRating || 0, // Start with 0
-    joinDate: driverData?.joinDate ? new Date(driverData.joinDate) : new Date(),
-    currentShift: driverData?.currentShift,
+    vehicleNumber: "DL 01 AB 1234",
+    vehicleModel: "Honda City 2022",
+    licenseNumber: "DL1420110012345",
+    rating: 4.8,
+    joinDate: new Date("2024-01-15"),
+    currentShift: {
+      startTime: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+      targetKm: 150,
+      completedKm: 85,
+    },
   });
-
-  // Update profile when driverData changes
-  useEffect(() => {
-    if (driverData) {
-      setDriverProfile({
-        id: driverData.id,
-        name: driverData.name,
-        phone: driverData.phone,
-        email: driverData.email,
-        driverType: driverData.driverType,
-        vehicleNumber: driverData.vehicleNumber || "",
-        vehicleModel: driverData.vehicleModel || "",
-        licenseNumber: driverData.licenseNumber,
-        rating: driverData.averageRating || 0,
-        joinDate: new Date(driverData.joinDate || driverData.createdAt),
-        currentShift: driverData.currentShift,
-      });
-
-      // Update driver stats from database
-      setDriverStats({
-        totalEarnings: driverData.totalEarnings || 0,
-        todayEarnings: 0, // This would come from today's rides
-        weeklyEarnings: 0, // This would be calculated
-        monthlyEarnings: 0, // This would be calculated
-        totalCommissionPaid: 0,
-        totalKmSalary: 0,
-        totalRides: driverData.totalRides || 0,
-        todayRides: 0,
-        totalKmDriven: driverData.totalKmDriven || 0,
-        todayKmDriven: 0,
-        averageRating: driverData.averageRating || 0,
-        onlineHours: driverData.onlineHours || 0,
-        acceptanceRate: driverData.acceptanceRate || 100,
-        completionRate: driverData.completionRate || 100,
-        monthlyTarget: driverData.driverType?.type === "fleet" ? 2000 : 1500,
-        targetProgress: 0,
-      });
-    }
-  }, [driverData]);
 
   // Fleet driver demo profile
   const [fleetDriverProfile] = useState<DriverProfile>({
@@ -311,23 +228,23 @@ export default function DriverDashboard() {
   const currentProfile = driverProfile;
   const isFleetDriver = currentProfile.driverType.type === "fleet";
 
-  const [driverStats, setDriverStats] = useState<DriverStats>({
-    totalEarnings: 0, // Start with 0
-    todayEarnings: 0,
-    weeklyEarnings: 0,
-    monthlyEarnings: 0,
-    totalCommissionPaid: 0,
-    totalKmSalary: 0,
-    totalRides: 0,
-    todayRides: 0,
-    totalKmDriven: 0,
-    todayKmDriven: 0,
-    averageRating: 0,
-    onlineHours: 0,
-    acceptanceRate: 100, // Start with 100%
-    completionRate: 100, // Start with 100%
-    monthlyTarget: isFleetDriver ? 2000 : 1500, // Realistic targets
-    targetProgress: 0,
+  const [driverStats] = useState<DriverStats>({
+    totalEarnings: isFleetDriver ? 28450 : 42180, // Lower for fleet due to salary model
+    todayEarnings: isFleetDriver ? 1020 : 1450,
+    weeklyEarnings: isFleetDriver ? 7200 : 10800,
+    monthlyEarnings: isFleetDriver ? 24300 : 32140,
+    totalCommissionPaid: isFleetDriver ? undefined : 2100,
+    totalKmSalary: isFleetDriver ? 24300 : undefined,
+    totalRides: 487,
+    todayRides: 8,
+    totalKmDriven: isFleetDriver ? 2025 : 1890, // Fleet drivers typically drive more
+    todayKmDriven: isFleetDriver ? 85 : 72,
+    averageRating: 4.8,
+    onlineHours: 6.5,
+    acceptanceRate: 92,
+    completionRate: 98,
+    monthlyTarget: isFleetDriver ? 2500 : 2000, // Higher target for fleet
+    targetProgress: isFleetDriver ? 65 : 78,
   });
 
   // Sample ride requests with new earnings calculation
@@ -397,162 +314,42 @@ export default function DriverDashboard() {
       : isDevelopmentMode
         ? fallbackRequests
         : [];
-
-  // Use local online state instead of service state
-  const isOnline = isOnlineState;
-
-  // Get driver's current location
-  const getCurrentLocation = (): Promise<{ lat: number; lng: number }> => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error("Geolocation is not supported by this browser"));
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          resolve({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        },
-        (error) => {
-          reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000, // Cache for 1 minute
-        },
-      );
-    });
-  };
+  const isOnline = driverService.isOnline;
 
   // Handle online/offline toggle
   const handleOnlineToggle = async (checked: boolean) => {
     try {
-      if (checked) {
-        // Going online - need location
-        const location = await getCurrentLocation();
-        setCurrentLocation(location);
-
-        await driverMatchingService.updateDriverLocation(
-          user?.id || "driver_123",
-          location.lat,
-          location.lng,
-          true,
-          true,
-        );
-
-        setIsOnlineState(true);
-        setLocationError(null);
-
-        toast({
-          title: "You're now online! 🟢",
-          description: "You'll start receiving ride requests",
-        });
-      } else {
-        // Going offline
-        await driverMatchingService.setDriverOffline(user?.id || "driver_123");
-        setIsOnlineState(false);
-
-        toast({
-          title: "You're now offline 🔴",
-          description: "You won't receive new ride requests",
-        });
-      }
-    } catch (error: any) {
-      console.error("Location error:", error);
-
-      if (error.code === 1) {
-        setLocationError(
-          "Location access denied. Please enable location services to go online.",
-        );
-      } else if (error.code === 2) {
-        setLocationError(
-          "Location unavailable. Please check your GPS settings.",
-        );
-      } else if (error.code === 3) {
-        setLocationError("Location request timeout. Please try again.");
-      } else {
-        setLocationError("Failed to get location. Please try again.");
-      }
-
+      await driverService.toggleOnlineStatus();
       toast({
-        title: "Location Error",
-        description:
-          error.message ||
-          "Failed to update online status. Location access required.",
+        title: checked ? "You're now online!" : "You're now offline",
+        description: checked
+          ? "You'll start receiving ride requests"
+          : "You won't receive new ride requests",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update online status. Please try again.",
         variant: "destructive",
       });
-
-      setIsOnlineState(false);
     }
   };
 
   // Handle ride request actions
   const handleAcceptRequest = async (requestId: string) => {
     try {
-      const success = await driverMatchingService.acceptRide(
-        requestId,
-        user?.id || "driver_123",
-      );
+      await driverService.acceptRide(requestId);
+      setActiveTab("ongoing");
 
-      if (success) {
-        setActiveTab("ongoing");
-        const request = rideRequests.find((r) => r.id === requestId);
-
-        toast({
-          title: "Ride Accepted! 🎉",
-          description: `You've accepted the ride. Earnings: ₹${request?.driverEarnings || 0}`,
-        });
-
-        // Update driver stats
-        setDriverStats((prev) => ({
-          ...prev,
-          todayRides: prev.todayRides + 1,
-          totalRides: prev.totalRides + 1,
-        }));
-      } else {
-        toast({
-          title: "Ride Unavailable",
-          description: "This ride has already been taken by another driver",
-          variant: "destructive",
-        });
-      }
+      const request = rideRequests.find((r) => r.id === requestId);
+      toast({
+        title: "Ride Accepted!",
+        description: `You've accepted the ride. Earnings: ₹${request?.driverEarnings || 0}`,
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to accept ride. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleCancelRide = async (
-    rideId: string,
-    reason: string = "Driver cancelled",
-  ) => {
-    try {
-      await driverMatchingService.cancelRide(
-        rideId,
-        user?.id || "driver_123",
-        reason,
-      );
-
-      toast({
-        title: "Ride Cancelled",
-        description: "You have cancelled the ride. A penalty may apply.",
-        variant: "destructive",
-      });
-
-      // Refresh current data
-      // In a real app, this would be handled by real-time listeners
-      setActiveTab("requests");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to cancel ride. Please try again.",
         variant: "destructive",
       });
     }
@@ -636,6 +433,7 @@ export default function DriverDashboard() {
                 <Switch
                   checked={isOnline}
                   onCheckedChange={handleOnlineToggle}
+                  disabled={driverService.loading.toggleStatus}
                   className="data-[state=checked]:bg-green-600"
                 />
                 <div
@@ -659,26 +457,7 @@ export default function DriverDashboard() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={async () => {
-                  try {
-                    await signOut(auth);
-                    localStorage.removeItem("uride_driver");
-                    localStorage.removeItem("uride_driver_token");
-                    localStorage.removeItem("uride_driver_remember");
-                    toast({
-                      title: "Signed Out",
-                      description: "You have been successfully signed out.",
-                    });
-                    navigate("/driver-login");
-                  } catch (error) {
-                    console.error("Sign out error:", error);
-                    toast({
-                      title: "Sign Out Error",
-                      description: "Failed to sign out. Please try again.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
+                onClick={() => navigate("/driver-login")}
                 className="border-red-200 text-red-600 hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4 mr-2" />
@@ -699,20 +478,12 @@ export default function DriverDashboard() {
 
           {/* Mobile Header Info */}
           <div className="md:hidden mt-4 space-y-3">
-            {locationError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-center space-x-2 text-red-700">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">{locationError}</span>
-                </div>
-              </div>
-            )}
-
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <Switch
                   checked={isOnline}
                   onCheckedChange={handleOnlineToggle}
+                  disabled={driverService.loading.toggleStatus}
                   className="data-[state=checked]:bg-green-600"
                 />
                 <span className="text-sm text-gray-600">
@@ -1045,16 +816,19 @@ export default function DriverDashboard() {
                           <div className="flex space-x-3 lg:flex-col lg:space-x-0 lg:space-y-2 lg:w-32">
                             <Button
                               onClick={() => handleAcceptRequest(request.id)}
+                              disabled={driverService.loading.acceptRide}
                               className="flex-1 lg:w-full bg-yellow-600 hover:bg-yellow-700 text-white"
                             >
                               <CheckCircle className="w-4 h-4 mr-2" />
-                              Accept
+                              {driverService.loading.acceptRide
+                                ? "Accepting..."
+                                : "Accept"}
                             </Button>
                             <Button
                               variant="outline"
-                              onClick={() =>
-                                handleCancelRide(request.id, "Driver rejected")
-                              }
+                              onClick={() => {
+                                /* handleRejectRequest */
+                              }}
                               className="flex-1 lg:w-full border-red-200 text-red-600 hover:bg-red-50"
                             >
                               <XCircle className="w-4 h-4 mr-2" />

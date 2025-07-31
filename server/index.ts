@@ -6,6 +6,13 @@ import {
   signupHandler,
   migratePasswordsHandler,
 } from "./routes/auth";
+import {
+  driverLoginHandler,
+  driverSignupHandler,
+  getDriverProfileHandler,
+  updateDriverStatusHandler,
+  getDriversHandler,
+} from "./routes/driverAuth";
 import { getUserDataHandler, getUserRidesHandler } from "./routes/user";
 import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
@@ -55,6 +62,13 @@ export async function createServer() {
   // Authentication routes
   app.post("/api/auth/login", loginHandler);
   app.post("/api/auth/signup", signupHandler);
+
+  // Driver authentication routes
+  app.post("/api/driver/login", driverLoginHandler);
+  app.post("/api/driver/signup", driverSignupHandler);
+  app.get("/api/driver/:driverId/profile", getDriverProfileHandler);
+  app.put("/api/driver/:driverId/status", updateDriverStatusHandler);
+  app.get("/api/drivers", getDriversHandler);
 
   // Admin/Security routes
   app.post("/api/auth/migrate-passwords", migratePasswordsHandler);
