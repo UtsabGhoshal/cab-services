@@ -104,11 +104,10 @@ export const getUserRides = async (
 ): Promise<Ride[]> => {
   try {
     const ridesRef = collection(db, RIDES_COLLECTION);
+    // Remove orderBy to avoid composite index requirement
     const q = query(
       ridesRef,
-      where("userId", "==", userId),
-      orderBy("date", "desc"),
-      limit(limitCount),
+      where("userId", "==", userId)
     );
 
     const querySnapshot = await getDocs(q);
@@ -123,7 +122,13 @@ export const getUserRides = async (
       } as Ride);
     });
 
-    return rides;
+    // Sort by date in JavaScript and limit
+    const sortedRides = rides
+      .sort((a, b) => b.date.getTime() - a.date.getTime())
+      .slice(0, limitCount);
+
+    console.log(`📋 Returning ${sortedRides.length} sorted rides for user ${userId}`);
+    return sortedRides;
   } catch (error) {
     console.error("Error getting user rides:", error);
     return [];
