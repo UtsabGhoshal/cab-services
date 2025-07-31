@@ -980,7 +980,10 @@ export default function Booking() {
                             Emergency
                           </p>
                           <p className="text-sm text-gray-600">
-                            Priority booking with 50% surcharge
+                            Automatic driver assignment with 50% surcharge
+                          </p>
+                          <p className="text-xs text-red-600 mt-1">
+                            Driver will be automatically matched - no cancellation option
                           </p>
                         </div>
                         <Badge variant="destructive">+50%</Badge>
