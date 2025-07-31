@@ -173,10 +173,21 @@ export const validateUserCredentials = async (
 ): Promise<User | null> => {
   try {
     const user = await getUserByEmail(email);
-    if (user && await bcrypt.compare(password, user.password)) {
-      return user;
+    if (!user) {
+      return null;
     }
-    return null;
+
+    // Check if password is hashed (bcrypt hashes start with $2a$, $2b$, or $2y$)
+    const isHashed = user.password.startsWith('$2a$') || user.password.startsWith('$2b$') || user.password.startsWith('$2y$');
+
+    if (isHashed) {
+      // Use bcrypt for hashed passwords
+      const isValid = await bcrypt.compare(password, user.password);
+      return isValid ? user : null;
+    } else {
+      // Direct comparison for plain text passwords (legacy users)
+      return user.password === password ? user : null;
+    }
   } catch (error) {
     console.error("Error validating credentials:", error);
     return null;
