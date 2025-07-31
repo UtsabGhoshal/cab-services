@@ -632,6 +632,15 @@ export default function DriverDashboard() {
 
           {/* Mobile Header Info */}
           <div className="md:hidden mt-4 space-y-3">
+            {locationError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center space-x-2 text-red-700">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm">{locationError}</span>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <Switch
