@@ -62,16 +62,21 @@ const App = () => (
   </QueryClientProvider>
 );
 
-// Prevent multiple roots from being created during development hot reloads
+// Prevent multiple roots during development hot reloads
 const container = document.getElementById("root")!;
 
-// Check if root already exists on the container
-if (!container._reactRootContainer) {
-  const root = createRoot(container);
-  // Store reference to prevent recreation
-  container._reactRootContainer = root;
-  root.render(<App />);
+// Create or reuse root - using a simple module-level variable
+let root: Root;
+
+if (import.meta.hot) {
+  // In development, store root in import.meta.hot.data to persist across HMR
+  if (!import.meta.hot.data.root) {
+    import.meta.hot.data.root = createRoot(container);
+  }
+  root = import.meta.hot.data.root;
 } else {
-  // If root exists, just re-render
-  container._reactRootContainer.render(<App />);
+  // In production, create root normally
+  root = createRoot(container);
 }
+
+root.render(<App />);
