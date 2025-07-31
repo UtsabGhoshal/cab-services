@@ -20,10 +20,13 @@ import {
   Clock,
   DollarSign,
   AlertTriangle,
+  AlertCircle,
+  Map,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { MapsConfigResponse, BookingLocation, PricingInfo } from "@shared/maps";
+import { FallbackMap } from "@/components/FallbackMap";
 
 interface GoogleMapsProps {
   onLocationSelect: (location: BookingLocation, isPickup: boolean) => void;
