@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Booking from "./pages/Booking";
+import Places from "./pages/Places";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
