@@ -637,7 +637,26 @@ export default function DriverDashboard() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate("/driver-login")}
+                onClick={async () => {
+                  try {
+                    await signOut(auth);
+                    localStorage.removeItem("uride_driver");
+                    localStorage.removeItem("uride_driver_token");
+                    localStorage.removeItem("uride_driver_remember");
+                    toast({
+                      title: "Signed Out",
+                      description: "You have been successfully signed out.",
+                    });
+                    navigate("/driver-login");
+                  } catch (error) {
+                    console.error("Sign out error:", error);
+                    toast({
+                      title: "Sign Out Error",
+                      description: "Failed to sign out. Please try again.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
                 className="border-red-200 text-red-600 hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4 mr-2" />
