@@ -179,17 +179,41 @@ export default function DriverDashboard() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [driverData, setDriverData] = useState<any>(null);
 
-  // Load driver data from localStorage
+  // Firebase auth state and driver data loading
   useEffect(() => {
-    const storedDriver = localStorage.getItem("uride_driver");
-    if (storedDriver) {
-      const driver = JSON.parse(storedDriver);
-      setDriverData(driver);
-    } else if (!user) {
-      // Redirect to login if no driver data
-      navigate("/driver-login");
-    }
-  }, [user, navigate]);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          // Get driver profile from Firestore using email
+          const driver = await firebaseDriverService.getDriverByEmail(user.email!);
+          if (driver) {
+            setDriverData(driver);
+            // Update localStorage for quick access
+            localStorage.setItem("uride_driver", JSON.stringify(driver));
+          } else {
+            toast({
+              title: "Driver Profile Not Found",
+              description: "No driver profile found. Please contact support.",
+              variant: "destructive",
+            });
+            navigate("/driver-login");
+          }
+        } catch (error) {
+          console.error("Error loading driver profile:", error);
+          toast({
+            title: "Error Loading Profile",
+            description: "Failed to load driver profile. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        // No authenticated user, redirect to login
+        navigate("/driver-login");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate, toast]);
 
   // Use Firebase driver service
   const driverService = useDriverService({
