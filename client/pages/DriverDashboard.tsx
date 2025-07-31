@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useDriverService } from "@/hooks/useDriverService";
-import { useAuth } from "@/contexts/AuthContext";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "@/firebase/config";
+import { firebaseDriverService } from "@/services/firebaseDriverService";
 import { driverMatchingService } from "@/services/driverMatchingService";
 import {
   Car,
