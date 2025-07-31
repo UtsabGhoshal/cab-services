@@ -38,6 +38,8 @@ interface DriverFormData {
   fullName: string;
   email: string;
   phone: string;
+  password: string;
+  confirmPassword: string;
   dateOfBirth: string;
   address: string;
   
@@ -74,6 +76,8 @@ const initialFormData: DriverFormData = {
   fullName: "",
   email: "",
   phone: "",
+  password: "",
+  confirmPassword: "",
   dateOfBirth: "",
   address: "",
   licenseNumber: "",
