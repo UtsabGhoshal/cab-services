@@ -39,6 +39,7 @@ const AppContent = () => {
         <Route path="/driver-login" element={<DriverLogin />} />
         <Route path="/driver-signup" element={<DriverSignup />} />
         <Route path="/driver-dashboard" element={<DriverDashboard />} />
+        <Route path="/admin" element={<AdminPanel />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
