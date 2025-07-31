@@ -10,6 +10,17 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     proxy: {
       '/api': 'http://localhost:3000',
+      // Firebase Auth proxy for CORS issues
+      '/__/auth/': {
+        target: 'https://uride-cab-service.firebaseapp.com',
+        changeOrigin: true,
+        secure: true,
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('Firebase proxy error:', err);
+          });
+        },
+      },
     },
   },
   build: {
