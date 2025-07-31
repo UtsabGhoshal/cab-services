@@ -15,6 +15,8 @@ import Dashboard from "./pages/Dashboard";
 import Booking from "./pages/Booking";
 import Places from "./pages/Places";
 import DriverDashboard from "./pages/DriverDashboard";
+import DriverLogin from "./pages/DriverLogin";
+import DriverSignup from "./pages/DriverSignup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
