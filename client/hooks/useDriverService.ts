@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createDriverService, DriverService, RideRequest, OngoingRide, DriverLocation } from '@/services/driverService';
+import { initializeFirebaseCollections } from '@/utils/firebaseInit';
 
 interface UseDriverServiceOptions {
   driverId: string;
