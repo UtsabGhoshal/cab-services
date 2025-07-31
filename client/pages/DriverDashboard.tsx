@@ -709,7 +709,7 @@ export default function DriverDashboard() {
                 </Card>
               ) : (
                 <div className="grid gap-4">
-                  {ongoingRides.map((ride) => (
+                  {displayOngoingRides.map((ride) => (
                     <Card key={ride.id} className="border-l-4 border-l-green-500">
                       <CardContent className="p-6">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
