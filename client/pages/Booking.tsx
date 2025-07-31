@@ -662,7 +662,9 @@ export default function Booking() {
 
     try {
       // Import the driver matching service
-      const { driverMatchingService } = await import("@/services/driverMatchingService");
+      const { driverMatchingService } = await import(
+        "@/services/driverMatchingService"
+      );
       const { GeoPoint, Timestamp } = await import("firebase/firestore");
 
       // Create ride request with automatic driver matching
@@ -691,18 +693,19 @@ export default function Booking() {
       if (purpose === "emergency") {
         toast({
           title: "Emergency Ride Requested! 🚨",
-          description: "Finding the nearest driver for immediate pickup. You will be automatically matched.",
+          description:
+            "Finding the nearest driver for immediate pickup. You will be automatically matched.",
         });
       } else {
         toast({
           title: "Ride Requested! 🚗",
-          description: "Finding nearby drivers. You'll be notified when a driver accepts.",
+          description:
+            "Finding nearby drivers. You'll be notified when a driver accepts.",
         });
       }
 
       // Show real-time status updates
       showRideStatusDialog(rideId, purpose === "emergency");
-
     } catch (error: any) {
       console.error("Booking error:", error);
       toast({
@@ -726,7 +729,8 @@ export default function Booking() {
           clearInterval(statusInterval);
           toast({
             title: "Driver Assigned! 🎉",
-            description: "Your emergency ride has been automatically assigned. Driver is on the way!",
+            description:
+              "Your emergency ride has been automatically assigned. Driver is on the way!",
           });
           navigate("/dashboard");
         }, 3000);
@@ -735,7 +739,8 @@ export default function Booking() {
           clearInterval(statusInterval);
           toast({
             title: "Driver Found! 🎉",
-            description: "A driver has accepted your ride request and is on the way!",
+            description:
+              "A driver has accepted your ride request and is on the way!",
           });
           navigate("/dashboard");
         }, 8000);
@@ -983,7 +988,8 @@ export default function Booking() {
                             Automatic driver assignment with 50% surcharge
                           </p>
                           <p className="text-xs text-red-600 mt-1">
-                            Driver will be automatically matched - no cancellation option
+                            Driver will be automatically matched - no
+                            cancellation option
                           </p>
                         </div>
                         <Badge variant="destructive">+50%</Badge>
@@ -1058,10 +1064,14 @@ export default function Booking() {
               {bookingLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {purpose === "emergency" ? "Finding Nearest Driver..." : "Searching for Drivers..."}
+                  {purpose === "emergency"
+                    ? "Finding Nearest Driver..."
+                    : "Searching for Drivers..."}
                 </>
+              ) : purpose === "emergency" ? (
+                "Request Emergency Ride"
               ) : (
-                purpose === "emergency" ? "Request Emergency Ride" : "Find Driver"
+                "Find Driver"
               )}
             </Button>
           </div>

@@ -123,23 +123,23 @@ interface DriverStats {
   todayEarnings: number;
   weeklyEarnings: number;
   monthlyEarnings: number;
-  
+
   // Commission/Salary breakdown
   totalCommissionPaid?: number; // For vehicle owners
   totalKmSalary?: number; // For fleet drivers
-  
+
   // Rides
   totalRides: number;
   todayRides: number;
   totalKmDriven: number;
   todayKmDriven: number;
-  
+
   // Performance
   averageRating: number;
   onlineHours: number;
   acceptanceRate: number;
   completionRate: number;
-  
+
   // Goals
   monthlyTarget?: number;
   targetProgress?: number;
@@ -448,7 +448,8 @@ export default function NewDriverDashboard() {
                 </div>
                 {isFleetDriver && (
                   <div className="text-xs text-gray-500">
-                    {driverStats.todayKmDriven} km @ ₹{currentProfile.driverType.salaryPerKm}/km
+                    {driverStats.todayKmDriven} km @ ₹
+                    {currentProfile.driverType.salaryPerKm}/km
                   </div>
                 )}
               </div>
@@ -516,7 +517,9 @@ export default function NewDriverDashboard() {
               {isFleetDriver && (
                 <div className="text-right">
                   <div className="text-xs text-gray-500">Today's Distance</div>
-                  <div className="text-sm font-medium">{driverStats.todayKmDriven} km</div>
+                  <div className="text-sm font-medium">
+                    {driverStats.todayKmDriven} km
+                  </div>
                 </div>
               )}
             </div>
@@ -537,7 +540,8 @@ export default function NewDriverDashboard() {
                     ₹{driverStats.todayEarnings}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {driverStats.todayRides} rides • {driverStats.todayKmDriven} km
+                    {driverStats.todayRides} rides • {driverStats.todayKmDriven}{" "}
+                    km
                   </p>
                 </div>
                 <IndianRupee className="w-8 h-8 text-green-600" />
@@ -553,13 +557,14 @@ export default function NewDriverDashboard() {
                     {isFleetDriver ? "Distance Today" : "Total Rides"}
                   </p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {isFleetDriver ? `${driverStats.todayKmDriven} km` : driverStats.todayRides}
+                    {isFleetDriver
+                      ? `${driverStats.todayKmDriven} km`
+                      : driverStats.todayRides}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {isFleetDriver 
+                    {isFleetDriver
                       ? `₹${currentProfile.driverType.salaryPerKm}/km rate`
-                      : `${driverStats.totalRides} total rides`
-                    }
+                      : `${driverStats.totalRides} total rides`}
                   </p>
                 </div>
                 {isFleetDriver ? (
@@ -596,16 +601,14 @@ export default function NewDriverDashboard() {
                     {isFleetDriver ? "Shift Progress" : "Online Hours"}
                   </p>
                   <p className="text-2xl font-bold text-orange-600">
-                    {isFleetDriver 
+                    {isFleetDriver
                       ? `${Math.round(calculateShiftProgress())}%`
-                      : `${driverStats.onlineHours}h`
-                    }
+                      : `${driverStats.onlineHours}h`}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {isFleetDriver 
+                    {isFleetDriver
                       ? `${currentProfile.currentShift?.completedKm}/${currentProfile.currentShift?.targetKm} km`
-                      : `${driverStats.completionRate}% completion`
-                    }
+                      : `${driverStats.completionRate}% completion`}
                   </p>
                 </div>
                 {isFleetDriver ? (
@@ -624,9 +627,12 @@ export default function NewDriverDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-blue-900">Current Shift Progress</h3>
+                  <h3 className="text-lg font-semibold text-blue-900">
+                    Current Shift Progress
+                  </h3>
                   <p className="text-sm text-blue-700">
-                    Started {formatTime(currentProfile.currentShift.startTime)} • Target: {currentProfile.currentShift.targetKm} km
+                    Started {formatTime(currentProfile.currentShift.startTime)}{" "}
+                    • Target: {currentProfile.currentShift.targetKm} km
                   </p>
                 </div>
                 <Badge className="bg-blue-100 text-blue-800">
@@ -635,8 +641,14 @@ export default function NewDriverDashboard() {
               </div>
               <Progress value={calculateShiftProgress()} className="h-3 mb-2" />
               <div className="flex justify-between text-sm text-blue-700">
-                <span>{currentProfile.currentShift.completedKm} km completed</span>
-                <span>{(currentProfile.currentShift.targetKm || 0) - (currentProfile.currentShift.completedKm || 0)} km remaining</span>
+                <span>
+                  {currentProfile.currentShift.completedKm} km completed
+                </span>
+                <span>
+                  {(currentProfile.currentShift.targetKm || 0) -
+                    (currentProfile.currentShift.completedKm || 0)}{" "}
+                  km remaining
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -725,7 +737,9 @@ export default function NewDriverDashboard() {
                               <div className="flex items-start space-x-2">
                                 <div className="w-3 h-3 bg-green-500 rounded-full mt-2" />
                                 <div>
-                                  <p className="text-sm text-gray-600">Pickup</p>
+                                  <p className="text-sm text-gray-600">
+                                    Pickup
+                                  </p>
                                   <p className="font-medium">
                                     {request.pickup.address}
                                   </p>
@@ -759,25 +773,40 @@ export default function NewDriverDashboard() {
                             <div className="bg-white rounded-lg p-4 border">
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                  <p className="text-sm text-gray-600">Total Fare</p>
-                                  <p className="text-lg font-semibold">₹{request.estimatedEarnings}</p>
+                                  <p className="text-sm text-gray-600">
+                                    Total Fare
+                                  </p>
+                                  <p className="text-lg font-semibold">
+                                    ₹{request.estimatedEarnings}
+                                  </p>
                                 </div>
                                 <div>
                                   <p className="text-sm text-gray-600">
-                                    {isFleetDriver ? "Your Salary" : "Your Earnings"}
+                                    {isFleetDriver
+                                      ? "Your Salary"
+                                      : "Your Earnings"}
                                   </p>
                                   <p className="text-lg font-bold text-green-600">
                                     ₹{request.driverEarnings}
                                   </p>
                                 </div>
                               </div>
-                              
+
                               {request.fareBreakdown && (
                                 <div className="mt-3 pt-3 border-t text-xs text-gray-500">
                                   {isFleetDriver ? (
-                                    <p>Salary: {request.distance} km × ₹{currentProfile.driverType.salaryPerKm}/km = ₹{request.driverEarnings}</p>
+                                    <p>
+                                      Salary: {request.distance} km × ₹
+                                      {currentProfile.driverType.salaryPerKm}/km
+                                      = ₹{request.driverEarnings}
+                                    </p>
                                   ) : (
-                                    <p>After 5% commission: ₹{request.estimatedEarnings} - ₹{request.fareBreakdown.commission} = ₹{request.driverEarnings}</p>
+                                    <p>
+                                      After 5% commission: ₹
+                                      {request.estimatedEarnings} - ₹
+                                      {request.fareBreakdown.commission} = ₹
+                                      {request.driverEarnings}
+                                    </p>
                                   )}
                                 </div>
                               )}
@@ -797,7 +826,9 @@ export default function NewDriverDashboard() {
                             </Button>
                             <Button
                               variant="outline"
-                              onClick={() => {/* handleRejectRequest */}}
+                              onClick={() => {
+                                /* handleRejectRequest */
+                              }}
                               className="flex-1 lg:w-full border-red-200 text-red-600 hover:bg-red-50"
                             >
                               <XCircle className="w-4 h-4 mr-2" />
@@ -838,7 +869,13 @@ export default function NewDriverDashboard() {
                 <h2 className="text-2xl font-bold text-gray-800">
                   Earnings Overview
                 </h2>
-                <Badge className={isFleetDriver ? "bg-blue-100 text-blue-800" : "bg-yellow-100 text-yellow-800"}>
+                <Badge
+                  className={
+                    isFleetDriver
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }
+                >
                   {isFleetDriver ? "Fleet Driver" : "Vehicle Owner"}
                 </Badge>
               </div>
@@ -856,7 +893,8 @@ export default function NewDriverDashboard() {
                       ₹{driverStats.todayEarnings.toLocaleString()}
                     </div>
                     <p className="text-sm text-green-600 mt-1">
-                      {driverStats.todayRides} rides • {driverStats.todayKmDriven} km
+                      {driverStats.todayRides} rides •{" "}
+                      {driverStats.todayKmDriven} km
                     </p>
                   </CardContent>
                 </Card>
@@ -872,7 +910,8 @@ export default function NewDriverDashboard() {
                       ₹{driverStats.weeklyEarnings.toLocaleString()}
                     </div>
                     <p className="text-sm text-blue-600 mt-1">
-                      Average ₹{Math.round(driverStats.weeklyEarnings / 7)} per day
+                      Average ₹{Math.round(driverStats.weeklyEarnings / 7)} per
+                      day
                     </p>
                   </CardContent>
                 </Card>
@@ -924,23 +963,40 @@ export default function NewDriverDashboard() {
                       <div className="flex items-center space-x-4">
                         <Building className="w-8 h-8 text-blue-600" />
                         <div>
-                          <h3 className="font-semibold text-blue-900">Fleet Driver - Salary Model</h3>
-                          <p className="text-blue-700">₹{currentProfile.driverType.salaryPerKm} per kilometer driven</p>
+                          <h3 className="font-semibold text-blue-900">
+                            Fleet Driver - Salary Model
+                          </h3>
+                          <p className="text-blue-700">
+                            ₹{currentProfile.driverType.salaryPerKm} per
+                            kilometer driven
+                          </p>
                         </div>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div className="text-center p-3 bg-blue-100 rounded-lg">
-                          <div className="text-2xl font-bold text-blue-600">{driverStats.totalKmDriven}</div>
-                          <div className="text-sm text-blue-700">Total KM Driven</div>
+                          <div className="text-2xl font-bold text-blue-600">
+                            {driverStats.totalKmDriven}
+                          </div>
+                          <div className="text-sm text-blue-700">
+                            Total KM Driven
+                          </div>
                         </div>
                         <div className="text-center p-3 bg-green-100 rounded-lg">
-                          <div className="text-2xl font-bold text-green-600">₹{currentProfile.driverType.salaryPerKm}</div>
-                          <div className="text-sm text-green-700">Per KM Rate</div>
+                          <div className="text-2xl font-bold text-green-600">
+                            ₹{currentProfile.driverType.salaryPerKm}
+                          </div>
+                          <div className="text-sm text-green-700">
+                            Per KM Rate
+                          </div>
                         </div>
                         <div className="text-center p-3 bg-purple-100 rounded-lg">
-                          <div className="text-2xl font-bold text-purple-600">₹{driverStats.totalKmSalary}</div>
-                          <div className="text-sm text-purple-700">Total Salary</div>
+                          <div className="text-2xl font-bold text-purple-600">
+                            ₹{driverStats.totalKmSalary}
+                          </div>
+                          <div className="text-sm text-purple-700">
+                            Total Salary
+                          </div>
                         </div>
                       </div>
 
@@ -962,23 +1018,35 @@ export default function NewDriverDashboard() {
                       <div className="flex items-center space-x-4">
                         <Crown className="w-8 h-8 text-yellow-600" />
                         <div>
-                          <h3 className="font-semibold text-yellow-900">Vehicle Owner - Commission Model</h3>
-                          <p className="text-yellow-700">Keep 95% of ride earnings (5% commission)</p>
+                          <h3 className="font-semibold text-yellow-900">
+                            Vehicle Owner - Commission Model
+                          </h3>
+                          <p className="text-yellow-700">
+                            Keep 95% of ride earnings (5% commission)
+                          </p>
                         </div>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div className="text-center p-3 bg-green-100 rounded-lg">
-                          <div className="text-2xl font-bold text-green-600">95%</div>
+                          <div className="text-2xl font-bold text-green-600">
+                            95%
+                          </div>
                           <div className="text-sm text-green-700">You Keep</div>
                         </div>
                         <div className="text-center p-3 bg-red-100 rounded-lg">
-                          <div className="text-2xl font-bold text-red-600">5%</div>
+                          <div className="text-2xl font-bold text-red-600">
+                            5%
+                          </div>
                           <div className="text-sm text-red-700">Commission</div>
                         </div>
                         <div className="text-center p-3 bg-yellow-100 rounded-lg">
-                          <div className="text-2xl font-bold text-yellow-600">₹{driverStats.totalCommissionPaid}</div>
-                          <div className="text-sm text-yellow-700">Total Commission</div>
+                          <div className="text-2xl font-bold text-yellow-600">
+                            ₹{driverStats.totalCommissionPaid}
+                          </div>
+                          <div className="text-sm text-yellow-700">
+                            Total Commission
+                          </div>
                         </div>
                       </div>
 
@@ -1012,30 +1080,35 @@ export default function NewDriverDashboard() {
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">
-                          Target: {isFleetDriver ? `${driverStats.monthlyTarget} km` : `₹${driverStats.monthlyTarget.toLocaleString()}`}
+                          Target:{" "}
+                          {isFleetDriver
+                            ? `${driverStats.monthlyTarget} km`
+                            : `₹${driverStats.monthlyTarget.toLocaleString()}`}
                         </span>
                         <Badge className="bg-orange-100 text-orange-800">
-                          {Math.round(driverStats.targetProgress || 0)}% Complete
+                          {Math.round(driverStats.targetProgress || 0)}%
+                          Complete
                         </Badge>
                       </div>
-                      <Progress value={driverStats.targetProgress} className="h-3" />
+                      <Progress
+                        value={driverStats.targetProgress}
+                        className="h-3"
+                      />
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-gray-600">Achieved: </span>
                           <span className="font-semibold">
-                            {isFleetDriver 
+                            {isFleetDriver
                               ? `${Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget)} km`
-                              : `₹${Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget).toLocaleString()}`
-                            }
+                              : `₹${Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget).toLocaleString()}`}
                           </span>
                         </div>
                         <div>
                           <span className="text-gray-600">Remaining: </span>
                           <span className="font-semibold">
-                            {isFleetDriver 
+                            {isFleetDriver
                               ? `${driverStats.monthlyTarget - Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget)} km`
-                              : `₹${(driverStats.monthlyTarget - Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget)).toLocaleString()}`
-                            }
+                              : `₹${(driverStats.monthlyTarget - Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget)).toLocaleString()}`}
                           </span>
                         </div>
                       </div>
@@ -1049,8 +1122,10 @@ export default function NewDriverDashboard() {
           {/* Profile Tab */}
           <TabsContent value="profile">
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800">Driver Profile</h2>
-              
+              <h2 className="text-2xl font-bold text-gray-800">
+                Driver Profile
+              </h2>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -1089,19 +1164,36 @@ export default function NewDriverDashboard() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600 mt-4">
                         <div>
-                          <p><span className="font-medium">Phone:</span> {currentProfile.phone}</p>
-                          <p><span className="font-medium">Email:</span> {currentProfile.email}</p>
-                          <p><span className="font-medium">License:</span> {currentProfile.licenseNumber}</p>
+                          <p>
+                            <span className="font-medium">Phone:</span>{" "}
+                            {currentProfile.phone}
+                          </p>
+                          <p>
+                            <span className="font-medium">Email:</span>{" "}
+                            {currentProfile.email}
+                          </p>
+                          <p>
+                            <span className="font-medium">License:</span>{" "}
+                            {currentProfile.licenseNumber}
+                          </p>
                         </div>
                         <div>
                           <p>
                             <span className="font-medium">Vehicle:</span>{" "}
-                            {isFleetDriver ? currentProfile.assignedVehicle : currentProfile.vehicleModel}
+                            {isFleetDriver
+                              ? currentProfile.assignedVehicle
+                              : currentProfile.vehicleModel}
                           </p>
                           {!isFleetDriver && (
-                            <p><span className="font-medium">Number:</span> {currentProfile.vehicleNumber}</p>
+                            <p>
+                              <span className="font-medium">Number:</span>{" "}
+                              {currentProfile.vehicleNumber}
+                            </p>
                           )}
-                          <p><span className="font-medium">Member since:</span> {formatDate(currentProfile.joinDate)}</p>
+                          <p>
+                            <span className="font-medium">Member since:</span>{" "}
+                            {formatDate(currentProfile.joinDate)}
+                          </p>
                         </div>
                       </div>
                     </div>

@@ -9,12 +9,12 @@ export interface IVehicle extends Document {
   registrationNumber: string;
   type: "company" | "driver_owned";
   status: "available" | "assigned" | "maintenance";
-  
+
   // Assignment
   assignedDriverId?: string;
   assignedDriverName?: string;
   assignedAt?: Date;
-  
+
   // Maintenance and Service
   mileage: number;
   lastService: Date;
@@ -26,29 +26,29 @@ export interface IVehicle extends Document {
     description: string;
     serviceCenter?: string;
   }[];
-  
+
   // Documents
   insuranceExpiry: Date;
   registrationExpiry: Date;
   pollutionCertExpiry: Date;
-  
+
   // Document URLs
   registrationDocumentUrl?: string;
   insuranceDocumentUrl?: string;
   pollutionCertUrl?: string;
-  
+
   // Vehicle Specifications
   fuelType: "petrol" | "diesel" | "cng" | "electric";
   transmission: "manual" | "automatic";
   seatingCapacity: number;
   engineCapacity?: number; // in CC
-  
+
   // Operational Data
   totalTrips: number;
   totalKmDriven: number;
   totalEarnings: number;
   averageFuelEfficiency?: number; // km per liter
-  
+
   // Location and Tracking
   lastKnownLocation?: {
     lat: number;
@@ -56,17 +56,17 @@ export interface IVehicle extends Document {
     address?: string;
     timestamp: Date;
   };
-  
+
   // Financial
   purchasePrice?: number;
   purchaseDate?: Date;
   depreciationRate?: number;
-  
+
   // Status tracking
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Methods
   assignToDriver(driverId: string, driverName: string): Promise<void>;
   unassign(): Promise<void>;
@@ -80,54 +80,60 @@ export interface IVehicle extends Document {
   }): Promise<void>;
 }
 
-const MaintenanceRecordSchema = new Schema({
-  date: {
-    type: Date,
-    default: Date.now,
+const MaintenanceRecordSchema = new Schema(
+  {
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+    type: {
+      type: String,
+      required: true,
+      enum: ["routine", "repair", "inspection", "breakdown", "accident"],
+    },
+    cost: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    description: {
+      type: String,
+      required: true,
+      maxlength: 500,
+    },
+    serviceCenter: {
+      type: String,
+      maxlength: 200,
+    },
   },
-  type: {
-    type: String,
-    required: true,
-    enum: ["routine", "repair", "inspection", "breakdown", "accident"],
-  },
-  cost: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-  description: {
-    type: String,
-    required: true,
-    maxlength: 500,
-  },
-  serviceCenter: {
-    type: String,
-    maxlength: 200,
-  },
-}, { _id: true });
+  { _id: true },
+);
 
-const LocationSchema = new Schema({
-  lat: {
-    type: Number,
-    required: true,
-    min: -90,
-    max: 90,
+const LocationSchema = new Schema(
+  {
+    lat: {
+      type: Number,
+      required: true,
+      min: -90,
+      max: 90,
+    },
+    lng: {
+      type: Number,
+      required: true,
+      min: -180,
+      max: 180,
+    },
+    address: {
+      type: String,
+      maxlength: 300,
+    },
+    timestamp: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  lng: {
-    type: Number,
-    required: true,
-    min: -180,
-    max: 180,
-  },
-  address: {
-    type: String,
-    maxlength: 300,
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-  },
-}, { _id: false });
+  { _id: false },
+);
 
 const VehicleSchema: Schema<IVehicle> = new Schema(
   {
@@ -176,7 +182,7 @@ const VehicleSchema: Schema<IVehicle> = new Schema(
       enum: ["available", "assigned", "maintenance"],
       default: "available",
     },
-    
+
     // Assignment
     assignedDriverId: {
       type: String,
@@ -187,7 +193,7 @@ const VehicleSchema: Schema<IVehicle> = new Schema(
       maxlength: 100,
     },
     assignedAt: Date,
-    
+
     // Maintenance and Service
     mileage: {
       type: Number,
@@ -203,13 +209,13 @@ const VehicleSchema: Schema<IVehicle> = new Schema(
       required: [true, "Next service due date is required"],
     },
     maintenanceHistory: [MaintenanceRecordSchema],
-    
+
     // Documents
     insuranceExpiry: {
       type: Date,
       required: [true, "Insurance expiry date is required"],
       validate: {
-        validator: function(date: Date) {
+        validator: function (date: Date) {
           return date > new Date();
         },
         message: "Insurance must not be expired",
@@ -219,7 +225,7 @@ const VehicleSchema: Schema<IVehicle> = new Schema(
       type: Date,
       required: [true, "Registration expiry date is required"],
       validate: {
-        validator: function(date: Date) {
+        validator: function (date: Date) {
           return date > new Date();
         },
         message: "Registration must not be expired",
@@ -229,18 +235,18 @@ const VehicleSchema: Schema<IVehicle> = new Schema(
       type: Date,
       required: [true, "Pollution certificate expiry date is required"],
       validate: {
-        validator: function(date: Date) {
+        validator: function (date: Date) {
           return date > new Date();
         },
         message: "Pollution certificate must not be expired",
       },
     },
-    
+
     // Document URLs
     registrationDocumentUrl: String,
     insuranceDocumentUrl: String,
     pollutionCertUrl: String,
-    
+
     // Vehicle Specifications
     fuelType: {
       type: String,
@@ -266,7 +272,7 @@ const VehicleSchema: Schema<IVehicle> = new Schema(
       min: 800,
       max: 5000,
     },
-    
+
     // Operational Data
     totalTrips: {
       type: Number,
@@ -288,10 +294,10 @@ const VehicleSchema: Schema<IVehicle> = new Schema(
       min: 5,
       max: 40,
     },
-    
+
     // Location and Tracking
     lastKnownLocation: LocationSchema,
-    
+
     // Financial
     purchasePrice: {
       type: Number,
@@ -304,7 +310,7 @@ const VehicleSchema: Schema<IVehicle> = new Schema(
       max: 1,
       default: 0.15, // 15% per year
     },
-    
+
     // Status tracking
     isActive: {
       type: Boolean,
@@ -351,22 +357,26 @@ VehicleSchema.pre<IVehicle>("save", function (next) {
     const nextServiceByKm = Math.ceil(this.mileage / 10000) * 10000;
     const nextServiceByDate = new Date(this.lastService);
     nextServiceByDate.setMonth(nextServiceByDate.getMonth() + 6);
-    
+
     // Use the earlier of the two dates
     const nextServiceByKmDate = new Date();
-    nextServiceByKmDate.setDate(nextServiceByKmDate.getDate() + 
-      Math.max(0, (nextServiceByKm - this.mileage) * 0.5)); // Assume 2 km per day average
-    
-    this.nextServiceDue = nextServiceByKmDate < nextServiceByDate ? 
-      nextServiceByKmDate : nextServiceByDate;
+    nextServiceByKmDate.setDate(
+      nextServiceByKmDate.getDate() +
+        Math.max(0, (nextServiceByKm - this.mileage) * 0.5),
+    ); // Assume 2 km per day average
+
+    this.nextServiceDue =
+      nextServiceByKmDate < nextServiceByDate
+        ? nextServiceByKmDate
+        : nextServiceByDate;
   }
   next();
 });
 
 // Method to assign vehicle to driver
 VehicleSchema.methods.assignToDriver = async function (
-  driverId: string, 
-  driverName: string
+  driverId: string,
+  driverName: string,
 ): Promise<void> {
   if (this.status !== "available") {
     throw new Error("Vehicle is not available for assignment");
@@ -392,8 +402,8 @@ VehicleSchema.methods.unassign = async function (): Promise<void> {
 
 // Method to schedule service
 VehicleSchema.methods.scheduleService = async function (
-  date: Date, 
-  type: string
+  date: Date,
+  type: string,
 ): Promise<void> {
   this.nextServiceDue = date;
   this.status = "maintenance";
@@ -410,7 +420,9 @@ VehicleSchema.methods.scheduleService = async function (
 };
 
 // Method to update mileage
-VehicleSchema.methods.updateMileage = async function (newMileage: number): Promise<void> {
+VehicleSchema.methods.updateMileage = async function (
+  newMileage: number,
+): Promise<void> {
   if (newMileage < this.mileage) {
     throw new Error("New mileage cannot be less than current mileage");
   }
@@ -471,7 +483,7 @@ VehicleSchema.statics.findDueForService = function () {
 VehicleSchema.statics.findExpiringDocuments = function (days: number = 30) {
   const futureDate = new Date();
   futureDate.setDate(futureDate.getDate() + days);
-  
+
   return this.find({
     $or: [
       { insuranceExpiry: { $lte: futureDate } },
@@ -490,27 +502,27 @@ VehicleSchema.statics.getFleetStatistics = function () {
         _id: null,
         totalVehicles: { $sum: 1 },
         companyVehicles: {
-          $sum: { $cond: [{ $eq: ["$type", "company"] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$type", "company"] }, 1, 0] },
         },
         driverOwnedVehicles: {
-          $sum: { $cond: [{ $eq: ["$type", "driver_owned"] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$type", "driver_owned"] }, 1, 0] },
         },
         availableVehicles: {
-          $sum: { $cond: [{ $eq: ["$status", "available"] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$status", "available"] }, 1, 0] },
         },
         assignedVehicles: {
-          $sum: { $cond: [{ $eq: ["$status", "assigned"] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$status", "assigned"] }, 1, 0] },
         },
         maintenanceVehicles: {
-          $sum: { $cond: [{ $eq: ["$status", "maintenance"] }, 1, 0] }
+          $sum: { $cond: [{ $eq: ["$status", "maintenance"] }, 1, 0] },
         },
         totalKmDriven: { $sum: "$totalKmDriven" },
         totalEarnings: { $sum: "$totalEarnings" },
         averageAge: {
-          $avg: { $subtract: [new Date().getFullYear(), "$year"] }
+          $avg: { $subtract: [new Date().getFullYear(), "$year"] },
         },
-      }
-    }
+      },
+    },
   ]);
 };
 

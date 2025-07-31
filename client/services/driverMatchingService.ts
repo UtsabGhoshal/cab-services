@@ -1,6 +1,21 @@
-import { firebaseDriverService, FirebaseDriver, FirebaseRide } from './firebaseDriverService';
-import { collection, query, where, getDocs, addDoc, updateDoc, doc, onSnapshot, Timestamp, GeoPoint } from 'firebase/firestore';
-import { db } from '@/firebase/config';
+import {
+  firebaseDriverService,
+  FirebaseDriver,
+  FirebaseRide,
+} from "./firebaseDriverService";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc,
+  onSnapshot,
+  Timestamp,
+  GeoPoint,
+} from "firebase/firestore";
+import { db } from "@/firebase/config";
 
 export interface DriverLocation {
   driverId: string;
@@ -65,14 +80,14 @@ export class DriverMatchingService {
 
   // Update driver location
   async updateDriverLocation(
-    driverId: string, 
-    lat: number, 
-    lng: number, 
+    driverId: string,
+    lat: number,
+    lng: number,
     isOnline: boolean = true,
-    isAvailable: boolean = true
+    isAvailable: boolean = true,
   ): Promise<void> {
     const locationRef = doc(this.driverLocationsCollection, driverId);
-    
+
     const locationData: DriverLocation = {
       driverId,
       lat,
@@ -100,56 +115,80 @@ export class DriverMatchingService {
 
   // Get nearby drivers
   private async getNearbyDrivers(
-    pickupLat: number, 
-    pickupLng: number, 
-    radiusKm: number
+    pickupLat: number,
+    pickupLng: number,
+    radiusKm: number,
   ): Promise<DriverLocation[]> {
     // Get all online and available drivers
     const q = query(
       this.driverLocationsCollection,
       where("isOnline", "==", true),
-      where("isAvailable", "==", true)
+      where("isAvailable", "==", true),
     );
-    
+
     const snapshot = await getDocs(q);
-    const allDrivers = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as DriverLocation));
+    const allDrivers = snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as DriverLocation,
+    );
 
     // Filter by distance using Haversine formula
-    return allDrivers.filter(driver => {
-      const distance = this.calculateDistance(
-        pickupLat, pickupLng,
-        driver.lat, driver.lng
-      );
-      return distance <= radiusKm;
-    }).sort((a, b) => {
-      // Sort by distance, then by rating, then by total rides
-      const distanceA = this.calculateDistance(pickupLat, pickupLng, a.lat, a.lng);
-      const distanceB = this.calculateDistance(pickupLat, pickupLng, b.lat, b.lng);
-      
-      if (Math.abs(distanceA - distanceB) > 0.1) {
-        return distanceA - distanceB; // Closer drivers first
-      }
-      
-      if (Math.abs(a.rating - b.rating) > 0.1) {
-        return b.rating - a.rating; // Higher rated drivers first
-      }
-      
-      return b.totalRides - a.totalRides; // More experienced drivers first
-    });
+    return allDrivers
+      .filter((driver) => {
+        const distance = this.calculateDistance(
+          pickupLat,
+          pickupLng,
+          driver.lat,
+          driver.lng,
+        );
+        return distance <= radiusKm;
+      })
+      .sort((a, b) => {
+        // Sort by distance, then by rating, then by total rides
+        const distanceA = this.calculateDistance(
+          pickupLat,
+          pickupLng,
+          a.lat,
+          a.lng,
+        );
+        const distanceB = this.calculateDistance(
+          pickupLat,
+          pickupLng,
+          b.lat,
+          b.lng,
+        );
+
+        if (Math.abs(distanceA - distanceB) > 0.1) {
+          return distanceA - distanceB; // Closer drivers first
+        }
+
+        if (Math.abs(a.rating - b.rating) > 0.1) {
+          return b.rating - a.rating; // Higher rated drivers first
+        }
+
+        return b.totalRides - a.totalRides; // More experienced drivers first
+      });
   }
 
   // Calculate distance between two points using Haversine formula
-  private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  private calculateDistance(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number,
+  ): number {
     const R = 6371; // Earth's radius in kilometers
     const dLat = this.toRadians(lat2 - lat1);
     const dLng = this.toRadians(lng2 - lng1);
-    const a = 
+    const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRadians(lat1)) * Math.cos(this.toRadians(lat2)) *
-      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      Math.cos(this.toRadians(lat1)) *
+        Math.cos(this.toRadians(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
@@ -159,7 +198,9 @@ export class DriverMatchingService {
   }
 
   // Create a ride request
-  async createRideRequest(rideData: Omit<RideRequest, "id" | "createdAt" | "updatedAt">): Promise<string> {
+  async createRideRequest(
+    rideData: Omit<RideRequest, "id" | "createdAt" | "updatedAt">,
+  ): Promise<string> {
     const now = Timestamp.now();
     const request: Omit<RideRequest, "id"> = {
       ...rideData,
@@ -168,26 +209,29 @@ export class DriverMatchingService {
     };
 
     const docRef = await addDoc(this.rideRequestsCollection, request);
-    
+
     // Start matching process
     if (rideData.purpose === "emergency") {
       await this.matchEmergencyRide(docRef.id, rideData);
     } else {
       await this.matchGeneralRide(docRef.id, rideData);
     }
-    
+
     return docRef.id;
   }
 
   // Match emergency ride (automatic assignment)
-  private async matchEmergencyRide(rideId: string, rideData: Omit<RideRequest, "id" | "createdAt" | "updatedAt">): Promise<void> {
+  private async matchEmergencyRide(
+    rideId: string,
+    rideData: Omit<RideRequest, "id" | "createdAt" | "updatedAt">,
+  ): Promise<void> {
     const pickupCoords = rideData.pickup.coordinates;
-    
+
     // Find the nearest available driver within emergency radius
     const nearbyDrivers = await this.getNearbyDrivers(
       pickupCoords.latitude,
       pickupCoords.longitude,
-      this.EMERGENCY_AUTO_MATCH_RADIUS
+      this.EMERGENCY_AUTO_MATCH_RADIUS,
     );
 
     if (nearbyDrivers.length === 0) {
@@ -195,9 +239,9 @@ export class DriverMatchingService {
       const expandedDrivers = await this.getNearbyDrivers(
         pickupCoords.latitude,
         pickupCoords.longitude,
-        this.MAX_SEARCH_RADIUS_KM
+        this.MAX_SEARCH_RADIUS_KM,
       );
-      
+
       if (expandedDrivers.length === 0) {
         // No drivers available
         await this.updateRideRequest(rideId, {
@@ -206,7 +250,7 @@ export class DriverMatchingService {
         });
         return;
       }
-      
+
       // Auto-assign to the best available driver (even if far)
       await this.autoAssignRide(rideId, expandedDrivers[0].driverId);
     } else {
@@ -216,44 +260,52 @@ export class DriverMatchingService {
   }
 
   // Match general ride (driver choice)
-  private async matchGeneralRide(rideId: string, rideData: Omit<RideRequest, "id" | "createdAt" | "updatedAt">): Promise<void> {
+  private async matchGeneralRide(
+    rideId: string,
+    rideData: Omit<RideRequest, "id" | "createdAt" | "updatedAt">,
+  ): Promise<void> {
     const pickupCoords = rideData.pickup.coordinates;
     let currentRadius = this.SEARCH_RADIUS_KM;
-    
+
     // Try to find drivers in expanding circles
     while (currentRadius <= this.MAX_SEARCH_RADIUS_KM) {
       const nearbyDrivers = await this.getNearbyDrivers(
         pickupCoords.latitude,
         pickupCoords.longitude,
-        currentRadius
+        currentRadius,
       );
 
       if (nearbyDrivers.length > 0) {
         // Send ride request to multiple drivers (top 3)
         const driversToNotify = nearbyDrivers.slice(0, 3);
         await this.sendRideRequestToDrivers(rideId, driversToNotify);
-        
+
         // Set acceptance deadline
         const deadline = new Date();
-        deadline.setSeconds(deadline.getSeconds() + this.GENERAL_ACCEPTANCE_TIMEOUT);
-        
+        deadline.setSeconds(
+          deadline.getSeconds() + this.GENERAL_ACCEPTANCE_TIMEOUT,
+        );
+
         await this.updateRideRequest(rideId, {
           status: "matched",
           acceptanceDeadline: Timestamp.fromDate(deadline),
           updatedAt: Timestamp.now(),
         });
-        
+
         // Set timeout to handle no response
         setTimeout(() => {
-          this.handleNoResponse(rideId, driversToNotify.map(d => d.driverId));
+          this.handleNoResponse(
+            rideId,
+            driversToNotify.map((d) => d.driverId),
+          );
         }, this.GENERAL_ACCEPTANCE_TIMEOUT * 1000);
-        
+
         return;
       }
-      
+
       currentRadius += 2; // Expand radius by 2km
     }
-    
+
     // No drivers found
     await this.updateRideRequest(rideId, {
       status: "cancelled",
@@ -262,7 +314,10 @@ export class DriverMatchingService {
   }
 
   // Auto-assign ride to driver (for emergency)
-  private async autoAssignRide(rideId: string, driverId: string): Promise<void> {
+  private async autoAssignRide(
+    rideId: string,
+    driverId: string,
+  ): Promise<void> {
     await this.updateRideRequest(rideId, {
       status: "accepted",
       matchedDriverId: driverId,
@@ -272,26 +327,34 @@ export class DriverMatchingService {
 
     // Mark driver as unavailable
     await this.updateDriverLocation(driverId, 0, 0, true, false);
-    
+
     // Notify driver of auto-assignment
     await this.notifyDriverOfAutoAssignment(driverId, rideId);
   }
 
   // Send ride request to multiple drivers
-  private async sendRideRequestToDrivers(rideId: string, drivers: DriverLocation[]): Promise<void> {
+  private async sendRideRequestToDrivers(
+    rideId: string,
+    drivers: DriverLocation[],
+  ): Promise<void> {
     // In a real app, this would send push notifications or real-time updates
-    console.log(`Sending ride request ${rideId} to drivers:`, drivers.map(d => d.driverId));
-    
+    console.log(
+      `Sending ride request ${rideId} to drivers:`,
+      drivers.map((d) => d.driverId),
+    );
+
     // Create notifications for each driver
     const notificationsCollection = collection(db, "driver_notifications");
-    
+
     for (const driver of drivers) {
       await addDoc(notificationsCollection, {
         driverId: driver.driverId,
         rideId,
         type: "ride_request",
         createdAt: Timestamp.now(),
-        expiresAt: Timestamp.fromDate(new Date(Date.now() + this.GENERAL_ACCEPTANCE_TIMEOUT * 1000)),
+        expiresAt: Timestamp.fromDate(
+          new Date(Date.now() + this.GENERAL_ACCEPTANCE_TIMEOUT * 1000),
+        ),
         read: false,
       });
     }
@@ -300,11 +363,11 @@ export class DriverMatchingService {
   // Handle driver acceptance of ride
   async acceptRide(rideId: string, driverId: string): Promise<boolean> {
     const rideRef = doc(this.rideRequestsCollection, rideId);
-    
+
     try {
       // Check if ride is still available
       const rideDoc = await firebaseDriverService.getDriver(rideId); // This should be getRideRequest
-      
+
       if (!rideDoc || rideDoc.status !== "matched") {
         return false; // Ride already taken or cancelled
       }
@@ -318,10 +381,10 @@ export class DriverMatchingService {
 
       // Mark driver as unavailable
       await this.updateDriverLocation(driverId, 0, 0, true, false);
-      
+
       // Cancel notifications for other drivers
       await this.cancelOtherDriverNotifications(rideId, driverId);
-      
+
       return true;
     } catch (error) {
       console.error("Error accepting ride:", error);
@@ -330,20 +393,29 @@ export class DriverMatchingService {
   }
 
   // Handle driver cancellation
-  async cancelRide(rideId: string, driverId: string, reason: string = "Driver cancelled"): Promise<void> {
+  async cancelRide(
+    rideId: string,
+    driverId: string,
+    reason: string = "Driver cancelled",
+  ): Promise<void> {
     const rideDoc = await this.getRideRequest(rideId);
-    
+
     if (!rideDoc) return;
 
     // Calculate penalty
-    const penaltyAmount = rideDoc.purpose === "emergency" 
-      ? this.EMERGENCY_CANCEL_PENALTY 
-      : this.GENERAL_CANCEL_PENALTY;
+    const penaltyAmount =
+      rideDoc.purpose === "emergency"
+        ? this.EMERGENCY_CANCEL_PENALTY
+        : this.GENERAL_CANCEL_PENALTY;
 
     // Apply penalty
-    await this.applyPenalty(driverId, rideId, 
+    await this.applyPenalty(
+      driverId,
+      rideId,
       rideDoc.purpose === "emergency" ? "emergency_cancel" : "general_cancel",
-      penaltyAmount, reason);
+      penaltyAmount,
+      reason,
+    );
 
     // Update ride status
     await this.updateRideRequest(rideId, {
@@ -363,16 +435,25 @@ export class DriverMatchingService {
   }
 
   // Handle no response from drivers
-  private async handleNoResponse(rideId: string, driverIds: string[]): Promise<void> {
+  private async handleNoResponse(
+    rideId: string,
+    driverIds: string[],
+  ): Promise<void> {
     const rideDoc = await this.getRideRequest(rideId);
-    
+
     if (!rideDoc || rideDoc.status !== "matched") {
       return; // Ride was already accepted or cancelled
     }
 
     // Apply no response penalty to all drivers who didn't respond
     for (const driverId of driverIds) {
-      await this.applyPenalty(driverId, rideId, "no_response", this.NO_RESPONSE_PENALTY, "No response to ride request");
+      await this.applyPenalty(
+        driverId,
+        rideId,
+        "no_response",
+        this.NO_RESPONSE_PENALTY,
+        "No response to ride request",
+      );
     }
 
     // Try to match again with expanded radius
@@ -381,11 +462,11 @@ export class DriverMatchingService {
 
   // Apply penalty to driver
   private async applyPenalty(
-    driverId: string, 
-    rideId: string, 
+    driverId: string,
+    rideId: string,
     penaltyType: "general_cancel" | "emergency_cancel" | "no_response",
     amount: number,
-    reason: string
+    reason: string,
   ): Promise<void> {
     const penalty: DriverPenalty = {
       driverId,
@@ -397,13 +478,16 @@ export class DriverMatchingService {
     };
 
     await addDoc(this.penaltiesCollection, penalty);
-    
+
     // Update driver's penalty balance in their profile
     // This would be implemented in the driver service
   }
 
   // Utility methods
-  private async updateRideRequest(rideId: string, updates: Partial<RideRequest>): Promise<void> {
+  private async updateRideRequest(
+    rideId: string,
+    updates: Partial<RideRequest>,
+  ): Promise<void> {
     const rideRef = doc(this.rideRequestsCollection, rideId);
     await updateDoc(rideRef, {
       ...updates,
@@ -417,7 +501,10 @@ export class DriverMatchingService {
     return null;
   }
 
-  private async notifyDriverOfAutoAssignment(driverId: string, rideId: string): Promise<void> {
+  private async notifyDriverOfAutoAssignment(
+    driverId: string,
+    rideId: string,
+  ): Promise<void> {
     const notificationsCollection = collection(db, "driver_notifications");
     await addDoc(notificationsCollection, {
       driverId,
@@ -429,18 +516,24 @@ export class DriverMatchingService {
     });
   }
 
-  private async cancelOtherDriverNotifications(rideId: string, acceptedDriverId: string): Promise<void> {
+  private async cancelOtherDriverNotifications(
+    rideId: string,
+    acceptedDriverId: string,
+  ): Promise<void> {
     // This would cancel notifications for other drivers
     // Implementation needed using Firestore queries
   }
 
   // Real-time listeners
-  onRideRequestsChange(driverId: string, callback: (requests: RideRequest[]) => void): () => void {
+  onRideRequestsChange(
+    driverId: string,
+    callback: (requests: RideRequest[]) => void,
+  ): () => void {
     const q = query(
       collection(db, "driver_notifications"),
       where("driverId", "==", driverId),
       where("type", "==", "ride_request"),
-      where("read", "==", false)
+      where("read", "==", false),
     );
 
     return onSnapshot(q, (snapshot) => {
@@ -453,14 +546,17 @@ export class DriverMatchingService {
   async getDriverPenalties(driverId: string): Promise<DriverPenalty[]> {
     const q = query(
       this.penaltiesCollection,
-      where("driverId", "==", driverId)
+      where("driverId", "==", driverId),
     );
-    
+
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as DriverPenalty));
+    return snapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        }) as DriverPenalty,
+    );
   }
 
   // Calculate total penalty amount for driver

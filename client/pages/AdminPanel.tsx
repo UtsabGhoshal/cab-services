@@ -6,8 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   Car,
@@ -221,35 +233,38 @@ export default function AdminPanel() {
     },
   ]);
 
-  const [commissionSettings, setCommissionSettings] = useState<CommissionSettings>({
-    vehicleOwnerRate: 5, // 5%
-    fleetDriverSalaryRate: 12, // ��12 per km
-    platformFee: 2, // 2%
-    bonusThresholds: [
-      { rides: 50, bonus: 500 },
-      { rides: 100, bonus: 1200 },
-      { rides: 200, bonus: 2500 },
-    ],
-  });
+  const [commissionSettings, setCommissionSettings] =
+    useState<CommissionSettings>({
+      vehicleOwnerRate: 5, // 5%
+      fleetDriverSalaryRate: 12, // ��12 per km
+      platformFee: 2, // 2%
+      bonusThresholds: [
+        { rides: 50, bonus: 500 },
+        { rides: 100, bonus: 1200 },
+        { rides: 200, bonus: 2500 },
+      ],
+    });
 
   // Dashboard stats
   const dashboardStats = {
     totalDrivers: drivers.length,
-    activeDrivers: drivers.filter(d => d.status === "active").length,
-    pendingApprovals: drivers.filter(d => d.status === "pending").length,
+    activeDrivers: drivers.filter((d) => d.status === "active").length,
+    pendingApprovals: drivers.filter((d) => d.status === "pending").length,
     totalVehicles: vehicles.length,
-    availableVehicles: vehicles.filter(v => v.status === "available").length,
+    availableVehicles: vehicles.filter((v) => v.status === "available").length,
     totalRevenue: drivers.reduce((sum, d) => sum + d.totalEarnings, 0),
     monthlyCommission: drivers
-      .filter(d => d.type === "owner")
-      .reduce((sum, d) => sum + (d.totalEarnings * (d.commissionRate || 0)), 0),
+      .filter((d) => d.type === "owner")
+      .reduce((sum, d) => sum + d.totalEarnings * (d.commissionRate || 0), 0),
   };
 
-  const filteredDrivers = drivers.filter(driver => {
-    const matchesSearch = driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         driver.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         driver.phone.includes(searchTerm);
-    const matchesStatus = filterStatus === "all" || driver.status === filterStatus;
+  const filteredDrivers = drivers.filter((driver) => {
+    const matchesSearch =
+      driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      driver.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      driver.phone.includes(searchTerm);
+    const matchesStatus =
+      filterStatus === "all" || driver.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -341,7 +356,11 @@ export default function AdminPanel() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6 lg:px-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
             <TabsTrigger value="dashboard" className="text-xs sm:text-sm">
               Dashboard
@@ -368,15 +387,19 @@ export default function AdminPanel() {
           {/* Dashboard Tab */}
           <TabsContent value="dashboard">
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800">Admin Dashboard</h2>
-              
+              <h2 className="text-2xl font-bold text-gray-800">
+                Admin Dashboard
+              </h2>
+
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-blue-600 font-medium">Total Drivers</p>
+                        <p className="text-sm text-blue-600 font-medium">
+                          Total Drivers
+                        </p>
                         <p className="text-3xl font-bold text-blue-700">
                           {dashboardStats.totalDrivers}
                         </p>
@@ -393,7 +416,9 @@ export default function AdminPanel() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-green-600 font-medium">Total Vehicles</p>
+                        <p className="text-sm text-green-600 font-medium">
+                          Total Vehicles
+                        </p>
                         <p className="text-3xl font-bold text-green-700">
                           {dashboardStats.totalVehicles}
                         </p>
@@ -410,13 +435,13 @@ export default function AdminPanel() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-purple-600 font-medium">Total Revenue</p>
+                        <p className="text-sm text-purple-600 font-medium">
+                          Total Revenue
+                        </p>
                         <p className="text-3xl font-bold text-purple-700">
                           ��{dashboardStats.totalRevenue.toLocaleString()}
                         </p>
-                        <p className="text-sm text-purple-600">
-                          This month
-                        </p>
+                        <p className="text-sm text-purple-600">This month</p>
                       </div>
                       <IndianRupee className="w-12 h-12 text-purple-600" />
                     </div>
@@ -427,7 +452,9 @@ export default function AdminPanel() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-orange-600 font-medium">Pending Approvals</p>
+                        <p className="text-sm text-orange-600 font-medium">
+                          Pending Approvals
+                        </p>
                         <p className="text-3xl font-bold text-orange-700">
                           {dashboardStats.pendingApprovals}
                         </p>
@@ -454,19 +481,30 @@ export default function AdminPanel() {
                     <div className="flex items-center space-x-4 p-3 bg-yellow-50 rounded-lg">
                       <AlertTriangle className="w-5 h-5 text-yellow-600" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium">New driver application pending</p>
-                        <p className="text-xs text-gray-600">Priya Sharma submitted documents 2 hours ago</p>
+                        <p className="text-sm font-medium">
+                          New driver application pending
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          Priya Sharma submitted documents 2 hours ago
+                        </p>
                       </div>
-                      <Button size="sm" className="bg-yellow-600 hover:bg-yellow-700">
+                      <Button
+                        size="sm"
+                        className="bg-yellow-600 hover:bg-yellow-700"
+                      >
                         Review
                       </Button>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4 p-3 bg-blue-50 rounded-lg">
                       <Car className="w-5 h-5 text-blue-600" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium">Vehicle maintenance completed</p>
-                        <p className="text-xs text-gray-600">DL 04 GH 3456 is ready for assignment</p>
+                        <p className="text-sm font-medium">
+                          Vehicle maintenance completed
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          DL 04 GH 3456 is ready for assignment
+                        </p>
                       </div>
                       <Button size="sm" variant="outline">
                         Assign
@@ -476,8 +514,12 @@ export default function AdminPanel() {
                     <div className="flex items-center space-x-4 p-3 bg-green-50 rounded-lg">
                       <Star className="w-5 h-5 text-green-600" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium">High-rated driver milestone</p>
-                        <p className="text-xs text-gray-600">Rajesh Kumar completed 500 rides with 4.8★ rating</p>
+                        <p className="text-sm font-medium">
+                          High-rated driver milestone
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          Rajesh Kumar completed 500 rides with 4.8★ rating
+                        </p>
                       </div>
                       <Button size="sm" variant="outline">
                         Reward
@@ -493,7 +535,9 @@ export default function AdminPanel() {
           <TabsContent value="drivers">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-800">Driver Management</h2>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Driver Management
+                </h2>
                 <Button className="bg-yellow-600 hover:bg-yellow-700">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Driver
@@ -527,17 +571,31 @@ export default function AdminPanel() {
               {/* Drivers List */}
               <div className="grid gap-4">
                 {filteredDrivers.map((driver) => (
-                  <Card key={driver.id} className="hover:shadow-md transition-shadow">
+                  <Card
+                    key={driver.id}
+                    className="hover:shadow-md transition-shadow"
+                  >
                     <CardContent className="p-6">
                       <div className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
                         <div className="flex items-center space-x-4">
                           <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                            {driver.name.split(" ").map(n => n[0]).join("")}
+                            {driver.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
                           </div>
                           <div>
-                            <h3 className="font-semibold text-lg">{driver.name}</h3>
+                            <h3 className="font-semibold text-lg">
+                              {driver.name}
+                            </h3>
                             <div className="flex items-center space-x-2">
-                              <Badge className={driver.type === "owner" ? "bg-yellow-100 text-yellow-800" : "bg-blue-100 text-blue-800"}>
+                              <Badge
+                                className={
+                                  driver.type === "owner"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-blue-100 text-blue-800"
+                                }
+                              >
                                 {driver.type === "owner" ? (
                                   <>
                                     <Crown className="w-3 h-3 mr-1" />
@@ -560,7 +618,9 @@ export default function AdminPanel() {
                         <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                           <div>
                             <p className="text-gray-600">Rating</p>
-                            <p className="font-semibold">{driver.rating > 0 ? `${driver.rating}★` : "New"}</p>
+                            <p className="font-semibold">
+                              {driver.rating > 0 ? `${driver.rating}★` : "New"}
+                            </p>
                           </div>
                           <div>
                             <p className="text-gray-600">Total Rides</p>
@@ -568,11 +628,15 @@ export default function AdminPanel() {
                           </div>
                           <div>
                             <p className="text-gray-600">Earnings</p>
-                            <p className="font-semibold">₹{driver.totalEarnings.toLocaleString()}</p>
+                            <p className="font-semibold">
+                              ₹{driver.totalEarnings.toLocaleString()}
+                            </p>
                           </div>
                           <div>
                             <p className="text-gray-600">Joined</p>
-                            <p className="font-semibold">{driver.joinDate.toLocaleDateString()}</p>
+                            <p className="font-semibold">
+                              {driver.joinDate.toLocaleDateString()}
+                            </p>
                           </div>
                         </div>
 
@@ -612,57 +676,107 @@ export default function AdminPanel() {
                                 </DialogTrigger>
                                 <DialogContent className="max-w-2xl">
                                   <DialogHeader>
-                                    <DialogTitle>Driver Details - {driver.name}</DialogTitle>
+                                    <DialogTitle>
+                                      Driver Details - {driver.name}
+                                    </DialogTitle>
                                   </DialogHeader>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-4">
                                       <div>
-                                        <Label className="text-sm text-gray-600">Contact</Label>
+                                        <Label className="text-sm text-gray-600">
+                                          Contact
+                                        </Label>
                                         <div className="space-y-1">
-                                          <p className="text-sm">{driver.email}</p>
-                                          <p className="text-sm">{driver.phone}</p>
+                                          <p className="text-sm">
+                                            {driver.email}
+                                          </p>
+                                          <p className="text-sm">
+                                            {driver.phone}
+                                          </p>
                                         </div>
                                       </div>
                                       <div>
-                                        <Label className="text-sm text-gray-600">License</Label>
-                                        <p className="text-sm">{driver.licenseNumber}</p>
+                                        <Label className="text-sm text-gray-600">
+                                          License
+                                        </Label>
+                                        <p className="text-sm">
+                                          {driver.licenseNumber}
+                                        </p>
                                       </div>
                                       <div>
-                                        <Label className="text-sm text-gray-600">Documents</Label>
-                                        <Badge className={driver.documentsVerified ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                                          {driver.documentsVerified ? "Verified" : "Pending"}
+                                        <Label className="text-sm text-gray-600">
+                                          Documents
+                                        </Label>
+                                        <Badge
+                                          className={
+                                            driver.documentsVerified
+                                              ? "bg-green-100 text-green-800"
+                                              : "bg-red-100 text-red-800"
+                                          }
+                                        >
+                                          {driver.documentsVerified
+                                            ? "Verified"
+                                            : "Pending"}
                                         </Badge>
                                       </div>
                                     </div>
                                     <div className="space-y-4">
                                       <div>
-                                        <Label className="text-sm text-gray-600">Performance</Label>
+                                        <Label className="text-sm text-gray-600">
+                                          Performance
+                                        </Label>
                                         <div className="space-y-1">
-                                          <p className="text-sm">Rating: {driver.rating}★</p>
-                                          <p className="text-sm">Total Rides: {driver.totalRides}</p>
-                                          <p className="text-sm">Earnings: ₹{driver.totalEarnings.toLocaleString()}</p>
+                                          <p className="text-sm">
+                                            Rating: {driver.rating}★
+                                          </p>
+                                          <p className="text-sm">
+                                            Total Rides: {driver.totalRides}
+                                          </p>
+                                          <p className="text-sm">
+                                            Earnings: ₹
+                                            {driver.totalEarnings.toLocaleString()}
+                                          </p>
                                         </div>
                                       </div>
                                       {driver.type === "fleet" && (
                                         <div>
-                                          <Label className="text-sm text-gray-600">Vehicle Assignment</Label>
+                                          <Label className="text-sm text-gray-600">
+                                            Vehicle Assignment
+                                          </Label>
                                           <div className="flex items-center space-x-2">
                                             <Select
-                                              value={driver.assignedVehicle || ""}
-                                              onValueChange={(value) => handleAssignVehicle(driver.id, value)}
+                                              value={
+                                                driver.assignedVehicle || ""
+                                              }
+                                              onValueChange={(value) =>
+                                                handleAssignVehicle(
+                                                  driver.id,
+                                                  value,
+                                                )
+                                              }
                                             >
                                               <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Assign vehicle" />
                                               </SelectTrigger>
                                               <SelectContent>
                                                 {vehicles
-                                                  .filter(v => v.type === "company" && v.status === "available")
-                                                  .map(vehicle => (
-                                                    <SelectItem key={vehicle.id} value={vehicle.id}>
-                                                      {vehicle.make} {vehicle.model} - {vehicle.registrationNumber}
+                                                  .filter(
+                                                    (v) =>
+                                                      v.type === "company" &&
+                                                      v.status === "available",
+                                                  )
+                                                  .map((vehicle) => (
+                                                    <SelectItem
+                                                      key={vehicle.id}
+                                                      value={vehicle.id}
+                                                    >
+                                                      {vehicle.make}{" "}
+                                                      {vehicle.model} -{" "}
+                                                      {
+                                                        vehicle.registrationNumber
+                                                      }
                                                     </SelectItem>
-                                                  ))
-                                                }
+                                                  ))}
                                               </SelectContent>
                                             </Select>
                                           </div>
@@ -691,7 +805,9 @@ export default function AdminPanel() {
           <TabsContent value="vehicles">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-800">Vehicle Management</h2>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Vehicle Management
+                </h2>
                 <Button className="bg-yellow-600 hover:bg-yellow-700">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Vehicle
@@ -701,15 +817,22 @@ export default function AdminPanel() {
               {/* Vehicles Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {vehicles.map((vehicle) => (
-                  <Card key={vehicle.id} className="hover:shadow-md transition-shadow">
+                  <Card
+                    key={vehicle.id}
+                    className="hover:shadow-md transition-shadow"
+                  >
                     <CardContent className="p-6">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             <Car className="w-8 h-8 text-blue-600" />
                             <div>
-                              <h3 className="font-semibold">{vehicle.make} {vehicle.model}</h3>
-                              <p className="text-sm text-gray-600">{vehicle.registrationNumber}</p>
+                              <h3 className="font-semibold">
+                                {vehicle.make} {vehicle.model}
+                              </h3>
+                              <p className="text-sm text-gray-600">
+                                {vehicle.registrationNumber}
+                              </p>
                             </div>
                           </div>
                           <Badge className={getStatusColor(vehicle.status)}>
@@ -729,19 +852,24 @@ export default function AdminPanel() {
                           <div>
                             <p className="text-gray-600">Type</p>
                             <p className="font-semibold">
-                              {vehicle.type === "company" ? "Company" : "Driver Owned"}
+                              {vehicle.type === "company"
+                                ? "Company"
+                                : "Driver Owned"}
                             </p>
                           </div>
                           <div>
                             <p className="text-gray-600">Mileage</p>
-                            <p className="font-semibold">{vehicle.mileage.toLocaleString()} km</p>
+                            <p className="font-semibold">
+                              {vehicle.mileage.toLocaleString()} km
+                            </p>
                           </div>
                         </div>
 
                         {vehicle.assignedDriverName && (
                           <div className="p-3 bg-blue-50 rounded-lg">
                             <p className="text-sm text-blue-800">
-                              <strong>Assigned to:</strong> {vehicle.assignedDriverName}
+                              <strong>Assigned to:</strong>{" "}
+                              {vehicle.assignedDriverName}
                             </p>
                           </div>
                         )}
@@ -766,26 +894,46 @@ export default function AdminPanel() {
                               <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                   <div>
-                                    <Label className="text-sm text-gray-600">Registration</Label>
-                                    <p className="text-sm">{vehicle.registrationNumber}</p>
+                                    <Label className="text-sm text-gray-600">
+                                      Registration
+                                    </Label>
+                                    <p className="text-sm">
+                                      {vehicle.registrationNumber}
+                                    </p>
                                   </div>
                                   <div>
-                                    <Label className="text-sm text-gray-600">Last Service</Label>
-                                    <p className="text-sm">{vehicle.lastService.toLocaleDateString()}</p>
+                                    <Label className="text-sm text-gray-600">
+                                      Last Service
+                                    </Label>
+                                    <p className="text-sm">
+                                      {vehicle.lastService.toLocaleDateString()}
+                                    </p>
                                   </div>
                                   <div>
-                                    <Label className="text-sm text-gray-600">Insurance Expiry</Label>
-                                    <p className="text-sm">{vehicle.insuranceExpiry.toLocaleDateString()}</p>
+                                    <Label className="text-sm text-gray-600">
+                                      Insurance Expiry
+                                    </Label>
+                                    <p className="text-sm">
+                                      {vehicle.insuranceExpiry.toLocaleDateString()}
+                                    </p>
                                   </div>
                                   <div>
-                                    <Label className="text-sm text-gray-600">Registration Expiry</Label>
-                                    <p className="text-sm">{vehicle.registrationExpiry.toLocaleDateString()}</p>
+                                    <Label className="text-sm text-gray-600">
+                                      Registration Expiry
+                                    </Label>
+                                    <p className="text-sm">
+                                      {vehicle.registrationExpiry.toLocaleDateString()}
+                                    </p>
                                   </div>
                                 </div>
                                 {vehicle.assignedDriverName && (
                                   <div>
-                                    <Label className="text-sm text-gray-600">Assigned Driver</Label>
-                                    <p className="text-sm">{vehicle.assignedDriverName}</p>
+                                    <Label className="text-sm text-gray-600">
+                                      Assigned Driver
+                                    </Label>
+                                    <p className="text-sm">
+                                      {vehicle.assignedDriverName}
+                                    </p>
                                   </div>
                                 )}
                               </div>
@@ -807,14 +955,18 @@ export default function AdminPanel() {
           {/* Earnings Tab */}
           <TabsContent value="earnings">
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800">Earnings & Commission</h2>
-              
+              <h2 className="text-2xl font-bold text-gray-800">
+                Earnings & Commission
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-green-600 font-medium">Total Revenue</p>
+                        <p className="text-sm text-green-600 font-medium">
+                          Total Revenue
+                        </p>
                         <p className="text-2xl font-bold text-green-700">
                           ₹{dashboardStats.totalRevenue.toLocaleString()}
                         </p>
@@ -829,11 +981,18 @@ export default function AdminPanel() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-yellow-600 font-medium">Commission Earned</p>
-                        <p className="text-2xl font-bold text-yellow-700">
-                          ₹{Math.round(dashboardStats.monthlyCommission).toLocaleString()}
+                        <p className="text-sm text-yellow-600 font-medium">
+                          Commission Earned
                         </p>
-                        <p className="text-xs text-yellow-600">From vehicle owners</p>
+                        <p className="text-2xl font-bold text-yellow-700">
+                          ₹
+                          {Math.round(
+                            dashboardStats.monthlyCommission,
+                          ).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-yellow-600">
+                          From vehicle owners
+                        </p>
                       </div>
                       <IndianRupee className="w-8 h-8 text-yellow-600" />
                     </div>
@@ -844,14 +1003,19 @@ export default function AdminPanel() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-blue-600 font-medium">Fleet Salaries</p>
+                        <p className="text-sm text-blue-600 font-medium">
+                          Fleet Salaries
+                        </p>
                         <p className="text-2xl font-bold text-blue-700">
-                          ₹{drivers
-                            .filter(d => d.type === "fleet")
+                          ₹
+                          {drivers
+                            .filter((d) => d.type === "fleet")
                             .reduce((sum, d) => sum + d.totalEarnings, 0)
                             .toLocaleString()}
                         </p>
-                        <p className="text-xs text-blue-600">Paid to fleet drivers</p>
+                        <p className="text-xs text-blue-600">
+                          Paid to fleet drivers
+                        </p>
                       </div>
                       <Building className="w-8 h-8 text-blue-600" />
                     </div>
@@ -862,11 +1026,19 @@ export default function AdminPanel() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-purple-600 font-medium">Avg. per Driver</p>
-                        <p className="text-2xl font-bold text-purple-700">
-                          ₹{Math.round(dashboardStats.totalRevenue / Math.max(dashboardStats.activeDrivers, 1)).toLocaleString()}
+                        <p className="text-sm text-purple-600 font-medium">
+                          Avg. per Driver
                         </p>
-                        <p className="text-xs text-purple-600">Monthly average</p>
+                        <p className="text-2xl font-bold text-purple-700">
+                          ₹
+                          {Math.round(
+                            dashboardStats.totalRevenue /
+                              Math.max(dashboardStats.activeDrivers, 1),
+                          ).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-purple-600">
+                          Monthly average
+                        </p>
                       </div>
                       <BarChart3 className="w-8 h-8 text-purple-600" />
                     </div>
@@ -888,7 +1060,10 @@ export default function AdminPanel() {
                       .sort((a, b) => b.totalEarnings - a.totalEarnings)
                       .slice(0, 5)
                       .map((driver, index) => (
-                        <div key={driver.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div
+                          key={driver.id}
+                          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                        >
                           <div className="flex items-center space-x-4">
                             <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                               {index + 1}
@@ -896,13 +1071,20 @@ export default function AdminPanel() {
                             <div>
                               <p className="font-semibold">{driver.name}</p>
                               <p className="text-sm text-gray-600">
-                                {driver.type === "owner" ? "Vehicle Owner" : "Fleet Driver"} • {driver.totalRides} rides
+                                {driver.type === "owner"
+                                  ? "Vehicle Owner"
+                                  : "Fleet Driver"}{" "}
+                                • {driver.totalRides} rides
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-green-600">₹{driver.totalEarnings.toLocaleString()}</p>
-                            <p className="text-sm text-gray-600">{driver.rating}★ rating</p>
+                            <p className="font-bold text-green-600">
+                              ₹{driver.totalEarnings.toLocaleString()}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {driver.rating}★ rating
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -915,7 +1097,9 @@ export default function AdminPanel() {
           {/* Settings Tab */}
           <TabsContent value="settings">
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800">Commission & Salary Settings</h2>
+              <h2 className="text-2xl font-bold text-gray-800">
+                Commission & Salary Settings
+              </h2>
 
               <Card>
                 <CardHeader>
@@ -927,15 +1111,19 @@ export default function AdminPanel() {
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <Label htmlFor="vehicleOwnerRate">Vehicle Owner Commission (%)</Label>
+                      <Label htmlFor="vehicleOwnerRate">
+                        Vehicle Owner Commission (%)
+                      </Label>
                       <Input
                         id="vehicleOwnerRate"
                         type="number"
                         value={commissionSettings.vehicleOwnerRate}
-                        onChange={(e) => setCommissionSettings(prev => ({
-                          ...prev,
-                          vehicleOwnerRate: parseFloat(e.target.value)
-                        }))}
+                        onChange={(e) =>
+                          setCommissionSettings((prev) => ({
+                            ...prev,
+                            vehicleOwnerRate: parseFloat(e.target.value),
+                          }))
+                        }
                         min="0"
                         max="20"
                         step="0.1"
@@ -946,15 +1134,19 @@ export default function AdminPanel() {
                     </div>
 
                     <div>
-                      <Label htmlFor="fleetDriverRate">Fleet Driver Salary (₹/km)</Label>
+                      <Label htmlFor="fleetDriverRate">
+                        Fleet Driver Salary (₹/km)
+                      </Label>
                       <Input
                         id="fleetDriverRate"
                         type="number"
                         value={commissionSettings.fleetDriverSalaryRate}
-                        onChange={(e) => setCommissionSettings(prev => ({
-                          ...prev,
-                          fleetDriverSalaryRate: parseFloat(e.target.value)
-                        }))}
+                        onChange={(e) =>
+                          setCommissionSettings((prev) => ({
+                            ...prev,
+                            fleetDriverSalaryRate: parseFloat(e.target.value),
+                          }))
+                        }
                         min="5"
                         max="30"
                         step="0.5"
@@ -970,10 +1162,12 @@ export default function AdminPanel() {
                         id="platformFee"
                         type="number"
                         value={commissionSettings.platformFee}
-                        onChange={(e) => setCommissionSettings(prev => ({
-                          ...prev,
-                          platformFee: parseFloat(e.target.value)
-                        }))}
+                        onChange={(e) =>
+                          setCommissionSettings((prev) => ({
+                            ...prev,
+                            platformFee: parseFloat(e.target.value),
+                          }))
+                        }
                         min="0"
                         max="10"
                         step="0.1"
@@ -987,50 +1181,76 @@ export default function AdminPanel() {
                   <div>
                     <Label>Performance Bonuses</Label>
                     <div className="space-y-3 mt-2">
-                      {commissionSettings.bonusThresholds.map((threshold, index) => (
-                        <div key={index} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
-                          <div className="flex-1">
-                            <Label htmlFor={`rides-${index}`} className="text-sm">Rides Completed</Label>
-                            <Input
-                              id={`rides-${index}`}
-                              type="number"
-                              value={threshold.rides}
-                              onChange={(e) => {
-                                const newThresholds = [...commissionSettings.bonusThresholds];
-                                newThresholds[index].rides = parseInt(e.target.value);
-                                setCommissionSettings(prev => ({
-                                  ...prev,
-                                  bonusThresholds: newThresholds
-                                }));
-                              }}
-                              min="10"
-                              step="10"
-                            />
+                      {commissionSettings.bonusThresholds.map(
+                        (threshold, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"
+                          >
+                            <div className="flex-1">
+                              <Label
+                                htmlFor={`rides-${index}`}
+                                className="text-sm"
+                              >
+                                Rides Completed
+                              </Label>
+                              <Input
+                                id={`rides-${index}`}
+                                type="number"
+                                value={threshold.rides}
+                                onChange={(e) => {
+                                  const newThresholds = [
+                                    ...commissionSettings.bonusThresholds,
+                                  ];
+                                  newThresholds[index].rides = parseInt(
+                                    e.target.value,
+                                  );
+                                  setCommissionSettings((prev) => ({
+                                    ...prev,
+                                    bonusThresholds: newThresholds,
+                                  }));
+                                }}
+                                min="10"
+                                step="10"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <Label
+                                htmlFor={`bonus-${index}`}
+                                className="text-sm"
+                              >
+                                Bonus Amount (₹)
+                              </Label>
+                              <Input
+                                id={`bonus-${index}`}
+                                type="number"
+                                value={threshold.bonus}
+                                onChange={(e) => {
+                                  const newThresholds = [
+                                    ...commissionSettings.bonusThresholds,
+                                  ];
+                                  newThresholds[index].bonus = parseInt(
+                                    e.target.value,
+                                  );
+                                  setCommissionSettings((prev) => ({
+                                    ...prev,
+                                    bonusThresholds: newThresholds,
+                                  }));
+                                }}
+                                min="100"
+                                step="100"
+                              />
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <Label htmlFor={`bonus-${index}`} className="text-sm">Bonus Amount (₹)</Label>
-                            <Input
-                              id={`bonus-${index}`}
-                              type="number"
-                              value={threshold.bonus}
-                              onChange={(e) => {
-                                const newThresholds = [...commissionSettings.bonusThresholds];
-                                newThresholds[index].bonus = parseInt(e.target.value);
-                                setCommissionSettings(prev => ({
-                                  ...prev,
-                                  bonusThresholds: newThresholds
-                                }));
-                              }}
-                              min="100"
-                              step="100"
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        ),
+                      )}
                     </div>
                   </div>
 
-                  <Button onClick={handleUpdateCommission} className="bg-yellow-600 hover:bg-yellow-700">
+                  <Button
+                    onClick={handleUpdateCommission}
+                    className="bg-yellow-600 hover:bg-yellow-700"
+                  >
                     Update Settings
                   </Button>
                 </CardContent>
@@ -1044,17 +1264,25 @@ export default function AdminPanel() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                      <h4 className="font-semibold text-yellow-800 mb-2">Vehicle Owner Example</h4>
+                      <h4 className="font-semibold text-yellow-800 mb-2">
+                        Vehicle Owner Example
+                      </h4>
                       <p className="text-sm text-yellow-700">
-                        For a ₹500 ride, driver keeps ₹{500 - (500 * commissionSettings.vehicleOwnerRate / 100)} 
-                        (₹{500 * commissionSettings.vehicleOwnerRate / 100} commission)
+                        For a ₹500 ride, driver keeps ₹
+                        {500 -
+                          (500 * commissionSettings.vehicleOwnerRate) / 100}
+                        (₹{(500 * commissionSettings.vehicleOwnerRate) / 100}{" "}
+                        commission)
                       </p>
                     </div>
-                    
+
                     <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h4 className="font-semibold text-blue-800 mb-2">Fleet Driver Example</h4>
+                      <h4 className="font-semibold text-blue-800 mb-2">
+                        Fleet Driver Example
+                      </h4>
                       <p className="text-sm text-blue-700">
-                        For a 10km trip, driver earns ₹{10 * commissionSettings.fleetDriverSalaryRate} 
+                        For a 10km trip, driver earns ₹
+                        {10 * commissionSettings.fleetDriverSalaryRate}
                         (₹{commissionSettings.fleetDriverSalaryRate}/km)
                       </p>
                     </div>

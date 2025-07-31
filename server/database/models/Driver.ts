@@ -28,115 +28,125 @@ export interface IDriver extends Document {
   totalEarnings: number;
   totalKmDriven: number;
   joinDate: Date;
-  
+
   // Vehicle Information
   vehicleNumber?: string; // For vehicle owners
   vehicleModel?: string; // For vehicle owners
   assignedVehicleId?: string; // For fleet drivers
-  
+
   // License and Documents
   licenseNumber: string;
   licenseExpiry: Date;
   documentsVerified: boolean;
   licenseDocumentUrl?: string;
-  
+
   // Vehicle Documents (for owners)
   registrationDocumentUrl?: string;
   insuranceDocumentUrl?: string;
-  
+
   // ID Verification
   idProofType?: "aadhar" | "passport" | "voter";
   idProofNumber?: string;
   idProofDocumentUrl?: string;
-  
+
   // Background Check
   hasCleanRecord: boolean;
   backgroundCheckCompleted: boolean;
   backgroundCheckDate?: Date;
-  
+
   // Performance Metrics
   acceptanceRate: number;
   completionRate: number;
   averageRating: number;
   onlineHours: number;
-  
+
   // Shift Information (for fleet drivers)
   currentShift?: IShift;
-  
+
   // Address and Location
   address: string;
   dateOfBirth?: Date;
-  
+
   // Account status
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   lastLogin?: Date;
   lastActive?: Date;
-  
+
   // Terms and Conditions
   acceptedTerms: boolean;
   acceptedPrivacyPolicy: boolean;
   termsAcceptedAt?: Date;
-  
+
   // Created/Updated timestamps
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Methods
   comparePassword(candidatePassword: string): Promise<boolean>;
-  updateStats(rideData: { earnings: number; distance: number; rating: number }): Promise<void>;
+  updateStats(rideData: {
+    earnings: number;
+    distance: number;
+    rating: number;
+  }): Promise<void>;
   startShift(targetKm?: number): Promise<void>;
   endShift(): Promise<void>;
 }
 
-const DriverTypeSchema = new Schema<IDriverType>({
-  type: {
-    type: String,
-    enum: ["owner", "fleet"],
-    required: true,
-  },
-  vehicleId: {
-    type: String,
-    sparse: true,
-  },
-  commissionRate: {
-    type: Number,
-    min: 0,
-    max: 0.3, // Maximum 30%
-    default: function(this: IDriverType) {
-      return this.type === "owner" ? 0.05 : undefined;
+const DriverTypeSchema = new Schema<IDriverType>(
+  {
+    type: {
+      type: String,
+      enum: ["owner", "fleet"],
+      required: true,
+    },
+    vehicleId: {
+      type: String,
+      sparse: true,
+    },
+    commissionRate: {
+      type: Number,
+      min: 0,
+      max: 0.3, // Maximum 30%
+      default: function (this: IDriverType) {
+        return this.type === "owner" ? 0.05 : undefined;
+      },
+    },
+    salaryPerKm: {
+      type: Number,
+      min: 5,
+      max: 50,
+      default: function (this: IDriverType) {
+        return this.type === "fleet" ? 12 : undefined;
+      },
     },
   },
-  salaryPerKm: {
-    type: Number,
-    min: 5,
-    max: 50,
-    default: function(this: IDriverType) {
-      return this.type === "fleet" ? 12 : undefined;
-    },
-  },
-}, { _id: false });
+  { _id: false },
+);
 
-const ShiftSchema = new Schema<IShift>({
-  startTime: {
-    type: Date,
-    required: true,
+const ShiftSchema = new Schema<IShift>(
+  {
+    startTime: {
+      type: Date,
+      required: true,
+    },
+    targetKm: {
+      type: Number,
+      min: 10,
+      max: 500,
+    },
+    completedKm: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-  targetKm: {
-    type: Number,
-    min: 10,
-    max: 500,
-  },
-  completedKm: {
-    type: Number,
-    min: 0,
-    default: 0,
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
-}, { _id: false });
+  { _id: false },
+);
 
 const DriverSchema: Schema<IDriver> = new Schema(
   {
@@ -208,7 +218,7 @@ const DriverSchema: Schema<IDriver> = new Schema(
       type: Date,
       default: Date.now,
     },
-    
+
     // Vehicle Information
     vehicleNumber: {
       type: String,
@@ -227,23 +237,20 @@ const DriverSchema: Schema<IDriver> = new Schema(
       type: String,
       sparse: true,
     },
-    
+
     // License and Documents
     licenseNumber: {
       type: String,
       required: [true, "License number is required"],
       unique: true,
       uppercase: true,
-      match: [
-        /^[A-Z]{2}[0-9]{13}$/,
-        "Please provide a valid license number",
-      ],
+      match: [/^[A-Z]{2}[0-9]{13}$/, "Please provide a valid license number"],
     },
     licenseExpiry: {
       type: Date,
       required: [true, "License expiry date is required"],
       validate: {
-        validator: function(date: Date) {
+        validator: function (date: Date) {
           return date > new Date();
         },
         message: "License must not be expired",
@@ -256,7 +263,7 @@ const DriverSchema: Schema<IDriver> = new Schema(
     licenseDocumentUrl: String,
     registrationDocumentUrl: String,
     insuranceDocumentUrl: String,
-    
+
     // ID Verification
     idProofType: {
       type: String,
@@ -267,7 +274,7 @@ const DriverSchema: Schema<IDriver> = new Schema(
       sparse: true,
     },
     idProofDocumentUrl: String,
-    
+
     // Background Check
     hasCleanRecord: {
       type: Boolean,
@@ -278,7 +285,7 @@ const DriverSchema: Schema<IDriver> = new Schema(
       default: false,
     },
     backgroundCheckDate: Date,
-    
+
     // Performance Metrics
     acceptanceRate: {
       type: Number,
@@ -303,10 +310,10 @@ const DriverSchema: Schema<IDriver> = new Schema(
       min: 0,
       default: 0,
     },
-    
+
     // Shift Information
     currentShift: ShiftSchema,
-    
+
     // Address and Personal Info
     address: {
       type: String,
@@ -314,7 +321,7 @@ const DriverSchema: Schema<IDriver> = new Schema(
       maxlength: [500, "Address cannot exceed 500 characters"],
     },
     dateOfBirth: Date,
-    
+
     // Account status
     isEmailVerified: {
       type: Boolean,
@@ -326,7 +333,7 @@ const DriverSchema: Schema<IDriver> = new Schema(
     },
     lastLogin: Date,
     lastActive: Date,
-    
+
     // Terms and Conditions
     acceptedTerms: {
       type: Boolean,
@@ -390,7 +397,11 @@ DriverSchema.pre<IDriver>("save", async function (next) {
 
 // Set terms accepted date when terms are accepted
 DriverSchema.pre<IDriver>("save", function (next) {
-  if (this.isModified("acceptedTerms") && this.acceptedTerms && !this.termsAcceptedAt) {
+  if (
+    this.isModified("acceptedTerms") &&
+    this.acceptedTerms &&
+    !this.termsAcceptedAt
+  ) {
     this.termsAcceptedAt = new Date();
   }
   next();
@@ -422,10 +433,10 @@ DriverSchema.methods.updateStats = async function (rideData: {
   const newTotalRides = this.totalRides + 1;
   const newTotalEarnings = this.totalEarnings + rideData.earnings;
   const newTotalKmDriven = this.totalKmDriven + rideData.distance;
-  
+
   // Calculate new average rating
-  const newAverageRating = 
-    ((this.averageRating * this.totalRides) + rideData.rating) / newTotalRides;
+  const newAverageRating =
+    (this.averageRating * this.totalRides + rideData.rating) / newTotalRides;
 
   this.totalRides = newTotalRides;
   this.totalEarnings = newTotalEarnings;
@@ -437,7 +448,9 @@ DriverSchema.methods.updateStats = async function (rideData: {
 };
 
 // Method to start a shift (for fleet drivers)
-DriverSchema.methods.startShift = async function (targetKm?: number): Promise<void> {
+DriverSchema.methods.startShift = async function (
+  targetKm?: number,
+): Promise<void> {
   if (this.driverType.type !== "fleet") {
     throw new Error("Only fleet drivers can start shifts");
   }
@@ -459,7 +472,7 @@ DriverSchema.methods.endShift = async function (): Promise<void> {
   }
 
   this.currentShift.isActive = false;
-  
+
   // Add to total online hours (estimate based on shift duration)
   const shiftDuration = Date.now() - this.currentShift.startTime.getTime();
   const hoursWorked = shiftDuration / (1000 * 60 * 60); // Convert to hours
@@ -470,11 +483,15 @@ DriverSchema.methods.endShift = async function (): Promise<void> {
 
 // Static method to find driver with password for authentication
 DriverSchema.statics.findByEmailWithPassword = function (email: string) {
-  return this.findOne({ email, status: { $ne: "inactive" } }).select("+password");
+  return this.findOne({ email, status: { $ne: "inactive" } }).select(
+    "+password",
+  );
 };
 
 DriverSchema.statics.findByPhoneWithPassword = function (phone: string) {
-  return this.findOne({ phone, status: { $ne: "inactive" } }).select("+password");
+  return this.findOne({ phone, status: { $ne: "inactive" } }).select(
+    "+password",
+  );
 };
 
 // Static method to get drivers by type

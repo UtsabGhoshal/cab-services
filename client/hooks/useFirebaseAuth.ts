@@ -1,7 +1,14 @@
-import { useState, useEffect } from 'react';
-import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
-import { auth } from '@/firebase/config';
-import { firebaseDriverService, type FirebaseDriver } from '@/services/firebaseDriverService';
+import { useState, useEffect } from "react";
+import {
+  User,
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+} from "firebase/auth";
+import { auth } from "@/firebase/config";
+import {
+  firebaseDriverService,
+  type FirebaseDriver,
+} from "@/services/firebaseDriverService";
 
 interface DriverAuthState {
   user: User | null;
@@ -23,20 +30,22 @@ export const useFirebaseAuth = () => {
       if (user) {
         try {
           // Get driver profile from Firestore
-          const driver = await firebaseDriverService.getDriverByEmail(user.email!);
+          const driver = await firebaseDriverService.getDriverByEmail(
+            user.email!,
+          );
           setAuthState({
             user,
             driver,
             loading: false,
-            error: driver ? null : 'Driver profile not found',
+            error: driver ? null : "Driver profile not found",
           });
         } catch (error) {
-          console.error('Error loading driver profile:', error);
+          console.error("Error loading driver profile:", error);
           setAuthState({
             user,
             driver: null,
             loading: false,
-            error: 'Failed to load driver profile',
+            error: "Failed to load driver profile",
           });
         }
       } else {
@@ -55,13 +64,13 @@ export const useFirebaseAuth = () => {
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
-      localStorage.removeItem('uride_driver');
-      localStorage.removeItem('uride_driver_token');
-      localStorage.removeItem('uride_driver_remember');
+      localStorage.removeItem("uride_driver");
+      localStorage.removeItem("uride_driver_token");
+      localStorage.removeItem("uride_driver_remember");
       return { success: true };
     } catch (error) {
-      console.error('Sign out error:', error);
-      return { success: false, error: 'Failed to sign out' };
+      console.error("Sign out error:", error);
+      return { success: false, error: "Failed to sign out" };
     }
   };
 
@@ -69,6 +78,6 @@ export const useFirebaseAuth = () => {
     ...authState,
     signOut,
     isAuthenticated: !!authState.user,
-    isDriverActive: authState.driver?.status === 'active',
+    isDriverActive: authState.driver?.status === "active",
   };
 };

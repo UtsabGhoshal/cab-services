@@ -12,7 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/config";
-import { firebaseDriverService, type FirebaseDriver } from "@/services/firebaseDriverService";
+import {
+  firebaseDriverService,
+  type FirebaseDriver,
+} from "@/services/firebaseDriverService";
 import { fallbackAuthService } from "@/services/fallbackAuthService";
 import { Timestamp } from "firebase/firestore";
 import {
@@ -43,12 +46,12 @@ interface DriverFormData {
   confirmPassword: string;
   dateOfBirth: string;
   address: string;
-  
+
   // Driver License Information
   licenseNumber: string;
   licenseExpiry: string;
   licenseDocument: File | null;
-  
+
   // Vehicle Information (if owns car)
   hasVehicle: "yes" | "no" | "";
   vehicleMake: string;
@@ -58,16 +61,16 @@ interface DriverFormData {
   vehicleNumber: string;
   registrationDocument: File | null;
   insuranceDocument: File | null;
-  
+
   // ID Verification
   idProofType: "aadhar" | "passport" | "voter" | "";
   idProofNumber: string;
   idProofDocument: File | null;
-  
+
   // Background Check
   hasCleanRecord: boolean;
   backgroundCheckConsent: boolean;
-  
+
   // Terms
   acceptTerms: boolean;
   acceptPrivacyPolicy: boolean;
@@ -109,7 +112,7 @@ export default function DriverSignup() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
-  
+
   const licenseFileRef = useRef<HTMLInputElement>(null);
   const registrationFileRef = useRef<HTMLInputElement>(null);
   const insuranceFileRef = useRef<HTMLInputElement>(null);
@@ -119,7 +122,7 @@ export default function DriverSignup() {
   const progress = (currentStep / totalSteps) * 100;
 
   const updateFormData = (field: keyof DriverFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleFileUpload = (field: keyof DriverFormData, file: File | null) => {
@@ -170,7 +173,15 @@ export default function DriverSignup() {
   const validateCurrentStep = () => {
     switch (currentStep) {
       case 1: // Personal Info & Phone Verification
-        if (!formData.fullName || !formData.email || !formData.phone || !formData.password || !formData.confirmPassword || !formData.dateOfBirth || !formData.address) {
+        if (
+          !formData.fullName ||
+          !formData.email ||
+          !formData.phone ||
+          !formData.password ||
+          !formData.confirmPassword ||
+          !formData.dateOfBirth ||
+          !formData.address
+        ) {
           toast({
             title: "Missing Information",
             description: "Please fill in all required fields",
@@ -217,8 +228,13 @@ export default function DriverSignup() {
 
       case 3: // Vehicle Details (if has vehicle) OR Driver License (if no vehicle)
         if (formData.hasVehicle === "yes") {
-          if (!formData.vehicleMake || !formData.vehicleModel || !formData.vehicleYear || 
-              !formData.vehicleColor || !formData.vehicleNumber) {
+          if (
+            !formData.vehicleMake ||
+            !formData.vehicleModel ||
+            !formData.vehicleYear ||
+            !formData.vehicleColor ||
+            !formData.vehicleNumber
+          ) {
             toast({
               title: "Missing Vehicle Information",
               description: "Please fill in all vehicle details",
@@ -227,10 +243,15 @@ export default function DriverSignup() {
             return false;
           }
         } else {
-          if (!formData.licenseNumber || !formData.licenseExpiry || !formData.licenseDocument) {
+          if (
+            !formData.licenseNumber ||
+            !formData.licenseExpiry ||
+            !formData.licenseDocument
+          ) {
             toast({
               title: "Missing License Information",
-              description: "Please provide your driver's license details and upload the document",
+              description:
+                "Please provide your driver's license details and upload the document",
               variant: "destructive",
             });
             return false;
@@ -243,16 +264,22 @@ export default function DriverSignup() {
           if (!formData.registrationDocument || !formData.insuranceDocument) {
             toast({
               title: "Missing Documents",
-              description: "Please upload both registration and insurance documents",
+              description:
+                "Please upload both registration and insurance documents",
               variant: "destructive",
             });
             return false;
           }
         } else {
-          if (!formData.idProofType || !formData.idProofNumber || !formData.idProofDocument) {
+          if (
+            !formData.idProofType ||
+            !formData.idProofNumber ||
+            !formData.idProofDocument
+          ) {
             toast({
               title: "Missing ID Verification",
-              description: "Please provide ID proof details and upload the document",
+              description:
+                "Please provide ID proof details and upload the document",
               variant: "destructive",
             });
             return false;
@@ -262,7 +289,11 @@ export default function DriverSignup() {
 
       case 5: // Driver License (if has vehicle) OR Background Check (if no vehicle)
         if (formData.hasVehicle === "yes") {
-          if (!formData.licenseNumber || !formData.licenseExpiry || !formData.licenseDocument) {
+          if (
+            !formData.licenseNumber ||
+            !formData.licenseExpiry ||
+            !formData.licenseDocument
+          ) {
             toast({
               title: "Missing License Information",
               description: "Please provide your driver's license details",
@@ -284,8 +315,13 @@ export default function DriverSignup() {
 
       case 6: // ID Verification & Background Check (if has vehicle) OR Terms (if no vehicle)
         if (formData.hasVehicle === "yes") {
-          if (!formData.idProofType || !formData.idProofNumber || !formData.idProofDocument ||
-              !formData.hasCleanRecord || !formData.backgroundCheckConsent) {
+          if (
+            !formData.idProofType ||
+            !formData.idProofNumber ||
+            !formData.idProofDocument ||
+            !formData.hasCleanRecord ||
+            !formData.backgroundCheckConsent
+          ) {
             toast({
               title: "Missing Information",
               description: "Please complete all verification requirements",
@@ -311,12 +347,12 @@ export default function DriverSignup() {
 
   const nextStep = () => {
     if (validateCurrentStep()) {
-      setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+      setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
     }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleSubmit = async () => {
@@ -328,66 +364,80 @@ export default function DriverSignup() {
 
       // Determine driver type
       const driverType = {
-        type: formData.hasVehicle === "yes" ? "owner" : "fleet" as "owner" | "fleet",
+        type:
+          formData.hasVehicle === "yes"
+            ? "owner"
+            : ("fleet" as "owner" | "fleet"),
         commissionRate: formData.hasVehicle === "yes" ? 0.05 : undefined,
         salaryPerKm: formData.hasVehicle === "no" ? 12 : undefined,
       };
 
       // Create driver document data
-      const driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt"> = {
-        name: formData.fullName,
-        email: formData.email.toLowerCase(),
-        phone: formData.phone,
-        driverType,
-        status: "pending",
-        rating: 0,
-        totalRides: 0,
-        totalEarnings: 0,
-        totalKmDriven: 0,
-        joinDate: Timestamp.now(),
+      const driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt"> =
+        {
+          name: formData.fullName,
+          email: formData.email.toLowerCase(),
+          phone: formData.phone,
+          driverType,
+          status: "pending",
+          rating: 0,
+          totalRides: 0,
+          totalEarnings: 0,
+          totalKmDriven: 0,
+          joinDate: Timestamp.now(),
 
-        // Vehicle Information
-        vehicleNumber: formData.hasVehicle === "yes" ? formData.vehicleNumber?.toUpperCase() : undefined,
-        vehicleModel: formData.hasVehicle === "yes" ? `${formData.vehicleMake} ${formData.vehicleModel} ${formData.vehicleYear}` : undefined,
+          // Vehicle Information
+          vehicleNumber:
+            formData.hasVehicle === "yes"
+              ? formData.vehicleNumber?.toUpperCase()
+              : undefined,
+          vehicleModel:
+            formData.hasVehicle === "yes"
+              ? `${formData.vehicleMake} ${formData.vehicleModel} ${formData.vehicleYear}`
+              : undefined,
 
-        // License and Documents
-        licenseNumber: formData.licenseNumber.toUpperCase(),
-        licenseExpiry: Timestamp.fromDate(new Date(formData.licenseExpiry)),
-        documentsVerified: false,
+          // License and Documents
+          licenseNumber: formData.licenseNumber.toUpperCase(),
+          licenseExpiry: Timestamp.fromDate(new Date(formData.licenseExpiry)),
+          documentsVerified: false,
 
-        // ID Verification
-        idProofType: formData.idProofType,
-        idProofNumber: formData.idProofNumber,
+          // ID Verification
+          idProofType: formData.idProofType,
+          idProofNumber: formData.idProofNumber,
 
-        // Background Check
-        hasCleanRecord: formData.hasCleanRecord,
-        backgroundCheckCompleted: false,
+          // Background Check
+          hasCleanRecord: formData.hasCleanRecord,
+          backgroundCheckCompleted: false,
 
-        // Performance Metrics (initial values)
-        acceptanceRate: 0,
-        completionRate: 0,
-        averageRating: 0,
-        onlineHours: 0,
-      };
+          // Performance Metrics (initial values)
+          acceptanceRate: 0,
+          completionRate: 0,
+          averageRating: 0,
+          onlineHours: 0,
+        };
 
       try {
         // Try Firebase Auth first
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           formData.email,
-          formData.password
+          formData.password,
         );
 
         user = userCredential.user;
         driverId = await firebaseDriverService.createDriver(driverData);
       } catch (firebaseError: any) {
-        console.warn("Firebase signup failed, using fallback:", firebaseError.message);
+        console.warn(
+          "Firebase signup failed, using fallback:",
+          firebaseError.message,
+        );
 
         // Use fallback auth service
-        const fallbackCredential = await fallbackAuthService.createUserWithEmailAndPassword(
-          formData.email,
-          formData.password
-        );
+        const fallbackCredential =
+          await fallbackAuthService.createUserWithEmailAndPassword(
+            formData.email,
+            formData.password,
+          );
 
         user = fallbackCredential.user;
         driverId = await fallbackAuthService.createDriver(driverData);
@@ -400,26 +450,33 @@ export default function DriverSignup() {
 
       toast({
         title: "Application Submitted! 🎉",
-        description: "Your driver application has been submitted successfully. You will be contacted within 24-48 hours for verification.",
+        description:
+          "Your driver application has been submitted successfully. You will be contacted within 24-48 hours for verification.",
       });
 
       setTimeout(() => {
         navigate("/driver-login");
       }, 2000);
-
     } catch (error: any) {
       console.error("Driver signup error:", error);
 
-      let errorMessage = "An error occurred while submitting your application. Please try again.";
+      let errorMessage =
+        "An error occurred while submitting your application. Please try again.";
 
-      if (error.message?.includes("auth/email-already-in-use") || error.message?.includes("email-already-in-use")) {
-        errorMessage = "An account with this email already exists. Please try logging in instead.";
+      if (
+        error.message?.includes("auth/email-already-in-use") ||
+        error.message?.includes("email-already-in-use")
+      ) {
+        errorMessage =
+          "An account with this email already exists. Please try logging in instead.";
       } else if (error.message?.includes("auth/weak-password")) {
-        errorMessage = "Password is too weak. Please choose a stronger password.";
+        errorMessage =
+          "Password is too weak. Please choose a stronger password.";
       } else if (error.message?.includes("auth/invalid-email")) {
         errorMessage = "Please enter a valid email address.";
       } else if (error.message?.includes("network-request-failed")) {
-        errorMessage = "Network error. Please check your connection and try again.";
+        errorMessage =
+          "Network error. Please check your connection and try again.";
       }
 
       toast({
@@ -439,8 +496,12 @@ export default function DriverSignup() {
           <div className="space-y-6">
             <div className="text-center mb-6">
               <User className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
-              <p className="text-gray-600">Let's start with your basic details</p>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Personal Information
+              </h2>
+              <p className="text-gray-600">
+                Let's start with your basic details
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -474,11 +535,13 @@ export default function DriverSignup() {
                     onChange={(e) => updateFormData("phone", e.target.value)}
                     placeholder="+91 XXXXX XXXXX"
                     disabled={phoneVerified}
-                    className={phoneVerified ? "bg-green-50 border-green-300" : ""}
+                    className={
+                      phoneVerified ? "bg-green-50 border-green-300" : ""
+                    }
                   />
                   {!phoneVerified ? (
-                    <Button 
-                      type="button" 
+                    <Button
+                      type="button"
                       onClick={sendVerificationCode}
                       variant="outline"
                       className="whitespace-nowrap"
@@ -487,7 +550,11 @@ export default function DriverSignup() {
                       Send OTP
                     </Button>
                   ) : (
-                    <Button variant="outline" disabled className="text-green-600">
+                    <Button
+                      variant="outline"
+                      disabled
+                      className="text-green-600"
+                    >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Verified
                     </Button>
@@ -512,12 +579,18 @@ export default function DriverSignup() {
                   id="confirmPassword"
                   type="password"
                   value={formData.confirmPassword}
-                  onChange={(e) => updateFormData("confirmPassword", e.target.value)}
+                  onChange={(e) =>
+                    updateFormData("confirmPassword", e.target.value)
+                  }
                   placeholder="Confirm your password"
                 />
-                {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                  <p className="text-sm text-red-600">Passwords do not match</p>
-                )}
+                {formData.password &&
+                  formData.confirmPassword &&
+                  formData.password !== formData.confirmPassword && (
+                    <p className="text-sm text-red-600">
+                      Passwords do not match
+                    </p>
+                  )}
               </div>
 
               {formData.phone && !phoneVerified && (
@@ -531,8 +604,8 @@ export default function DriverSignup() {
                       placeholder="Enter 6-digit code"
                       maxLength={6}
                     />
-                    <Button 
-                      type="button" 
+                    <Button
+                      type="button"
                       onClick={verifyPhone}
                       className="bg-yellow-600 hover:bg-yellow-700"
                     >
@@ -549,7 +622,9 @@ export default function DriverSignup() {
                   id="dateOfBirth"
                   type="date"
                   value={formData.dateOfBirth}
-                  onChange={(e) => updateFormData("dateOfBirth", e.target.value)}
+                  onChange={(e) =>
+                    updateFormData("dateOfBirth", e.target.value)
+                  }
                 />
               </div>
             </div>
@@ -572,7 +647,9 @@ export default function DriverSignup() {
           <div className="space-y-6">
             <div className="text-center mb-8">
               <Car className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">Vehicle Information</h2>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Vehicle Information
+              </h2>
               <p className="text-gray-600">Do you have your own vehicle?</p>
             </div>
 
@@ -581,16 +658,22 @@ export default function DriverSignup() {
               onValueChange={(value) => updateFormData("hasVehicle", value)}
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
-              <Card className={`p-6 cursor-pointer transition-all ${
-                formData.hasVehicle === "yes" ? "ring-2 ring-yellow-500 bg-yellow-50" : "hover:shadow-md"
-              }`}>
+              <Card
+                className={`p-6 cursor-pointer transition-all ${
+                  formData.hasVehicle === "yes"
+                    ? "ring-2 ring-yellow-500 bg-yellow-50"
+                    : "hover:shadow-md"
+                }`}
+              >
                 <Label htmlFor="has-vehicle" className="cursor-pointer">
                   <div className="flex items-center space-x-4">
                     <RadioGroupItem value="yes" id="has-vehicle" />
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-3">
                         <Car className="w-8 h-8 text-yellow-600" />
-                        <h3 className="text-lg font-semibold">I have my own car</h3>
+                        <h3 className="text-lg font-semibold">
+                          I have my own car
+                        </h3>
                       </div>
                       <div className="space-y-2 text-sm text-gray-600">
                         <p className="flex items-center space-x-2">
@@ -615,16 +698,22 @@ export default function DriverSignup() {
                 </Label>
               </Card>
 
-              <Card className={`p-6 cursor-pointer transition-all ${
-                formData.hasVehicle === "no" ? "ring-2 ring-yellow-500 bg-yellow-50" : "hover:shadow-md"
-              }`}>
+              <Card
+                className={`p-6 cursor-pointer transition-all ${
+                  formData.hasVehicle === "no"
+                    ? "ring-2 ring-yellow-500 bg-yellow-50"
+                    : "hover:shadow-md"
+                }`}
+              >
                 <Label htmlFor="no-vehicle" className="cursor-pointer">
                   <div className="flex items-center space-x-4">
                     <RadioGroupItem value="no" id="no-vehicle" />
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-3">
                         <Building className="w-8 h-8 text-blue-600" />
-                        <h3 className="text-lg font-semibold">Join our fleet</h3>
+                        <h3 className="text-lg font-semibold">
+                          Join our fleet
+                        </h3>
                       </div>
                       <div className="space-y-2 text-sm text-gray-600">
                         <p className="flex items-center space-x-2">
@@ -656,13 +745,14 @@ export default function DriverSignup() {
                   <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
                   <div>
                     <h4 className="font-medium text-yellow-800">
-                      {formData.hasVehicle === "yes" ? "Own Vehicle Requirements" : "Fleet Driver Requirements"}
+                      {formData.hasVehicle === "yes"
+                        ? "Own Vehicle Requirements"
+                        : "Fleet Driver Requirements"}
                     </h4>
                     <p className="text-sm text-yellow-700 mt-1">
-                      {formData.hasVehicle === "yes" 
+                      {formData.hasVehicle === "yes"
                         ? "You'll need to provide vehicle registration, insurance, and other documents in the next steps."
-                        : "You'll be assigned a company vehicle after completing background verification and training."
-                      }
+                        : "You'll be assigned a company vehicle after completing background verification and training."}
                     </p>
                   </div>
                 </div>
@@ -677,7 +767,9 @@ export default function DriverSignup() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <Car className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900">Vehicle Details</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Vehicle Details
+                </h2>
                 <p className="text-gray-600">Tell us about your vehicle</p>
               </div>
 
@@ -687,7 +779,9 @@ export default function DriverSignup() {
                   <Input
                     id="vehicleMake"
                     value={formData.vehicleMake}
-                    onChange={(e) => updateFormData("vehicleMake", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("vehicleMake", e.target.value)
+                    }
                     placeholder="e.g., Maruti Suzuki, Hyundai"
                   />
                 </div>
@@ -697,7 +791,9 @@ export default function DriverSignup() {
                   <Input
                     id="vehicleModel"
                     value={formData.vehicleModel}
-                    onChange={(e) => updateFormData("vehicleModel", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("vehicleModel", e.target.value)
+                    }
                     placeholder="e.g., Swift Dzire, i20"
                   />
                 </div>
@@ -710,7 +806,9 @@ export default function DriverSignup() {
                     min="2010"
                     max="2024"
                     value={formData.vehicleYear}
-                    onChange={(e) => updateFormData("vehicleYear", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("vehicleYear", e.target.value)
+                    }
                     placeholder="e.g., 2020"
                   />
                 </div>
@@ -720,19 +818,28 @@ export default function DriverSignup() {
                   <Input
                     id="vehicleColor"
                     value={formData.vehicleColor}
-                    onChange={(e) => updateFormData("vehicleColor", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("vehicleColor", e.target.value)
+                    }
                     placeholder="e.g., White, Silver"
                   />
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="vehicleNumber">Vehicle Registration Number *</Label>
+                  <Label htmlFor="vehicleNumber">
+                    Vehicle Registration Number *
+                  </Label>
                   <Input
                     id="vehicleNumber"
                     value={formData.vehicleNumber}
-                    onChange={(e) => updateFormData("vehicleNumber", e.target.value.toUpperCase())}
+                    onChange={(e) =>
+                      updateFormData(
+                        "vehicleNumber",
+                        e.target.value.toUpperCase(),
+                      )
+                    }
                     placeholder="e.g., DL01AB1234"
-                    style={{ textTransform: 'uppercase' }}
+                    style={{ textTransform: "uppercase" }}
                   />
                 </div>
               </div>
@@ -743,8 +850,12 @@ export default function DriverSignup() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <FileText className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900">Driver's License</h2>
-                <p className="text-gray-600">Upload your driving license details</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Driver's License
+                </h2>
+                <p className="text-gray-600">
+                  Upload your driving license details
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -753,7 +864,12 @@ export default function DriverSignup() {
                   <Input
                     id="licenseNumber"
                     value={formData.licenseNumber}
-                    onChange={(e) => updateFormData("licenseNumber", e.target.value.toUpperCase())}
+                    onChange={(e) =>
+                      updateFormData(
+                        "licenseNumber",
+                        e.target.value.toUpperCase(),
+                      )
+                    }
                     placeholder="e.g., DL1420110012345"
                   />
                 </div>
@@ -764,7 +880,9 @@ export default function DriverSignup() {
                     id="licenseExpiry"
                     type="date"
                     value={formData.licenseExpiry}
-                    onChange={(e) => updateFormData("licenseExpiry", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("licenseExpiry", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -780,13 +898,20 @@ export default function DriverSignup() {
                       onClick={() => licenseFileRef.current?.click()}
                     >
                       <Camera className="w-4 h-4 mr-2" />
-                      {formData.licenseDocument ? "Change Document" : "Upload Document"}
+                      {formData.licenseDocument
+                        ? "Change Document"
+                        : "Upload Document"}
                     </Button>
                     <input
                       ref={licenseFileRef}
                       type="file"
                       accept="image/*,.pdf"
-                      onChange={(e) => handleFileUpload("licenseDocument", e.target.files?.[0] || null)}
+                      onChange={(e) =>
+                        handleFileUpload(
+                          "licenseDocument",
+                          e.target.files?.[0] || null,
+                        )
+                      }
                       className="hidden"
                     />
                     {formData.licenseDocument && (
@@ -796,7 +921,8 @@ export default function DriverSignup() {
                       </p>
                     )}
                     <p className="text-xs text-gray-500">
-                      Upload clear photo of both sides of your license (JPEG, PNG, or PDF)
+                      Upload clear photo of both sides of your license (JPEG,
+                      PNG, or PDF)
                     </p>
                   </div>
                 </div>
@@ -811,8 +937,12 @@ export default function DriverSignup() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <FileText className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900">Vehicle Documents</h2>
-                <p className="text-gray-600">Upload required vehicle documents</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Vehicle Documents
+                </h2>
+                <p className="text-gray-600">
+                  Upload required vehicle documents
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -833,7 +963,12 @@ export default function DriverSignup() {
                       ref={registrationFileRef}
                       type="file"
                       accept="image/*,.pdf"
-                      onChange={(e) => handleFileUpload("registrationDocument", e.target.files?.[0] || null)}
+                      onChange={(e) =>
+                        handleFileUpload(
+                          "registrationDocument",
+                          e.target.files?.[0] || null,
+                        )
+                      }
                       className="hidden"
                     />
                     {formData.registrationDocument && (
@@ -862,7 +997,12 @@ export default function DriverSignup() {
                       ref={insuranceFileRef}
                       type="file"
                       accept="image/*,.pdf"
-                      onChange={(e) => handleFileUpload("insuranceDocument", e.target.files?.[0] || null)}
+                      onChange={(e) =>
+                        handleFileUpload(
+                          "insuranceDocument",
+                          e.target.files?.[0] || null,
+                        )
+                      }
                       className="hidden"
                     />
                     {formData.insuranceDocument && (
@@ -879,11 +1019,16 @@ export default function DriverSignup() {
                 <div className="flex items-start space-x-3">
                   <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-blue-800">Document Requirements</h4>
+                    <h4 className="font-medium text-blue-800">
+                      Document Requirements
+                    </h4>
                     <ul className="text-sm text-blue-700 mt-1 space-y-1">
                       <li>• Ensure all documents are valid and not expired</li>
                       <li>• Upload clear, high-quality images</li>
-                      <li>• All document names should match your provided information</li>
+                      <li>
+                        • All document names should match your provided
+                        information
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -895,8 +1040,12 @@ export default function DriverSignup() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <Shield className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900">ID Verification</h2>
-                <p className="text-gray-600">Verify your identity with government-issued ID</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  ID Verification
+                </h2>
+                <p className="text-gray-600">
+                  Verify your identity with government-issued ID
+                </p>
               </div>
 
               <div className="space-y-6">
@@ -904,7 +1053,9 @@ export default function DriverSignup() {
                   <Label>ID Proof Type *</Label>
                   <RadioGroup
                     value={formData.idProofType}
-                    onValueChange={(value) => updateFormData("idProofType", value)}
+                    onValueChange={(value) =>
+                      updateFormData("idProofType", value)
+                    }
                     className="grid grid-cols-1 md:grid-cols-3 gap-4"
                   >
                     <div className="flex items-center space-x-2 p-3 border rounded-lg">
@@ -927,11 +1078,15 @@ export default function DriverSignup() {
                   <Input
                     id="idProofNumber"
                     value={formData.idProofNumber}
-                    onChange={(e) => updateFormData("idProofNumber", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("idProofNumber", e.target.value)
+                    }
                     placeholder={
-                      formData.idProofType === "aadhar" ? "XXXX XXXX XXXX" :
-                      formData.idProofType === "passport" ? "Passport Number" :
-                      "Voter ID Number"
+                      formData.idProofType === "aadhar"
+                        ? "XXXX XXXX XXXX"
+                        : formData.idProofType === "passport"
+                          ? "Passport Number"
+                          : "Voter ID Number"
                     }
                   />
                 </div>
@@ -947,13 +1102,20 @@ export default function DriverSignup() {
                         onClick={() => idProofFileRef.current?.click()}
                       >
                         <Camera className="w-4 h-4 mr-2" />
-                        {formData.idProofDocument ? "Change Document" : "Upload ID Proof"}
+                        {formData.idProofDocument
+                          ? "Change Document"
+                          : "Upload ID Proof"}
                       </Button>
                       <input
                         ref={idProofFileRef}
                         type="file"
                         accept="image/*,.pdf"
-                        onChange={(e) => handleFileUpload("idProofDocument", e.target.files?.[0] || null)}
+                        onChange={(e) =>
+                          handleFileUpload(
+                            "idProofDocument",
+                            e.target.files?.[0] || null,
+                          )
+                        }
                         className="hidden"
                       />
                       {formData.idProofDocument && (
@@ -979,8 +1141,12 @@ export default function DriverSignup() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <FileText className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900">Driver's License</h2>
-                <p className="text-gray-600">Upload your driving license details</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Driver's License
+                </h2>
+                <p className="text-gray-600">
+                  Upload your driving license details
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -989,7 +1155,12 @@ export default function DriverSignup() {
                   <Input
                     id="licenseNumber"
                     value={formData.licenseNumber}
-                    onChange={(e) => updateFormData("licenseNumber", e.target.value.toUpperCase())}
+                    onChange={(e) =>
+                      updateFormData(
+                        "licenseNumber",
+                        e.target.value.toUpperCase(),
+                      )
+                    }
                     placeholder="e.g., DL1420110012345"
                   />
                 </div>
@@ -1000,7 +1171,9 @@ export default function DriverSignup() {
                     id="licenseExpiry"
                     type="date"
                     value={formData.licenseExpiry}
-                    onChange={(e) => updateFormData("licenseExpiry", e.target.value)}
+                    onChange={(e) =>
+                      updateFormData("licenseExpiry", e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -1016,13 +1189,20 @@ export default function DriverSignup() {
                       onClick={() => licenseFileRef.current?.click()}
                     >
                       <Camera className="w-4 h-4 mr-2" />
-                      {formData.licenseDocument ? "Change Document" : "Upload Document"}
+                      {formData.licenseDocument
+                        ? "Change Document"
+                        : "Upload Document"}
                     </Button>
                     <input
                       ref={licenseFileRef}
                       type="file"
                       accept="image/*,.pdf"
-                      onChange={(e) => handleFileUpload("licenseDocument", e.target.files?.[0] || null)}
+                      onChange={(e) =>
+                        handleFileUpload(
+                          "licenseDocument",
+                          e.target.files?.[0] || null,
+                        )
+                      }
                       className="hidden"
                     />
                     {formData.licenseDocument && (
@@ -1032,7 +1212,8 @@ export default function DriverSignup() {
                       </p>
                     )}
                     <p className="text-xs text-gray-500">
-                      Upload clear photo of both sides of your license (JPEG, PNG, or PDF)
+                      Upload clear photo of both sides of your license (JPEG,
+                      PNG, or PDF)
                     </p>
                   </div>
                 </div>
@@ -1044,22 +1225,35 @@ export default function DriverSignup() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <Shield className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900">Background Check</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Background Check
+                </h2>
                 <p className="text-gray-600">Safety verification and consent</p>
               </div>
 
               <div className="space-y-6">
                 <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Safety Declaration</h3>
+                  <h3 className="text-lg font-semibold mb-4">
+                    Safety Declaration
+                  </h3>
                   <div className="space-y-4">
                     <div className="flex items-start space-x-3">
                       <Checkbox
                         id="cleanRecord"
                         checked={formData.hasCleanRecord}
-                        onCheckedChange={(checked) => updateFormData("hasCleanRecord", checked)}
+                        onCheckedChange={(checked) =>
+                          updateFormData("hasCleanRecord", checked)
+                        }
                       />
-                      <Label htmlFor="cleanRecord" className="text-sm leading-relaxed">
-                        I declare that I have no criminal record and have not been involved in any major traffic violations or accidents in the past 3 years. I understand that providing false information may result in immediate disqualification.
+                      <Label
+                        htmlFor="cleanRecord"
+                        className="text-sm leading-relaxed"
+                      >
+                        I declare that I have no criminal record and have not
+                        been involved in any major traffic violations or
+                        accidents in the past 3 years. I understand that
+                        providing false information may result in immediate
+                        disqualification.
                       </Label>
                     </div>
 
@@ -1067,10 +1261,18 @@ export default function DriverSignup() {
                       <Checkbox
                         id="backgroundConsent"
                         checked={formData.backgroundCheckConsent}
-                        onCheckedChange={(checked) => updateFormData("backgroundCheckConsent", checked)}
+                        onCheckedChange={(checked) =>
+                          updateFormData("backgroundCheckConsent", checked)
+                        }
                       />
-                      <Label htmlFor="backgroundConsent" className="text-sm leading-relaxed">
-                        I consent to URide conducting a comprehensive background check including criminal record verification, driving history, and reference checks. I understand this is mandatory for fleet driver positions.
+                      <Label
+                        htmlFor="backgroundConsent"
+                        className="text-sm leading-relaxed"
+                      >
+                        I consent to URide conducting a comprehensive background
+                        check including criminal record verification, driving
+                        history, and reference checks. I understand this is
+                        mandatory for fleet driver positions.
                       </Label>
                     </div>
                   </div>
@@ -1080,9 +1282,14 @@ export default function DriverSignup() {
                   <div className="flex items-start space-x-3">
                     <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-yellow-800">Background Check Process</h4>
+                      <h4 className="font-medium text-yellow-800">
+                        Background Check Process
+                      </h4>
                       <p className="text-sm text-yellow-700 mt-1">
-                        Our background check includes criminal record verification, driving history review, and reference checks. This process typically takes 2-3 business days and is mandatory for all fleet drivers.
+                        Our background check includes criminal record
+                        verification, driving history review, and reference
+                        checks. This process typically takes 2-3 business days
+                        and is mandatory for all fleet drivers.
                       </p>
                     </div>
                   </div>
@@ -1098,20 +1305,26 @@ export default function DriverSignup() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <Shield className="w-16 h-16 text-yellow-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900">Final Verification</h2>
-                <p className="text-gray-600">Complete ID verification and background check</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Final Verification
+                </h2>
+                <p className="text-gray-600">
+                  Complete ID verification and background check
+                </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-6">
                   <h3 className="text-lg font-semibold">ID Verification</h3>
-                  
+
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label>ID Proof Type *</Label>
                       <RadioGroup
                         value={formData.idProofType}
-                        onValueChange={(value) => updateFormData("idProofType", value)}
+                        onValueChange={(value) =>
+                          updateFormData("idProofType", value)
+                        }
                         className="grid grid-cols-1 gap-3"
                       >
                         <div className="flex items-center space-x-2 p-3 border rounded-lg">
@@ -1119,7 +1332,10 @@ export default function DriverSignup() {
                           <Label htmlFor="aadhar-final">Aadhar Card</Label>
                         </div>
                         <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                          <RadioGroupItem value="passport" id="passport-final" />
+                          <RadioGroupItem
+                            value="passport"
+                            id="passport-final"
+                          />
                           <Label htmlFor="passport-final">Passport</Label>
                         </div>
                         <div className="flex items-center space-x-2 p-3 border rounded-lg">
@@ -1134,11 +1350,15 @@ export default function DriverSignup() {
                       <Input
                         id="idProofNumber"
                         value={formData.idProofNumber}
-                        onChange={(e) => updateFormData("idProofNumber", e.target.value)}
+                        onChange={(e) =>
+                          updateFormData("idProofNumber", e.target.value)
+                        }
                         placeholder={
-                          formData.idProofType === "aadhar" ? "XXXX XXXX XXXX" :
-                          formData.idProofType === "passport" ? "Passport Number" :
-                          "Voter ID Number"
+                          formData.idProofType === "aadhar"
+                            ? "XXXX XXXX XXXX"
+                            : formData.idProofType === "passport"
+                              ? "Passport Number"
+                              : "Voter ID Number"
                         }
                       />
                     </div>
@@ -1159,7 +1379,12 @@ export default function DriverSignup() {
                           ref={idProofFileRef}
                           type="file"
                           accept="image/*,.pdf"
-                          onChange={(e) => handleFileUpload("idProofDocument", e.target.files?.[0] || null)}
+                          onChange={(e) =>
+                            handleFileUpload(
+                              "idProofDocument",
+                              e.target.files?.[0] || null,
+                            )
+                          }
                           className="hidden"
                         />
                         {formData.idProofDocument && (
@@ -1175,17 +1400,21 @@ export default function DriverSignup() {
 
                 <div className="space-y-6">
                   <h3 className="text-lg font-semibold">Background Check</h3>
-                  
+
                   <Card className="p-4">
                     <div className="space-y-4">
                       <div className="flex items-start space-x-3">
                         <Checkbox
                           id="cleanRecord-final"
                           checked={formData.hasCleanRecord}
-                          onCheckedChange={(checked) => updateFormData("hasCleanRecord", checked)}
+                          onCheckedChange={(checked) =>
+                            updateFormData("hasCleanRecord", checked)
+                          }
                         />
                         <Label htmlFor="cleanRecord-final" className="text-sm">
-                          I declare that I have no criminal record and have not been involved in any major traffic violations in the past 3 years.
+                          I declare that I have no criminal record and have not
+                          been involved in any major traffic violations in the
+                          past 3 years.
                         </Label>
                       </div>
 
@@ -1193,10 +1422,17 @@ export default function DriverSignup() {
                         <Checkbox
                           id="backgroundConsent-final"
                           checked={formData.backgroundCheckConsent}
-                          onCheckedChange={(checked) => updateFormData("backgroundCheckConsent", checked)}
+                          onCheckedChange={(checked) =>
+                            updateFormData("backgroundCheckConsent", checked)
+                          }
                         />
-                        <Label htmlFor="backgroundConsent-final" className="text-sm">
-                          I consent to URide conducting a comprehensive background check including criminal record and driving history verification.
+                        <Label
+                          htmlFor="backgroundConsent-final"
+                          className="text-sm"
+                        >
+                          I consent to URide conducting a comprehensive
+                          background check including criminal record and driving
+                          history verification.
                         </Label>
                       </div>
                     </div>
@@ -1206,13 +1442,15 @@ export default function DriverSignup() {
 
               <div className="space-y-4 pt-6 border-t">
                 <h3 className="text-lg font-semibold">Terms and Conditions</h3>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
                     <Checkbox
                       id="acceptTerms"
                       checked={formData.acceptTerms}
-                      onCheckedChange={(checked) => updateFormData("acceptTerms", checked)}
+                      onCheckedChange={(checked) =>
+                        updateFormData("acceptTerms", checked)
+                      }
                     />
                     <Label htmlFor="acceptTerms" className="text-sm">
                       I accept the{" "}
@@ -1227,7 +1465,9 @@ export default function DriverSignup() {
                     <Checkbox
                       id="acceptPrivacy"
                       checked={formData.acceptPrivacyPolicy}
-                      onCheckedChange={(checked) => updateFormData("acceptPrivacyPolicy", checked)}
+                      onCheckedChange={(checked) =>
+                        updateFormData("acceptPrivacyPolicy", checked)
+                      }
                     />
                     <Label htmlFor="acceptPrivacy" className="text-sm">
                       I accept the{" "}
@@ -1246,22 +1486,39 @@ export default function DriverSignup() {
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900">Terms and Conditions</h2>
-                <p className="text-gray-600">Review and accept our terms to complete your application</p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Terms and Conditions
+                </h2>
+                <p className="text-gray-600">
+                  Review and accept our terms to complete your application
+                </p>
               </div>
 
               <div className="space-y-6">
                 <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Fleet Driver Agreement</h3>
+                  <h3 className="text-lg font-semibold mb-4">
+                    Fleet Driver Agreement
+                  </h3>
                   <div className="space-y-4 text-sm text-gray-600">
                     <p>By joining URide as a fleet driver, you agree to:</p>
                     <ul className="list-disc list-inside space-y-2 ml-4">
-                      <li>Maintain professional conduct and provide excellent customer service</li>
-                      <li>Follow all traffic rules and company safety protocols</li>
-                      <li>Complete mandatory training programs within specified timeframes</li>
+                      <li>
+                        Maintain professional conduct and provide excellent
+                        customer service
+                      </li>
+                      <li>
+                        Follow all traffic rules and company safety protocols
+                      </li>
+                      <li>
+                        Complete mandatory training programs within specified
+                        timeframes
+                      </li>
                       <li>Maintain assigned vehicles in good condition</li>
                       <li>Work according to assigned schedules and routes</li>
-                      <li>Salary will be calculated based on kilometers driven and performance metrics</li>
+                      <li>
+                        Salary will be calculated based on kilometers driven and
+                        performance metrics
+                      </li>
                     </ul>
                   </div>
                 </Card>
@@ -1271,7 +1528,9 @@ export default function DriverSignup() {
                     <Checkbox
                       id="acceptTerms-fleet"
                       checked={formData.acceptTerms}
-                      onCheckedChange={(checked) => updateFormData("acceptTerms", checked)}
+                      onCheckedChange={(checked) =>
+                        updateFormData("acceptTerms", checked)
+                      }
                     />
                     <Label htmlFor="acceptTerms-fleet" className="text-sm">
                       I accept the{" "}
@@ -1286,7 +1545,9 @@ export default function DriverSignup() {
                     <Checkbox
                       id="acceptPrivacy-fleet"
                       checked={formData.acceptPrivacyPolicy}
-                      onCheckedChange={(checked) => updateFormData("acceptPrivacyPolicy", checked)}
+                      onCheckedChange={(checked) =>
+                        updateFormData("acceptPrivacyPolicy", checked)
+                      }
                     />
                     <Label htmlFor="acceptPrivacy-fleet" className="text-sm">
                       I accept the{" "}
@@ -1302,9 +1563,13 @@ export default function DriverSignup() {
                   <div className="flex items-start space-x-3">
                     <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-green-800">Ready to Submit</h4>
+                      <h4 className="font-medium text-green-800">
+                        Ready to Submit
+                      </h4>
                       <p className="text-sm text-green-700 mt-1">
-                        Your application is complete and ready for submission. Our team will review your application and contact you within 24-48 hours.
+                        Your application is complete and ready for submission.
+                        Our team will review your application and contact you
+                        within 24-48 hours.
                       </p>
                     </div>
                   </div>
@@ -1340,9 +1605,15 @@ export default function DriverSignup() {
             </Link>
 
             <div className="text-right">
-              <div className="text-sm text-gray-600">Step {currentStep} of {totalSteps}</div>
+              <div className="text-sm text-gray-600">
+                Step {currentStep} of {totalSteps}
+              </div>
               <div className="text-xs text-gray-500">
-                {formData.hasVehicle === "yes" ? "Own Vehicle" : formData.hasVehicle === "no" ? "Fleet Driver" : "Registration"}
+                {formData.hasVehicle === "yes"
+                  ? "Own Vehicle"
+                  : formData.hasVehicle === "no"
+                    ? "Fleet Driver"
+                    : "Registration"}
               </div>
             </div>
           </div>
@@ -1410,7 +1681,10 @@ export default function DriverSignup() {
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
             Need help? Contact our support team at{" "}
-            <a href="tel:+911234567890" className="text-yellow-600 hover:underline">
+            <a
+              href="tel:+911234567890"
+              className="text-yellow-600 hover:underline"
+            >
               +91 12345 67890
             </a>
           </p>

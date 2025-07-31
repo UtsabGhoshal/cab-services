@@ -43,7 +43,7 @@ export default function DriverLogin() {
   });
 
   const updateFormData = (field: keyof LoginFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,19 +67,23 @@ export default function DriverLogin() {
         const userCredential = await signInWithEmailAndPassword(
           auth,
           formData.email,
-          formData.password
+          formData.password,
         );
 
         user = userCredential.user;
         driver = await firebaseDriverService.getDriverByEmail(formData.email);
       } catch (firebaseError: any) {
-        console.warn("Firebase auth failed, using fallback:", firebaseError.message);
+        console.warn(
+          "Firebase auth failed, using fallback:",
+          firebaseError.message,
+        );
 
         // Use fallback auth service
-        const fallbackCredential = await fallbackAuthService.signInWithEmailAndPassword(
-          formData.email,
-          formData.password
-        );
+        const fallbackCredential =
+          await fallbackAuthService.signInWithEmailAndPassword(
+            formData.email,
+            formData.password,
+          );
 
         user = fallbackCredential.user;
         driver = await fallbackAuthService.getDriverByEmail(formData.email);
@@ -93,7 +97,8 @@ export default function DriverLogin() {
       if (!driver) {
         toast({
           title: "Driver Not Found",
-          description: "No driver account found with this email. Please contact support.",
+          description:
+            "No driver account found with this email. Please contact support.",
           variant: "destructive",
         });
         return;
@@ -102,7 +107,8 @@ export default function DriverLogin() {
       if (driver.status !== "active") {
         toast({
           title: "Account Inactive",
-          description: "Your driver account is pending approval or inactive. Please contact support.",
+          description:
+            "Your driver account is pending approval or inactive. Please contact support.",
           variant: "destructive",
         });
         return;
@@ -128,7 +134,7 @@ export default function DriverLogin() {
         completionRate: driver.completionRate,
         onlineHours: driver.onlineHours,
         joinDate: driver.joinDate,
-        createdAt: driver.createdAt
+        createdAt: driver.createdAt,
       };
 
       localStorage.setItem("uride_driver", JSON.stringify(driverSession));
@@ -143,17 +149,21 @@ export default function DriverLogin() {
         description: "Login successful. Redirecting to dashboard...",
       });
       navigate("/driver-dashboard");
-
     } catch (error: any) {
       console.error("Driver login error:", error);
       let errorMessage = "An error occurred during login. Please try again.";
 
-      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+      if (
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
         errorMessage = "Invalid email or password. Please try again.";
       } else if (error.code === "auth/too-many-requests") {
-        errorMessage = "Too many failed login attempts. Please try again later.";
+        errorMessage =
+          "Too many failed login attempts. Please try again later.";
       } else if (error.code === "auth/user-disabled") {
-        errorMessage = "This account has been disabled. Please contact support.";
+        errorMessage =
+          "This account has been disabled. Please contact support.";
       }
 
       toast({
@@ -177,11 +187,15 @@ export default function DriverLogin() {
         email: "amit.fleet@uride.com",
         password: "demo123",
         type: "Fleet Driver",
-      }
+      },
     };
 
     const demo = demoCredentials[type];
-    setFormData(prev => ({ ...prev, email: demo.email, password: demo.password }));
+    setFormData((prev) => ({
+      ...prev,
+      email: demo.email,
+      password: demo.password,
+    }));
 
     try {
       setIsLoading(true);
@@ -193,19 +207,23 @@ export default function DriverLogin() {
         const userCredential = await signInWithEmailAndPassword(
           auth,
           demo.email,
-          demo.password
+          demo.password,
         );
 
         user = userCredential.user;
         driver = await firebaseDriverService.getDriverByEmail(demo.email);
       } catch (firebaseError: any) {
-        console.warn("Firebase demo login failed, using fallback:", firebaseError.message);
+        console.warn(
+          "Firebase demo login failed, using fallback:",
+          firebaseError.message,
+        );
 
         // Use fallback auth service
-        const fallbackCredential = await fallbackAuthService.signInWithEmailAndPassword(
-          demo.email,
-          demo.password
-        );
+        const fallbackCredential =
+          await fallbackAuthService.signInWithEmailAndPassword(
+            demo.email,
+            demo.password,
+          );
 
         user = fallbackCredential.user;
         driver = await fallbackAuthService.getDriverByEmail(demo.email);
@@ -228,7 +246,8 @@ export default function DriverLogin() {
       if (driver.status !== "active") {
         toast({
           title: "Demo Account Inactive",
-          description: "Demo driver account is not active. Please contact support.",
+          description:
+            "Demo driver account is not active. Please contact support.",
           variant: "destructive",
         });
         return;
@@ -254,7 +273,7 @@ export default function DriverLogin() {
         completionRate: driver.completionRate,
         onlineHours: driver.onlineHours,
         joinDate: driver.joinDate,
-        createdAt: driver.createdAt
+        createdAt: driver.createdAt,
       };
 
       localStorage.setItem("uride_driver", JSON.stringify(driverSession));
@@ -268,14 +287,17 @@ export default function DriverLogin() {
       setTimeout(() => {
         navigate("/driver-dashboard");
       }, 1000);
-
     } catch (error: any) {
       console.error("Demo login error:", error);
 
       let errorMessage = "Demo login failed. Please try again.";
 
-      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-        errorMessage = "Demo user not found. Please contact support to set up demo accounts.";
+      if (
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
+        errorMessage =
+          "Demo user not found. Please contact support to set up demo accounts.";
       }
 
       toast({
@@ -428,7 +450,9 @@ export default function DriverLogin() {
                         id="email"
                         type="email"
                         value={formData.email}
-                        onChange={(e) => updateFormData("email", e.target.value)}
+                        onChange={(e) =>
+                          updateFormData("email", e.target.value)
+                        }
                         placeholder="Enter your email"
                         className="pl-10"
                         required
@@ -444,7 +468,9 @@ export default function DriverLogin() {
                         id="password"
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
-                        onChange={(e) => updateFormData("password", e.target.value)}
+                        onChange={(e) =>
+                          updateFormData("password", e.target.value)
+                        }
                         placeholder="Enter your password"
                         className="pl-10 pr-10"
                         required
@@ -468,9 +494,14 @@ export default function DriverLogin() {
                       <Checkbox
                         id="rememberMe"
                         checked={formData.rememberMe}
-                        onCheckedChange={(checked) => updateFormData("rememberMe", checked)}
+                        onCheckedChange={(checked) =>
+                          updateFormData("rememberMe", checked)
+                        }
                       />
-                      <Label htmlFor="rememberMe" className="text-sm text-gray-600">
+                      <Label
+                        htmlFor="rememberMe"
+                        className="text-sm text-gray-600"
+                      >
                         Remember me
                       </Label>
                     </div>
@@ -505,7 +536,9 @@ export default function DriverLogin() {
                       <div className="w-full border-t border-gray-300" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">Try Demo</span>
+                      <span className="px-2 bg-white text-gray-500">
+                        Try Demo
+                      </span>
                     </div>
                   </div>
 
@@ -548,7 +581,10 @@ export default function DriverLogin() {
             {/* Help Section */}
             <div className="mt-6 text-center">
               <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
-                <a href="tel:+911234567890" className="flex items-center space-x-1 hover:text-yellow-600">
+                <a
+                  href="tel:+911234567890"
+                  className="flex items-center space-x-1 hover:text-yellow-600"
+                >
                   <Phone className="w-4 h-4" />
                   <span>Support: +91 12345 67890</span>
                 </a>
@@ -572,19 +608,27 @@ export default function DriverLogin() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-600 mb-2">5000+</div>
+              <div className="text-3xl font-bold text-yellow-600 mb-2">
+                5000+
+              </div>
               <div className="text-sm text-gray-600">Active Drivers</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-600 mb-2">₹25K</div>
+              <div className="text-3xl font-bold text-yellow-600 mb-2">
+                ₹25K
+              </div>
               <div className="text-sm text-gray-600">Avg Monthly Earnings</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-600 mb-2">4.8★</div>
+              <div className="text-3xl font-bold text-yellow-600 mb-2">
+                4.8★
+              </div>
               <div className="text-sm text-gray-600">Driver Satisfaction</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-600 mb-2">24/7</div>
+              <div className="text-3xl font-bold text-yellow-600 mb-2">
+                24/7
+              </div>
               <div className="text-sm text-gray-600">Support Available</div>
             </div>
           </div>

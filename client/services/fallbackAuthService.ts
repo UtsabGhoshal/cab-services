@@ -1,6 +1,9 @@
 // Fallback authentication service for development when Firebase is unavailable
-import { firebaseDriverService, type FirebaseDriver } from './firebaseDriverService';
-import { Timestamp } from 'firebase/firestore';
+import {
+  firebaseDriverService,
+  type FirebaseDriver,
+} from "./firebaseDriverService";
+import { Timestamp } from "firebase/firestore";
 
 interface FallbackUser {
   uid: string;
@@ -9,7 +12,8 @@ interface FallbackUser {
 }
 
 class FallbackAuthService {
-  private mockUsers: Map<string, { password: string; driver: FirebaseDriver }> = new Map();
+  private mockUsers: Map<string, { password: string; driver: FirebaseDriver }> =
+    new Map();
   private currentUser: FallbackUser | null = null;
 
   constructor() {
@@ -69,7 +73,7 @@ class FallbackAuthService {
       vehicleModel: "URide Fleet Vehicle",
       licenseNumber: "DL1420110054321",
       documentsVerified: true,
-      idProofType: "aadhar", 
+      idProofType: "aadhar",
       idProofNumber: "9876-5432-1098",
       hasCleanRecord: true,
       backgroundCheckCompleted: true,
@@ -81,11 +85,20 @@ class FallbackAuthService {
       updatedAt: Timestamp.now(),
     };
 
-    this.mockUsers.set("rajesh.driver@uride.com", { password: "demo123", driver: ownerDriver });
-    this.mockUsers.set("amit.fleet@uride.com", { password: "demo123", driver: fleetDriver });
+    this.mockUsers.set("rajesh.driver@uride.com", {
+      password: "demo123",
+      driver: ownerDriver,
+    });
+    this.mockUsers.set("amit.fleet@uride.com", {
+      password: "demo123",
+      driver: fleetDriver,
+    });
   }
 
-  async createUserWithEmailAndPassword(email: string, password: string): Promise<{ user: FallbackUser }> {
+  async createUserWithEmailAndPassword(
+    email: string,
+    password: string,
+  ): Promise<{ user: FallbackUser }> {
     // Simulate Firebase user creation
     await this.delay(500); // Simulate network delay
 
@@ -103,7 +116,10 @@ class FallbackAuthService {
     return { user };
   }
 
-  async signInWithEmailAndPassword(email: string, password: string): Promise<{ user: FallbackUser }> {
+  async signInWithEmailAndPassword(
+    email: string,
+    password: string,
+  ): Promise<{ user: FallbackUser }> {
     await this.delay(500); // Simulate network delay
 
     const userData = this.mockUsers.get(email);
@@ -137,10 +153,12 @@ class FallbackAuthService {
     return userData ? userData.driver : null;
   }
 
-  async createDriver(driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt">): Promise<string> {
+  async createDriver(
+    driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt">,
+  ): Promise<string> {
     await this.delay(500);
     const id = `fallback_driver_${Date.now()}`;
-    
+
     const driver: FirebaseDriver = {
       ...driverData,
       id,
@@ -153,7 +171,7 @@ class FallbackAuthService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

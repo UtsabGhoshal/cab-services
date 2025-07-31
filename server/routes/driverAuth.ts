@@ -22,11 +22,11 @@ interface DriverSignupRequest {
   password: string;
   dateOfBirth: string;
   address: string;
-  
+
   // Driver License Information
   licenseNumber: string;
   licenseExpiry: string;
-  
+
   // Vehicle Information (if owns car)
   hasVehicle: "yes" | "no";
   vehicleMake?: string;
@@ -34,15 +34,15 @@ interface DriverSignupRequest {
   vehicleYear?: string;
   vehicleColor?: string;
   vehicleNumber?: string;
-  
+
   // ID Verification
   idProofType: "aadhar" | "passport" | "voter";
   idProofNumber: string;
-  
+
   // Background Check
   hasCleanRecord: boolean;
   backgroundCheckConsent: boolean;
-  
+
   // Terms
   acceptTerms: boolean;
   acceptPrivacyPolicy: boolean;
@@ -140,7 +140,14 @@ export const driverSignupHandler: RequestHandler<
     } = req.body;
 
     // Validate required fields
-    if (!fullName || !email || !phone || !password || !licenseNumber || !idProofNumber) {
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !password ||
+      !licenseNumber ||
+      !idProofNumber
+    ) {
       return res.status(400).json({
         success: false,
         error: "Missing required fields",
@@ -159,20 +166,21 @@ export const driverSignupHandler: RequestHandler<
       $or: [
         { email: email.toLowerCase() },
         { phone: phone },
-        { licenseNumber: licenseNumber.toUpperCase() }
-      ]
+        { licenseNumber: licenseNumber.toUpperCase() },
+      ],
     });
 
     if (existingDriver) {
       return res.status(409).json({
         success: false,
-        error: "Driver with this email, phone, or license number already exists",
+        error:
+          "Driver with this email, phone, or license number already exists",
       });
     }
 
     // Determine driver type
     const driverType = {
-      type: hasVehicle === "yes" ? "owner" : "fleet" as "owner" | "fleet",
+      type: hasVehicle === "yes" ? "owner" : ("fleet" as "owner" | "fleet"),
       commissionRate: hasVehicle === "yes" ? 0.05 : undefined,
       salaryPerKm: hasVehicle === "no" ? 12 : undefined,
     };
@@ -197,7 +205,7 @@ export const driverSignupHandler: RequestHandler<
       acceptedPrivacyPolicy: acceptPrivacyPolicy,
       isEmailVerified: false,
       isPhoneVerified: true, // Assume phone was verified during signup
-      
+
       // Vehicle information for owners
       ...(hasVehicle === "yes" && {
         vehicleNumber: vehicleNumber?.toUpperCase(),
@@ -212,12 +220,12 @@ export const driverSignupHandler: RequestHandler<
     res.status(201).json({
       success: true,
       driverId: newDriver.id,
-      message: "Driver application submitted successfully. You will be contacted within 24-48 hours for verification.",
+      message:
+        "Driver application submitted successfully. You will be contacted within 24-48 hours for verification.",
     });
-
   } catch (error: any) {
     console.error("Driver signup error:", error);
-    
+
     // Handle duplicate key errors
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
@@ -228,11 +236,13 @@ export const driverSignupHandler: RequestHandler<
     }
 
     // Handle validation errors
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err: any) => err.message);
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map(
+        (err: any) => err.message,
+      );
       return res.status(400).json({
         success: false,
-        error: messages.join(', '),
+        error: messages.join(", "),
       });
     }
 
@@ -285,7 +295,7 @@ export const updateDriverStatusHandler: RequestHandler = async (req, res) => {
     const driver = await Driver.findByIdAndUpdate(
       driverId,
       { status },
-      { new: true }
+      { new: true },
     );
 
     if (!driver) {
@@ -312,10 +322,10 @@ export const updateDriverStatusHandler: RequestHandler = async (req, res) => {
 export const getDriversHandler: RequestHandler = async (req, res) => {
   try {
     const { status, type, page = 1, limit = 20 } = req.query;
-    
+
     const filter: any = {};
     if (status) filter.status = status;
-    if (type) filter['driverType.type'] = type;
+    if (type) filter["driverType.type"] = type;
 
     const drivers = await Driver.find(filter)
       .limit(Number(limit))
@@ -326,7 +336,7 @@ export const getDriversHandler: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      drivers: drivers.map(driver => driver.toObject()),
+      drivers: drivers.map((driver) => driver.toObject()),
       pagination: {
         page: Number(page),
         limit: Number(limit),

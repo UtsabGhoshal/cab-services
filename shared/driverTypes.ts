@@ -19,31 +19,31 @@ export interface Driver {
   totalEarnings: number;
   totalKmDriven: number;
   joinDate: Date;
-  
+
   // Vehicle Information
   vehicleNumber?: string; // For vehicle owners
   vehicleModel?: string; // For vehicle owners
   assignedVehicleId?: string; // For fleet drivers
-  
+
   // License and Documents
   licenseNumber: string;
   licenseExpiry: Date;
   documentsVerified: boolean;
-  
+
   // ID Verification
   idProofType?: "aadhar" | "passport" | "voter";
   idProofNumber?: string;
-  
+
   // Background Check
   hasCleanRecord: boolean;
   backgroundCheckCompleted: boolean;
-  
+
   // Performance Metrics
   acceptanceRate: number;
   completionRate: number;
   averageRating: number;
   onlineHours: number;
-  
+
   // Shift Information (for fleet drivers)
   currentShift?: {
     startTime: Date;
@@ -62,16 +62,16 @@ export interface Vehicle {
   registrationNumber: string;
   type: "company" | "driver_owned";
   status: "available" | "assigned" | "maintenance";
-  
+
   // Assignment
   assignedDriverId?: string;
   assignedDriverName?: string;
-  
+
   // Maintenance
   mileage: number;
   lastService: Date;
   nextServiceDue: Date;
-  
+
   // Documents
   insuranceExpiry: Date;
   registrationExpiry: Date;
@@ -84,7 +84,7 @@ export interface Ride {
   driverName: string;
   passengerId: string;
   passengerName: string;
-  
+
   // Location data
   pickup: {
     address: string;
@@ -100,25 +100,31 @@ export interface Ride {
       lng: number;
     };
   };
-  
+
   // Ride details
   distance: number; // in km
   duration: number; // in minutes
   rideType: "economy" | "premium" | "luxury";
-  status: "requested" | "accepted" | "picking_up" | "en_route" | "completed" | "cancelled";
-  
+  status:
+    | "requested"
+    | "accepted"
+    | "picking_up"
+    | "en_route"
+    | "completed"
+    | "cancelled";
+
   // Financial details
   totalFare: number;
   driverEarnings: number;
   commission?: number; // For vehicle owners
   kmSalary?: number; // For fleet drivers
-  
+
   // Timestamps
   requestedAt: Date;
   acceptedAt?: Date;
   startedAt?: Date;
   completedAt?: Date;
-  
+
   // Ratings
   passengerRating?: number;
   driverRating?: number;
@@ -130,23 +136,23 @@ export interface DriverStats {
   todayEarnings: number;
   weeklyEarnings: number;
   monthlyEarnings: number;
-  
+
   // Commission/Salary breakdown
   totalCommissionPaid?: number; // For vehicle owners
   totalKmSalary?: number; // For fleet drivers
-  
+
   // Rides
   totalRides: number;
   todayRides: number;
   totalKmDriven: number;
   todayKmDriven: number;
-  
+
   // Performance
   averageRating: number;
   onlineHours: number;
   acceptanceRate: number;
   completionRate: number;
-  
+
   // Goals
   monthlyTarget?: number;
   targetProgress?: number;
@@ -159,12 +165,12 @@ export interface DriverSignupData {
   phone: string;
   dateOfBirth: string;
   address: string;
-  
+
   // Driver License Information
   licenseNumber: string;
   licenseExpiry: string;
   licenseDocument: File | null;
-  
+
   // Vehicle Information (if owns car)
   hasVehicle: "yes" | "no" | "";
   vehicleMake: string;
@@ -174,16 +180,16 @@ export interface DriverSignupData {
   vehicleNumber: string;
   registrationDocument: File | null;
   insuranceDocument: File | null;
-  
+
   // ID Verification
   idProofType: "aadhar" | "passport" | "voter" | "";
   idProofNumber: string;
   idProofDocument: File | null;
-  
+
   // Background Check
   hasCleanRecord: boolean;
   backgroundCheckConsent: boolean;
-  
+
   // Terms
   acceptTerms: boolean;
   acceptPrivacyPolicy: boolean;
@@ -252,8 +258,19 @@ export const DriverTypeSchema = {
 };
 
 export const DriverStatusSchema = ["active", "inactive", "pending"] as const;
-export const VehicleStatusSchema = ["available", "assigned", "maintenance"] as const;
-export const RideStatusSchema = ["requested", "accepted", "picking_up", "en_route", "completed", "cancelled"] as const;
+export const VehicleStatusSchema = [
+  "available",
+  "assigned",
+  "maintenance",
+] as const;
+export const RideStatusSchema = [
+  "requested",
+  "accepted",
+  "picking_up",
+  "en_route",
+  "completed",
+  "cancelled",
+] as const;
 export const RideTypeSchema = ["economy", "premium", "luxury"] as const;
 export const IDProofTypeSchema = ["aadhar", "passport", "voter"] as const;
 
@@ -261,7 +278,7 @@ export const IDProofTypeSchema = ["aadhar", "passport", "voter"] as const;
 export function calculateDriverEarnings(
   totalFare: number,
   distance: number,
-  driverType: DriverType
+  driverType: DriverType,
 ): DriverEarningsCalculation {
   const breakdown = {
     baseFare: totalFare * 0.3, // 30% base fare
