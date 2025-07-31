@@ -328,10 +328,10 @@ export default function Booking() {
         throw new Error("Failed to get maps configuration");
       }
 
-      // Load Go Maps Pro script
+      // Load Google Maps API script
       if (!window.google) {
         const script = document.createElement("script");
-        script.src = `https://maps.gomaps.pro/maps/api/js?key=${data.apiKey}&libraries=places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places`;
         script.async = true;
         script.defer = true;
         script.onload = () => {
@@ -342,7 +342,7 @@ export default function Booking() {
         script.onerror = () => {
           toast({
             title: "Error",
-            description: "Failed to load Go Maps Pro",
+            description: "Failed to load Google Maps API",
             variant: "destructive",
           });
           setLoading(false);
