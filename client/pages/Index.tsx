@@ -492,7 +492,10 @@ export default function Index() {
             <a href="#" className="hover:text-yellow-400 transition-colors">
               Support
             </a>
-            <Link to="/driver" className="hover:text-yellow-400 transition-colors">
+            <Link
+              to="/driver"
+              className="hover:text-yellow-400 transition-colors"
+            >
               Driver Portal
             </Link>
           </div>

@@ -75,15 +75,15 @@ export default function Places() {
       lat: place.geocodes.main.latitude,
       lng: place.geocodes.main.longitude,
       address: place.location.formatted_address || place.name,
-      name: place.name
+      name: place.name,
     };
 
     // Navigate to booking page with destination data
-    navigate('/booking', {
+    navigate("/booking", {
       state: {
         destination: destinationData,
-        fromPlaces: true
-      }
+        fromPlaces: true,
+      },
     });
   };
 

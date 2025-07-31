@@ -1,7 +1,7 @@
-import React from 'react';
-import { FoursquarePlace } from '@/lib/foursquare';
-import { Location } from '@/lib/location';
-import { MapPin, Star, Clock } from 'lucide-react';
+import React from "react";
+import { FoursquarePlace } from "@/lib/foursquare";
+import { Location } from "@/lib/location";
+import { MapPin, Star, Clock } from "lucide-react";
 
 interface MapProps {
   center: Location;
@@ -17,11 +17,11 @@ const Map: React.FC<MapProps> = ({
   places,
   userLocation,
   zoom = 13,
-  height = '400px',
+  height = "400px",
   onPlaceClick,
 }) => {
   const formatDistance = (distance?: number): string => {
-    if (!distance) return '';
+    if (!distance) return "";
     if (distance < 1000) return `${Math.round(distance)}m`;
     return `${(distance / 1000).toFixed(1)}km`;
   };

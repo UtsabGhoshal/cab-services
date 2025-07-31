@@ -1,24 +1,28 @@
-import { doc, setDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '@/firebase/config';
+import { doc, setDoc, collection, addDoc, Timestamp } from "firebase/firestore";
+import { db } from "@/firebase/config";
 
 // Initialize Firebase collections with sample data if they don't exist
 export const initializeFirebaseCollections = async (driverId: string) => {
   try {
     // Initialize driver document
-    const driverRef = doc(db, 'drivers', driverId);
-    await setDoc(driverRef, {
-      id: driverId,
-      isOnline: false,
-      location: null,
-      lastUpdate: Timestamp.now(),
-      totalEarnings: 0,
-      totalRides: 0,
-      createdAt: Timestamp.now(),
-    }, { merge: true }); // merge: true prevents overwriting existing data
+    const driverRef = doc(db, "drivers", driverId);
+    await setDoc(
+      driverRef,
+      {
+        id: driverId,
+        isOnline: false,
+        location: null,
+        lastUpdate: Timestamp.now(),
+        totalEarnings: 0,
+        totalRides: 0,
+        createdAt: Timestamp.now(),
+      },
+      { merge: true },
+    ); // merge: true prevents overwriting existing data
 
-    console.log('Firebase collections initialized successfully');
+    console.log("Firebase collections initialized successfully");
   } catch (error) {
-    console.warn('Failed to initialize Firebase collections:', error);
+    console.warn("Failed to initialize Firebase collections:", error);
     // Don't throw error as this is optional initialization
   }
 };
@@ -26,7 +30,7 @@ export const initializeFirebaseCollections = async (driverId: string) => {
 // Create sample ride request for testing (development only)
 export const createSampleRideRequest = async () => {
   try {
-    const rideRequestsRef = collection(db, 'rideRequests');
+    const rideRequestsRef = collection(db, "rideRequests");
     await addDoc(rideRequestsRef, {
       passengerName: "Test Passenger",
       passengerPhone: "+91 98765 43210",
@@ -48,9 +52,9 @@ export const createSampleRideRequest = async () => {
       status: "pending",
       createdAt: Timestamp.now(),
     });
-    
-    console.log('Sample ride request created');
+
+    console.log("Sample ride request created");
   } catch (error) {
-    console.warn('Failed to create sample ride request:', error);
+    console.warn("Failed to create sample ride request:", error);
   }
 };

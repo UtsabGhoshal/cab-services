@@ -1,6 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { createDriverService, DriverService, RideRequest, OngoingRide, DriverLocation } from '@/services/driverService';
-import { initializeFirebaseCollections } from '@/utils/firebaseInit';
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  createDriverService,
+  DriverService,
+  RideRequest,
+  OngoingRide,
+  DriverLocation,
+} from "@/services/driverService";
+import { initializeFirebaseCollections } from "@/utils/firebaseInit";
 
 interface UseDriverServiceOptions {
   driverId: string;
@@ -12,20 +18,23 @@ interface UseDriverServiceReturn {
   isOnline: boolean;
   isConnected: boolean;
   lastUpdate: Date | null;
-  
+
   // Data
   rideRequests: RideRequest[];
   ongoingRides: OngoingRide[];
   rideHistory: any[];
-  
+
   // Actions
   toggleOnlineStatus: (location?: DriverLocation) => Promise<void>;
   acceptRide: (requestId: string) => Promise<void>;
   rejectRide: (requestId: string) => Promise<void>;
-  updateRideStatus: (rideId: string, status: OngoingRide['status']) => Promise<void>;
+  updateRideStatus: (
+    rideId: string,
+    status: OngoingRide["status"],
+  ) => Promise<void>;
   completeRide: (rideId: string, finalEarnings: number) => Promise<void>;
   updateLocation: (location: DriverLocation) => Promise<void>;
-  
+
   // Loading states
   loading: {
     toggleStatus: boolean;
@@ -34,14 +43,14 @@ interface UseDriverServiceReturn {
     updateStatus: boolean;
     completeRide: boolean;
   };
-  
+
   // Errors
   error: string | null;
 }
 
-export const useDriverService = ({ 
-  driverId, 
-  autoStart = true 
+export const useDriverService = ({
+  driverId,
+  autoStart = true,
 }: UseDriverServiceOptions): UseDriverServiceReturn => {
   const [isOnline, setIsOnline] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
@@ -50,7 +59,7 @@ export const useDriverService = ({
   const [ongoingRides, setOngoingRides] = useState<OngoingRide[]>([]);
   const [rideHistory, setRideHistory] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [loading, setLoading] = useState({
     toggleStatus: false,
     acceptRide: false,
@@ -69,8 +78,8 @@ export const useDriverService = ({
       setIsConnected(true);
 
       // Initialize Firebase collections
-      initializeFirebaseCollections(driverId).catch(err => {
-        console.warn('Firebase initialization failed:', err);
+      initializeFirebaseCollections(driverId).catch((err) => {
+        console.warn("Firebase initialization failed:", err);
       });
 
       if (autoStart) {
@@ -89,7 +98,7 @@ export const useDriverService = ({
   const getCurrentLocation = useCallback((): Promise<DriverLocation> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported'));
+        reject(new Error("Geolocation is not supported"));
         return;
       }
 
@@ -117,7 +126,7 @@ export const useDriverService = ({
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 60000, // 1 minute
-        }
+        },
       );
     });
   }, []);
@@ -137,7 +146,7 @@ export const useDriverService = ({
           setLastUpdate(new Date());
         });
       } catch (err) {
-        console.warn('Error subscribing to ongoing rides:', err);
+        console.warn("Error subscribing to ongoing rides:", err);
       }
 
       // Subscribe to ride history with error handling
@@ -147,7 +156,7 @@ export const useDriverService = ({
           setLastUpdate(new Date());
         });
       } catch (err) {
-        console.warn('Error subscribing to ride history:', err);
+        console.warn("Error subscribing to ride history:", err);
       }
 
       // Subscribe to ride requests if online
@@ -159,66 +168,76 @@ export const useDriverService = ({
             (requests) => {
               setRideRequests(requests);
               setLastUpdate(new Date());
-            }
+            },
           );
         } catch (err) {
-          console.warn('Error subscribing to ride requests:', err);
+          console.warn("Error subscribing to ride requests:", err);
         }
       }
 
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to start listening');
+      setError(
+        err instanceof Error ? err.message : "Failed to start listening",
+      );
     }
   }, [isOnline, getCurrentLocation]);
 
   // Toggle online status
-  const toggleOnlineStatus = useCallback(async (location?: DriverLocation) => {
-    if (!driverService.current) return;
+  const toggleOnlineStatus = useCallback(
+    async (location?: DriverLocation) => {
+      if (!driverService.current) return;
 
-    setLoading(prev => ({ ...prev, toggleStatus: true }));
-    try {
-      const newStatus = !isOnline;
-      const driverLocation = location || await getCurrentLocation();
-      
-      await driverService.current.updateOnlineStatus(newStatus, driverLocation);
-      setIsOnline(newStatus);
-      
-      if (newStatus) {
-        // Start listening to ride requests when going online
-        driverService.current.subscribeToRideRequests(
+      setLoading((prev) => ({ ...prev, toggleStatus: true }));
+      try {
+        const newStatus = !isOnline;
+        const driverLocation = location || (await getCurrentLocation());
+
+        await driverService.current.updateOnlineStatus(
+          newStatus,
           driverLocation,
-          10, // 10km radius
-          (requests) => {
-            setRideRequests(requests);
-            setLastUpdate(new Date());
-          }
         );
-      } else {
-        // Clear ride requests when going offline
-        setRideRequests([]);
+        setIsOnline(newStatus);
+
+        if (newStatus) {
+          // Start listening to ride requests when going online
+          driverService.current.subscribeToRideRequests(
+            driverLocation,
+            10, // 10km radius
+            (requests) => {
+              setRideRequests(requests);
+              setLastUpdate(new Date());
+            },
+          );
+        } else {
+          // Clear ride requests when going offline
+          setRideRequests([]);
+        }
+
+        setError(null);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to update status",
+        );
+      } finally {
+        setLoading((prev) => ({ ...prev, toggleStatus: false }));
       }
-      
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update status');
-    } finally {
-      setLoading(prev => ({ ...prev, toggleStatus: false }));
-    }
-  }, [isOnline, getCurrentLocation]);
+    },
+    [isOnline, getCurrentLocation],
+  );
 
   // Accept ride request
   const acceptRide = useCallback(async (requestId: string) => {
     if (!driverService.current) return;
 
-    setLoading(prev => ({ ...prev, acceptRide: true }));
+    setLoading((prev) => ({ ...prev, acceptRide: true }));
     try {
       await driverService.current.acceptRideRequest(requestId);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to accept ride');
+      setError(err instanceof Error ? err.message : "Failed to accept ride");
     } finally {
-      setLoading(prev => ({ ...prev, acceptRide: false }));
+      setLoading((prev) => ({ ...prev, acceptRide: false }));
     }
   }, []);
 
@@ -226,46 +245,56 @@ export const useDriverService = ({
   const rejectRide = useCallback(async (requestId: string) => {
     if (!driverService.current) return;
 
-    setLoading(prev => ({ ...prev, rejectRide: true }));
+    setLoading((prev) => ({ ...prev, rejectRide: true }));
     try {
       await driverService.current.rejectRideRequest(requestId);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to reject ride');
+      setError(err instanceof Error ? err.message : "Failed to reject ride");
     } finally {
-      setLoading(prev => ({ ...prev, rejectRide: false }));
+      setLoading((prev) => ({ ...prev, rejectRide: false }));
     }
   }, []);
 
   // Update ride status
-  const updateRideStatus = useCallback(async (rideId: string, status: OngoingRide['status']) => {
-    if (!driverService.current) return;
+  const updateRideStatus = useCallback(
+    async (rideId: string, status: OngoingRide["status"]) => {
+      if (!driverService.current) return;
 
-    setLoading(prev => ({ ...prev, updateStatus: true }));
-    try {
-      await driverService.current.updateRideStatus(rideId, status);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update ride status');
-    } finally {
-      setLoading(prev => ({ ...prev, updateStatus: false }));
-    }
-  }, []);
+      setLoading((prev) => ({ ...prev, updateStatus: true }));
+      try {
+        await driverService.current.updateRideStatus(rideId, status);
+        setError(null);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to update ride status",
+        );
+      } finally {
+        setLoading((prev) => ({ ...prev, updateStatus: false }));
+      }
+    },
+    [],
+  );
 
   // Complete ride
-  const completeRide = useCallback(async (rideId: string, finalEarnings: number) => {
-    if (!driverService.current) return;
+  const completeRide = useCallback(
+    async (rideId: string, finalEarnings: number) => {
+      if (!driverService.current) return;
 
-    setLoading(prev => ({ ...prev, completeRide: true }));
-    try {
-      await driverService.current.completeRide(rideId, finalEarnings);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to complete ride');
-    } finally {
-      setLoading(prev => ({ ...prev, completeRide: false }));
-    }
-  }, []);
+      setLoading((prev) => ({ ...prev, completeRide: true }));
+      try {
+        await driverService.current.completeRide(rideId, finalEarnings);
+        setError(null);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to complete ride",
+        );
+      } finally {
+        setLoading((prev) => ({ ...prev, completeRide: false }));
+      }
+    },
+    [],
+  );
 
   // Update location
   const updateLocation = useCallback(async (location: DriverLocation) => {
@@ -277,7 +306,9 @@ export const useDriverService = ({
       setLastUpdate(new Date());
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update location');
+      setError(
+        err instanceof Error ? err.message : "Failed to update location",
+      );
     }
   }, []);
 
@@ -290,7 +321,7 @@ export const useDriverService = ({
         const location = await getCurrentLocation();
         await updateLocation(location);
       } catch (err) {
-        console.warn('Failed to update location:', err);
+        console.warn("Failed to update location:", err);
       }
     }, 30000); // Update every 30 seconds
 
@@ -302,12 +333,12 @@ export const useDriverService = ({
     isOnline,
     isConnected,
     lastUpdate,
-    
+
     // Data
     rideRequests,
     ongoingRides,
     rideHistory,
-    
+
     // Actions
     toggleOnlineStatus,
     acceptRide,
@@ -315,10 +346,10 @@ export const useDriverService = ({
     updateRideStatus,
     completeRide,
     updateLocation,
-    
+
     // Loading states
     loading,
-    
+
     // Errors
     error,
   };

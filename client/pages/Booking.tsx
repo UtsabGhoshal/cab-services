@@ -267,7 +267,7 @@ export default function Booking() {
       const incomingDestination: BookingLocation = {
         lat: state.destination.lat,
         lng: state.destination.lng,
-        address: state.destination.address || state.destination.name
+        address: state.destination.address || state.destination.name,
       };
       setDestination(incomingDestination);
       setDestinationInputValue(incomingDestination.address);

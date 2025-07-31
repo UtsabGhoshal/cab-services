@@ -171,7 +171,12 @@ export default function DriverDashboard() {
 
   // Use Firebase data or fallback to demo data
   const isDevelopmentMode = import.meta.env.DEV || !driverService.isConnected;
-  const rideRequests = driverService.rideRequests.length > 0 ? driverService.rideRequests : (isDevelopmentMode ? fallbackRequests : []);
+  const rideRequests =
+    driverService.rideRequests.length > 0
+      ? driverService.rideRequests
+      : isDevelopmentMode
+        ? fallbackRequests
+        : [];
   const ongoingRides = driverService.ongoingRides;
   const rideHistory = driverService.rideHistory;
   const isOnline = driverService.isOnline;
@@ -190,7 +195,7 @@ export default function DriverDashboard() {
       destination: {
         address: "Red Fort",
         lat: 28.6562,
-        lng: 77.2410,
+        lng: 77.241,
       },
       earnings: 320,
       status: "en_route",
@@ -262,8 +267,10 @@ export default function DriverDashboard() {
   });
 
   // Use fallback data if Firebase data is empty (for demo)
-  const displayOngoingRides = ongoingRides.length > 0 ? ongoingRides : fallbackOngoingRides;
-  const displayRideHistory = rideHistory.length > 0 ? rideHistory : fallbackHistory;
+  const displayOngoingRides =
+    ongoingRides.length > 0 ? ongoingRides : fallbackOngoingRides;
+  const displayRideHistory =
+    rideHistory.length > 0 ? rideHistory : fallbackHistory;
 
   // Handle online/offline toggle
   const handleOnlineToggle = async (checked: boolean) => {
@@ -290,10 +297,10 @@ export default function DriverDashboard() {
       await driverService.acceptRide(requestId);
       setActiveTab("ongoing");
 
-      const request = rideRequests.find(r => r.id === requestId);
+      const request = rideRequests.find((r) => r.id === requestId);
       toast({
         title: "Ride Accepted!",
-        description: `You've accepted the ride to ${request?.destination.address || 'destination'}`,
+        description: `You've accepted the ride to ${request?.destination.address || "destination"}`,
       });
     } catch (error) {
       toast({
@@ -323,12 +330,12 @@ export default function DriverDashboard() {
   // Handle ongoing ride actions
   const handleCompleteRide = async (rideId: string) => {
     try {
-      const ride = displayOngoingRides.find(r => r.id === rideId);
+      const ride = displayOngoingRides.find((r) => r.id === rideId);
       if (ride) {
         await driverService.completeRide(rideId, ride.earnings);
 
         // Update stats
-        setDriverStats(prev => ({
+        setDriverStats((prev) => ({
           ...prev,
           todayEarnings: prev.todayEarnings + ride.earnings,
           todayRides: prev.todayRides + 1,
@@ -351,44 +358,56 @@ export default function DriverDashboard() {
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-IN', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return date.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     });
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "picking_up": return "bg-blue-100 text-blue-800";
-      case "en_route": return "bg-green-100 text-green-800";
-      case "arrived": return "bg-purple-100 text-purple-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "picking_up":
+        return "bg-blue-100 text-blue-800";
+      case "en_route":
+        return "bg-green-100 text-green-800";
+      case "arrived":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "picking_up": return "Picking Up";
-      case "en_route": return "En Route";
-      case "arrived": return "Arrived";
-      default: return status;
+      case "picking_up":
+        return "Picking Up";
+      case "en_route":
+        return "En Route";
+      case "arrived":
+        return "Arrived";
+      default:
+        return status;
     }
   };
 
   const getRideTypeColor = (type: string) => {
     switch (type) {
-      case "economy": return "bg-blue-100 text-blue-800";
-      case "premium": return "bg-purple-100 text-purple-800";
-      case "luxury": return "bg-gold-100 text-gold-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "economy":
+        return "bg-blue-100 text-blue-800";
+      case "premium":
+        return "bg-purple-100 text-purple-800";
+      case "luxury":
+        return "bg-gold-100 text-gold-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -424,9 +443,11 @@ export default function DriverDashboard() {
                   disabled={driverService.loading.toggleStatus}
                   className="data-[state=checked]:bg-green-600"
                 />
-                <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+                <div
+                  className={`w-3 h-3 rounded-full ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}
+                />
               </div>
-              
+
               <div className="text-right">
                 <div className="text-sm text-slate-600">Today's Earnings</div>
                 <div className="text-xl font-bold text-green-600">
@@ -462,7 +483,9 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 text-red-700">
                   <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">Connection Error: {driverService.error}</span>
+                  <span className="text-sm">
+                    Connection Error: {driverService.error}
+                  </span>
                 </div>
                 <Button
                   size="sm"
@@ -481,7 +504,10 @@ export default function DriverDashboard() {
               <div className="flex items-center space-x-2 text-green-700">
                 <CheckCircle className="w-4 h-4" />
                 <span className="text-sm">
-                  Connected to Firebase • Last update: {driverService.lastUpdate ? formatTime(driverService.lastUpdate) : 'Initializing...'}
+                  Connected to Firebase • Last update:{" "}
+                  {driverService.lastUpdate
+                    ? formatTime(driverService.lastUpdate)
+                    : "Initializing..."}
                 </span>
               </div>
             </div>
@@ -499,7 +525,9 @@ export default function DriverDashboard() {
               <span className="text-sm text-slate-600">
                 {isOnline ? "Online" : "Offline"}
               </span>
-              <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+              <div
+                className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}
+              />
             </div>
             <div className="text-right">
               <div className="text-sm text-slate-600">Today</div>
@@ -514,7 +542,10 @@ export default function DriverDashboard() {
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => setMobileMenuOpen(false)}
+          />
           <div className="fixed top-0 right-0 h-full w-80 bg-white p-6 shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold">Driver Menu</h2>
@@ -526,14 +557,16 @@ export default function DriverDashboard() {
                 <X className="w-5 h-5" />
               </Button>
             </div>
-            
+
             <div className="space-y-4">
               <div className="p-4 bg-slate-50 rounded-lg">
                 <h3 className="font-medium mb-2">Profile</h3>
                 <p className="text-sm text-slate-600">{driverProfile.name}</p>
-                <p className="text-sm text-slate-600">{driverProfile.vehicleModel}</p>
+                <p className="text-sm text-slate-600">
+                  {driverProfile.vehicleModel}
+                </p>
               </div>
-              
+
               <Button
                 variant="outline"
                 className="w-full justify-start"
@@ -556,7 +589,9 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Today's Rides</p>
-                  <p className="text-2xl font-bold text-blue-600">{driverStats.todayRides}</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {driverStats.todayRides}
+                  </p>
                 </div>
                 <Car className="w-8 h-8 text-blue-600" />
               </div>
@@ -568,7 +603,9 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Today's Earnings</p>
-                  <p className="text-2xl font-bold text-green-600">₹{driverStats.todayEarnings}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    ₹{driverStats.todayEarnings}
+                  </p>
                 </div>
                 <IndianRupee className="w-8 h-8 text-green-600" />
               </div>
@@ -580,7 +617,9 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Rating</p>
-                  <p className="text-2xl font-bold text-purple-600">{driverStats.averageRating}★</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {driverStats.averageRating}★
+                  </p>
                 </div>
                 <Star className="w-8 h-8 text-purple-600" />
               </div>
@@ -592,7 +631,9 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Online Hours</p>
-                  <p className="text-2xl font-bold text-orange-600">{driverStats.onlineHours}h</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {driverStats.onlineHours}h
+                  </p>
                 </div>
                 <Clock className="w-8 h-8 text-orange-600" />
               </div>
@@ -601,31 +642,48 @@ export default function DriverDashboard() {
         </div>
 
         {/* Main Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
             <TabsTrigger value="requests" className="text-xs sm:text-sm">
               Requests
               {rideRequests.length > 0 && (
-                <Badge className="ml-2 bg-red-500 text-white">{rideRequests.length}</Badge>
+                <Badge className="ml-2 bg-red-500 text-white">
+                  {rideRequests.length}
+                </Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="ongoing" className="text-xs sm:text-sm">
               Ongoing
               {displayOngoingRides.length > 0 && (
-                <Badge className="ml-2 bg-blue-500 text-white">{displayOngoingRides.length}</Badge>
+                <Badge className="ml-2 bg-blue-500 text-white">
+                  {displayOngoingRides.length}
+                </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="history" className="text-xs sm:text-sm">History</TabsTrigger>
-            <TabsTrigger value="earnings" className="text-xs sm:text-sm">Earnings</TabsTrigger>
+            <TabsTrigger value="history" className="text-xs sm:text-sm">
+              History
+            </TabsTrigger>
+            <TabsTrigger value="earnings" className="text-xs sm:text-sm">
+              Earnings
+            </TabsTrigger>
           </TabsList>
 
           {/* Ride Requests Tab */}
           <TabsContent value="requests">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-slate-800">Ride Requests</h2>
+                <h2 className="text-2xl font-bold text-slate-800">
+                  Ride Requests
+                </h2>
                 {!isOnline && (
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                  <Badge
+                    variant="secondary"
+                    className="bg-orange-100 text-orange-800"
+                  >
                     <AlertCircle className="w-4 h-4 mr-1" />
                     Go online to receive requests
                   </Badge>
@@ -640,40 +698,54 @@ export default function DriverDashboard() {
                       No ride requests
                     </h3>
                     <p className="text-slate-500">
-                      {isOnline 
+                      {isOnline
                         ? "You'll see new ride requests here when passengers book rides near you"
-                        : "Turn on your online status to start receiving ride requests"
-                      }
+                        : "Turn on your online status to start receiving ride requests"}
                     </p>
                   </CardContent>
                 </Card>
               ) : (
                 <div className="grid gap-4">
                   {rideRequests.map((request) => (
-                    <Card key={request.id} className="border-l-4 border-l-blue-500">
+                    <Card
+                      key={request.id}
+                      className="border-l-4 border-l-blue-500"
+                    >
                       <CardContent className="p-6">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                           <div className="flex-1 space-y-3">
                             <div className="flex items-center justify-between">
-                              <h3 className="font-semibold text-lg">{request.passengerName}</h3>
-                              <Badge className={getRideTypeColor(request.rideType)}>
+                              <h3 className="font-semibold text-lg">
+                                {request.passengerName}
+                              </h3>
+                              <Badge
+                                className={getRideTypeColor(request.rideType)}
+                              >
                                 {request.rideType}
                               </Badge>
                             </div>
-                            
+
                             <div className="space-y-2">
                               <div className="flex items-start space-x-2">
                                 <div className="w-3 h-3 bg-green-500 rounded-full mt-2" />
                                 <div>
-                                  <p className="text-sm text-slate-600">Pickup</p>
-                                  <p className="font-medium">{request.pickup.address}</p>
+                                  <p className="text-sm text-slate-600">
+                                    Pickup
+                                  </p>
+                                  <p className="font-medium">
+                                    {request.pickup.address}
+                                  </p>
                                 </div>
                               </div>
                               <div className="flex items-start space-x-2">
                                 <div className="w-3 h-3 bg-red-500 rounded-full mt-2" />
                                 <div>
-                                  <p className="text-sm text-slate-600">Destination</p>
-                                  <p className="font-medium">{request.destination.address}</p>
+                                  <p className="text-sm text-slate-600">
+                                    Destination
+                                  </p>
+                                  <p className="font-medium">
+                                    {request.destination.address}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -689,7 +761,9 @@ export default function DriverDashboard() {
                               </div>
                               <div className="flex items-center space-x-1">
                                 <IndianRupee className="w-4 h-4" />
-                                <span className="font-semibold text-green-600">₹{request.estimatedEarnings}</span>
+                                <span className="font-semibold text-green-600">
+                                  ₹{request.estimatedEarnings}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -701,7 +775,9 @@ export default function DriverDashboard() {
                               className="flex-1 lg:w-full bg-green-600 hover:bg-green-700 text-white"
                             >
                               <CheckCircle className="w-4 h-4 mr-2" />
-                              {driverService.loading.acceptRide ? "Accepting..." : "Accept"}
+                              {driverService.loading.acceptRide
+                                ? "Accepting..."
+                                : "Accept"}
                             </Button>
                             <Button
                               variant="outline"
@@ -710,7 +786,9 @@ export default function DriverDashboard() {
                               className="flex-1 lg:w-full border-red-200 text-red-600 hover:bg-red-50"
                             >
                               <XCircle className="w-4 h-4 mr-2" />
-                              {driverService.loading.rejectRide ? "Rejecting..." : "Reject"}
+                              {driverService.loading.rejectRide
+                                ? "Rejecting..."
+                                : "Reject"}
                             </Button>
                           </div>
                         </div>
@@ -725,7 +803,9 @@ export default function DriverDashboard() {
           {/* Ongoing Rides Tab */}
           <TabsContent value="ongoing">
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-slate-800">Ongoing Rides</h2>
+              <h2 className="text-2xl font-bold text-slate-800">
+                Ongoing Rides
+              </h2>
 
               {displayOngoingRides.length === 0 ? (
                 <Card>
@@ -742,30 +822,43 @@ export default function DriverDashboard() {
               ) : (
                 <div className="grid gap-4">
                   {displayOngoingRides.map((ride) => (
-                    <Card key={ride.id} className="border-l-4 border-l-green-500">
+                    <Card
+                      key={ride.id}
+                      className="border-l-4 border-l-green-500"
+                    >
                       <CardContent className="p-6">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                           <div className="flex-1 space-y-3">
                             <div className="flex items-center justify-between">
-                              <h3 className="font-semibold text-lg">{ride.passengerName}</h3>
+                              <h3 className="font-semibold text-lg">
+                                {ride.passengerName}
+                              </h3>
                               <Badge className={getStatusColor(ride.status)}>
                                 {getStatusText(ride.status)}
                               </Badge>
                             </div>
-                            
+
                             <div className="space-y-2">
                               <div className="flex items-start space-x-2">
                                 <div className="w-3 h-3 bg-green-500 rounded-full mt-2" />
                                 <div>
-                                  <p className="text-sm text-slate-600">Pickup</p>
-                                  <p className="font-medium">{ride.pickup.address}</p>
+                                  <p className="text-sm text-slate-600">
+                                    Pickup
+                                  </p>
+                                  <p className="font-medium">
+                                    {ride.pickup.address}
+                                  </p>
                                 </div>
                               </div>
                               <div className="flex items-start space-x-2">
                                 <div className="w-3 h-3 bg-red-500 rounded-full mt-2" />
                                 <div>
-                                  <p className="text-sm text-slate-600">Destination</p>
-                                  <p className="font-medium">{ride.destination.address}</p>
+                                  <p className="text-sm text-slate-600">
+                                    Destination
+                                  </p>
+                                  <p className="font-medium">
+                                    {ride.destination.address}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -773,15 +866,21 @@ export default function DriverDashboard() {
                             <div className="flex items-center space-x-6 text-sm text-slate-600">
                               <div className="flex items-center space-x-1">
                                 <Clock className="w-4 h-4" />
-                                <span>Started {formatTime(ride.startTime)}</span>
+                                <span>
+                                  Started {formatTime(ride.startTime)}
+                                </span>
                               </div>
                               <div className="flex items-center space-x-1">
                                 <Target className="w-4 h-4" />
-                                <span>ETA {formatTime(ride.estimatedArrival)}</span>
+                                <span>
+                                  ETA {formatTime(ride.estimatedArrival)}
+                                </span>
                               </div>
                               <div className="flex items-center space-x-1">
                                 <IndianRupee className="w-4 h-4" />
-                                <span className="font-semibold text-green-600">₹{ride.earnings}</span>
+                                <span className="font-semibold text-green-600">
+                                  ₹{ride.earnings}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -807,7 +906,9 @@ export default function DriverDashboard() {
                               className="flex-1 lg:w-full bg-green-600 hover:bg-green-700 text-white"
                             >
                               <CheckCircle className="w-4 h-4 mr-2" />
-                              {driverService.loading.completeRide ? "Completing..." : "Complete"}
+                              {driverService.loading.completeRide
+                                ? "Completing..."
+                                : "Complete"}
                             </Button>
                           </div>
                         </div>
@@ -822,7 +923,9 @@ export default function DriverDashboard() {
           {/* Ride History Tab */}
           <TabsContent value="history">
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-slate-800">Ride History</h2>
+              <h2 className="text-2xl font-bold text-slate-800">
+                Ride History
+              </h2>
 
               {displayRideHistory.length === 0 ? (
                 <Card>
@@ -844,20 +947,33 @@ export default function DriverDashboard() {
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                           <div className="flex-1 space-y-2">
                             <div className="flex items-center justify-between">
-                              <h3 className="font-semibold text-lg">{ride.passengerName}</h3>
+                              <h3 className="font-semibold text-lg">
+                                {ride.passengerName}
+                              </h3>
                               <div className="flex items-center space-x-1">
                                 <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                                <span className="font-medium">{ride.rating}</span>
+                                <span className="font-medium">
+                                  {ride.rating}
+                                </span>
                               </div>
                             </div>
-                            
+
                             <div className="text-sm text-slate-600">
-                              <p><span className="font-medium">From:</span> {ride.pickup}</p>
-                              <p><span className="font-medium">To:</span> {ride.destination}</p>
+                              <p>
+                                <span className="font-medium">From:</span>{" "}
+                                {ride.pickup}
+                              </p>
+                              <p>
+                                <span className="font-medium">To:</span>{" "}
+                                {ride.destination}
+                              </p>
                             </div>
 
                             <div className="flex items-center space-x-4 text-sm text-slate-600">
-                              <span>{formatDate(ride.date)} at {formatTime(ride.date)}</span>
+                              <span>
+                                {formatDate(ride.date)} at{" "}
+                                {formatTime(ride.date)}
+                              </span>
                               <span>•</span>
                               <span>{ride.distance} km</span>
                               <span>•</span>
@@ -882,13 +998,17 @@ export default function DriverDashboard() {
           {/* Earnings Tab */}
           <TabsContent value="earnings">
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-slate-800">Earnings Summary</h2>
+              <h2 className="text-2xl font-bold text-slate-800">
+                Earnings Summary
+              </h2>
 
               {/* Earnings Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-600">Today</CardTitle>
+                    <CardTitle className="text-sm font-medium text-slate-600">
+                      Today
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="text-3xl font-bold text-green-600">
@@ -902,35 +1022,43 @@ export default function DriverDashboard() {
 
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-600">This Week</CardTitle>
+                    <CardTitle className="text-sm font-medium text-slate-600">
+                      This Week
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="text-3xl font-bold text-blue-600">
                       ₹{driverStats.weeklyEarnings.toLocaleString()}
                     </div>
                     <p className="text-sm text-slate-600 mt-1">
-                      Average ₹{Math.round(driverStats.weeklyEarnings / 7)} per day
+                      Average ₹{Math.round(driverStats.weeklyEarnings / 7)} per
+                      day
                     </p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-600">This Month</CardTitle>
+                    <CardTitle className="text-sm font-medium text-slate-600">
+                      This Month
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="text-3xl font-bold text-purple-600">
                       ₹{driverStats.monthlyEarnings.toLocaleString()}
                     </div>
                     <p className="text-sm text-slate-600 mt-1">
-                      Average ₹{Math.round(driverStats.monthlyEarnings / 30)} per day
+                      Average ₹{Math.round(driverStats.monthlyEarnings / 30)}{" "}
+                      per day
                     </p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-600">Total</CardTitle>
+                    <CardTitle className="text-sm font-medium text-slate-600">
+                      Total
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="text-3xl font-bold text-orange-600">
@@ -957,25 +1085,33 @@ export default function DriverDashboard() {
                       <div className="text-3xl font-bold text-blue-600 mb-2">
                         {driverStats.averageRating}★
                       </div>
-                      <div className="text-sm text-slate-600">Average Rating</div>
+                      <div className="text-sm text-slate-600">
+                        Average Rating
+                      </div>
                     </div>
                     <div className="text-center p-4 bg-green-50 rounded-lg">
                       <div className="text-3xl font-bold text-green-600 mb-2">
                         {driverStats.acceptanceRate}%
                       </div>
-                      <div className="text-sm text-slate-600">Acceptance Rate</div>
+                      <div className="text-sm text-slate-600">
+                        Acceptance Rate
+                      </div>
                     </div>
                     <div className="text-center p-4 bg-purple-50 rounded-lg">
                       <div className="text-3xl font-bold text-purple-600 mb-2">
                         {driverStats.completionRate}%
                       </div>
-                      <div className="text-sm text-slate-600">Completion Rate</div>
+                      <div className="text-sm text-slate-600">
+                        Completion Rate
+                      </div>
                     </div>
                     <div className="text-center p-4 bg-orange-50 rounded-lg">
                       <div className="text-3xl font-bold text-orange-600 mb-2">
                         {driverStats.onlineHours}h
                       </div>
-                      <div className="text-sm text-slate-600">Hours Online Today</div>
+                      <div className="text-sm text-slate-600">
+                        Hours Online Today
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -992,24 +1128,50 @@ export default function DriverDashboard() {
                 <CardContent>
                   <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-6">
                     <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mx-auto md:mx-0">
-                      {driverProfile.name.split(' ').map(n => n[0]).join('')}
+                      {driverProfile.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                     </div>
                     <div className="flex-1 space-y-2 text-center md:text-left">
-                      <h3 className="text-xl font-bold text-slate-800">{driverProfile.name}</h3>
+                      <h3 className="text-xl font-bold text-slate-800">
+                        {driverProfile.name}
+                      </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-600">
                         <div>
-                          <p><span className="font-medium">Phone:</span> {driverProfile.phone}</p>
-                          <p><span className="font-medium">Email:</span> {driverProfile.email}</p>
-                          <p><span className="font-medium">License:</span> {driverProfile.licenseNumber}</p>
+                          <p>
+                            <span className="font-medium">Phone:</span>{" "}
+                            {driverProfile.phone}
+                          </p>
+                          <p>
+                            <span className="font-medium">Email:</span>{" "}
+                            {driverProfile.email}
+                          </p>
+                          <p>
+                            <span className="font-medium">License:</span>{" "}
+                            {driverProfile.licenseNumber}
+                          </p>
                         </div>
                         <div>
-                          <p><span className="font-medium">Vehicle:</span> {driverProfile.vehicleModel}</p>
-                          <p><span className="font-medium">Number:</span> {driverProfile.vehicleNumber}</p>
-                          <p><span className="font-medium">Member since:</span> {formatDate(driverProfile.joinDate)}</p>
+                          <p>
+                            <span className="font-medium">Vehicle:</span>{" "}
+                            {driverProfile.vehicleModel}
+                          </p>
+                          <p>
+                            <span className="font-medium">Number:</span>{" "}
+                            {driverProfile.vehicleNumber}
+                          </p>
+                          <p>
+                            <span className="font-medium">Member since:</span>{" "}
+                            {formatDate(driverProfile.joinDate)}
+                          </p>
                         </div>
                       </div>
                     </div>
-                    <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+                    <Button
+                      variant="outline"
+                      className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                    >
                       <Settings className="w-4 h-4 mr-2" />
                       Edit Profile
                     </Button>

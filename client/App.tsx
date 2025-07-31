@@ -21,7 +21,7 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
-  const showDriverButton = !location.pathname.startsWith('/driver');
+  const showDriverButton = !location.pathname.startsWith("/driver");
 
   return (
     <>
