@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Leaflet CSS imports */
-@import 'leaflet/dist/leaflet.css';
-
 @layer base {
   /**
    * Tailwind CSS theme
