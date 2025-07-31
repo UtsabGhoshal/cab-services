@@ -228,16 +228,30 @@ export class FirebaseDriverService {
 
   async getDriversByStatus(status: "active" | "inactive" | "pending"): Promise<FirebaseDriver[]> {
     const q = query(
-      this.driversCollection, 
+      this.driversCollection,
       where("status", "==", status),
       orderBy("createdAt", "desc")
     );
     const querySnapshot = await getDocs(q);
-    
+
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     })) as FirebaseDriver[];
+  }
+
+  async getDriverByEmail(email: string): Promise<FirebaseDriver | null> {
+    const q = query(
+      this.driversCollection,
+      where("email", "==", email.toLowerCase())
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      return { id: doc.id, ...doc.data() } as FirebaseDriver;
+    }
+    return null;
   }
 
   // Vehicle operations
