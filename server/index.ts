@@ -6,6 +6,13 @@ import {
   signupHandler,
   migratePasswordsHandler,
 } from "./routes/auth";
+import {
+  driverLoginHandler,
+  driverSignupHandler,
+  getDriverProfileHandler,
+  updateDriverStatusHandler,
+  getDriversHandler,
+} from "./routes/driverAuth";
 import { getUserDataHandler, getUserRidesHandler } from "./routes/user";
 import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
