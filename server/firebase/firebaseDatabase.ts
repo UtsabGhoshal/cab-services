@@ -168,8 +168,7 @@ export const validateUserCredentials = async (
 ): Promise<User | null> => {
   try {
     const user = await getUserByEmail(email);
-    if (user && user.password === password) {
-      // In real app, you'd compare hashed passwords
+    if (user && await bcrypt.compare(password, user.password)) {
       return user;
     }
     return null;
