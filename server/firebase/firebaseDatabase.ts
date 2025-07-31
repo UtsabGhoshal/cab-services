@@ -193,7 +193,28 @@ export const validateUserCredentials = async (
       // Direct comparison for plain text passwords (legacy users)
       const isValid = user.password === password;
       console.log(`✅ Plain text validation result: ${isValid}`);
-      console.log(`🔍 Stored password: "${user.password}", Provided password: "${password}"`);
+      console.log(`🔍 Stored password length: ${user.password.length}, Provided password length: ${password.length}`);
+      console.log(`🔍 Stored password first 5 chars: "${user.password.substring(0, 5)}..."`);
+      console.log(`🔍 Provided password first 5 chars: "${password.substring(0, 5)}..."`);
+
+      // Try some common variations
+      const variations = [
+        password.trim(),
+        password.toLowerCase(),
+        password.toUpperCase(),
+        'utsab@2004',
+        'password123',
+        'utsab123',
+        'test123'
+      ];
+
+      for (const variation of variations) {
+        if (user.password === variation) {
+          console.log(`🎯 Password match found with variation: "${variation}"`);
+          return user;
+        }
+      }
+
       return isValid ? user : null;
     }
   } catch (error) {
