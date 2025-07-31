@@ -59,17 +59,35 @@ export default function DriverLogin() {
 
     setIsLoading(true);
     try {
-      // Sign in with Firebase Auth
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
+      let user, driver;
 
-      const user = userCredential.user;
+      try {
+        // Try Firebase Auth first
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
 
-      // Get driver profile from Firestore
-      const driver = await firebaseDriverService.getDriverByEmail(formData.email);
+        user = userCredential.user;
+        driver = await firebaseDriverService.getDriverByEmail(formData.email);
+      } catch (firebaseError: any) {
+        console.warn("Firebase auth failed, using fallback:", firebaseError.message);
+
+        // Use fallback auth service
+        const fallbackCredential = await fallbackAuthService.signInWithEmailAndPassword(
+          formData.email,
+          formData.password
+        );
+
+        user = fallbackCredential.user;
+        driver = await fallbackAuthService.getDriverByEmail(formData.email);
+
+        toast({
+          title: "Development Mode",
+          description: "Using fallback authentication for development.",
+        });
+      }
 
       if (!driver) {
         toast({
@@ -360,7 +378,7 @@ export default function DriverLogin() {
                   <ul className="space-y-1 text-sm text-yellow-700">
                     <li>• Background verified drivers only</li>
                     <li>• 24/7 customer support</li>
-                    <li>• Weekly earnings payouts</li>
+                    <li>��� Weekly earnings payouts</li>
                     <li>• Real-time ride tracking</li>
                   </ul>
                 </div>
