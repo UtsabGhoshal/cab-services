@@ -81,6 +81,16 @@ export class DriverService {
     this.driverId = driverId;
   }
 
+  // Check if Firebase is properly initialized
+  private checkFirebaseConnection(): boolean {
+    try {
+      return !!db;
+    } catch (error) {
+      console.error('Firebase not properly initialized:', error);
+      return false;
+    }
+  }
+
   // Update driver online status
   async updateOnlineStatus(isOnline: boolean, location?: DriverLocation): Promise<void> {
     try {
