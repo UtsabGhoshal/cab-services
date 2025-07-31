@@ -792,7 +792,7 @@ export default function DriverDashboard() {
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-slate-800">Ride History</h2>
 
-              {rideHistory.length === 0 ? (
+              {displayRideHistory.length === 0 ? (
                 <Card>
                   <CardContent className="p-8 text-center">
                     <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
