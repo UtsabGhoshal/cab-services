@@ -325,18 +325,21 @@ export class DriverService {
 
       const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
         const history: any[] = [];
-        
+
         snapshot.forEach((doc: DocumentSnapshot<DocumentData>) => {
           const data = doc.data();
           if (data) {
             history.push({
               id: doc.id,
               ...data,
-              completedAt: data.completedAt.toDate(),
+              completedAt: data.completedAt?.toDate() || new Date(),
+              date: data.completedAt?.toDate() || new Date(), // Add date field for compatibility
             });
           }
         });
 
+        // Sort by completion date in JavaScript (most recent first)
+        history.sort((a, b) => b.completedAt.getTime() - a.completedAt.getTime());
         callback(history);
       });
 
