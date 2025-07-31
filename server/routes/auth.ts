@@ -10,6 +10,7 @@ import {
   createUser,
   getUserByEmail,
 } from "../database/databaseService";
+import { migratePasswordsToHashed } from "../firebase/firebaseDatabase";
 
 export const loginHandler: RequestHandler<
   {},
