@@ -402,18 +402,56 @@ export default function DriverDashboard() {
   // Handle ride request actions
   const handleAcceptRequest = async (requestId: string) => {
     try {
-      await driverService.acceptRide(requestId);
-      setActiveTab("ongoing");
+      const success = await driverMatchingService.acceptRide(requestId, user?.id || "driver_123");
 
-      const request = rideRequests.find((r) => r.id === requestId);
-      toast({
-        title: "Ride Accepted!",
-        description: `You've accepted the ride. Earnings: ₹${request?.driverEarnings || 0}`,
-      });
+      if (success) {
+        setActiveTab("ongoing");
+        const request = rideRequests.find((r) => r.id === requestId);
+
+        toast({
+          title: "Ride Accepted! 🎉",
+          description: `You've accepted the ride. Earnings: ₹${request?.driverEarnings || 0}`,
+        });
+
+        // Update driver stats
+        setDriverStats(prev => ({
+          ...prev,
+          todayRides: prev.todayRides + 1,
+          totalRides: prev.totalRides + 1,
+        }));
+      } else {
+        toast({
+          title: "Ride Unavailable",
+          description: "This ride has already been taken by another driver",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to accept ride. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelRide = async (rideId: string, reason: string = "Driver cancelled") => {
+    try {
+      await driverMatchingService.cancelRide(rideId, user?.id || "driver_123", reason);
+
+      toast({
+        title: "Ride Cancelled",
+        description: "You have cancelled the ride. A penalty may apply.",
+        variant: "destructive",
+      });
+
+      // Refresh current data
+      // In a real app, this would be handled by real-time listeners
+      setActiveTab("requests");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to cancel ride. Please try again.",
         variant: "destructive",
       });
     }
