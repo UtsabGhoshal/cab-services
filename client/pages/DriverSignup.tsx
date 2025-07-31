@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { firebaseDriverService, type FirebaseDriver } from "@/services/firebaseDriverService";
+import { fallbackAuthService } from "@/services/fallbackAuthService";
 import { Timestamp } from "firebase/firestore";
 import {
   Car,
