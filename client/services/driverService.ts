@@ -340,6 +340,12 @@ export class DriverService {
     limitCount: number = 50,
     callback: (history: any[]) => void
   ): () => void {
+    if (!this.checkFirebaseConnection()) {
+      console.warn('Firebase connection not available for ride history');
+      callback([]); // Return empty array as fallback
+      return () => {}; // Return empty unsubscribe function
+    }
+
     try {
       const historyRef = collection(db, 'rideHistory');
       // Simplified query to avoid index requirements
