@@ -146,39 +146,15 @@ export default function Index() {
                   </div>
 
                   <div className="space-y-5">
-                    <div className="relative group/input">
-                      <div className="flex items-center space-x-4 p-5 bg-gradient-to-r from-slate-50 to-yellow-50 rounded-xl border border-slate-200 group-hover/input:border-yellow-300 transition-all duration-300 group-hover/input:shadow-lg">
-                        <div className="p-2 bg-yellow-100 rounded-lg group-hover/input:bg-yellow-200 transition-colors">
-                          <MapPin className="w-5 h-5 text-yellow-600" />
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="Connaught Place, New Delhi"
-                          className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500 text-lg"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="relative group/input">
-                      <div className="flex items-center space-x-4 p-5 bg-gradient-to-r from-slate-50 to-orange-50 rounded-xl border border-slate-200 group-hover/input:border-orange-300 transition-all duration-300 group-hover/input:shadow-lg">
-                        <div className="p-2 bg-orange-100 rounded-lg group-hover/input:bg-orange-200 transition-colors">
-                          <MapPin className="w-5 h-5 text-orange-600" />
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="IGI Airport, Terminal 3"
-                          className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500 text-lg"
-                        />
-                      </div>
-                    </div>
-
                     <div className="space-y-3">
-                      <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-7 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                        <Car className="w-6 h-6 mr-3 group-hover:animate-bounce" />
-                        Book Your Ride Now!
-                        <Zap className="w-5 h-5 ml-3 group-hover:animate-spin" />
-                      </Button>
+                      <Link to="/booking">
+                        <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-7 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                          <Car className="w-6 h-6 mr-3 group-hover:animate-bounce" />
+                          Book Your Ride Now!
+                          <Zap className="w-5 h-5 ml-3 group-hover:animate-spin" />
+                        </Button>
+                      </Link>
 
                       <Link to="/places">
                         <Button
@@ -473,11 +449,13 @@ export default function Index() {
                 experience the URide difference!
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-12 py-6 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
-                  <Car className="w-6 h-6 mr-3 group-hover:animate-bounce" />
-                  Book Your Ride
-                  <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                <Link to="/booking">
+                  <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-12 py-6 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+                    <Car className="w-6 h-6 mr-3 group-hover:animate-bounce" />
+                    Book Your Ride
+                    <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
               </div>
               <div className="text-sm text-yellow-200">
                 ⭐ Rated 4.8/5 by 25,000+ riders • 🚗 Available 24/7
@@ -514,9 +492,12 @@ export default function Index() {
             <a href="#" className="hover:text-yellow-400 transition-colors">
               Support
             </a>
-            <a href="#" className="hover:text-yellow-400 transition-colors">
+            <Link
+              to="/driver"
+              className="hover:text-yellow-400 transition-colors"
+            >
               Driver Portal
-            </a>
+            </Link>
           </div>
           <div className="text-xs text-slate-500">
             🚗 Serving multiple cities • 📱 Available 24/7 • 🌟 Quality service

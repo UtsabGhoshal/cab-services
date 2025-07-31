@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -238,6 +238,7 @@ const CarTypeSelector = ({
 
 export default function Booking() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -258,6 +259,26 @@ export default function Booking() {
     useState<google.maps.places.Autocomplete | null>(null);
   const [pickupInputValue, setPickupInputValue] = useState("");
   const [destinationInputValue, setDestinationInputValue] = useState("");
+
+  // Handle destination data from Places page
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.destination && state?.fromPlaces) {
+      const incomingDestination: BookingLocation = {
+        lat: state.destination.lat,
+        lng: state.destination.lng,
+        address: state.destination.address || state.destination.name,
+      };
+      setDestination(incomingDestination);
+      setDestinationInputValue(incomingDestination.address);
+      setLocationMode("pickup"); // Set to pickup mode since destination is already set
+
+      toast({
+        title: "Destination Set",
+        description: `${state.destination.name || "Selected place"} has been set as your destination`,
+      });
+    }
+  }, [location.state, toast]);
 
   const initializeAutocomplete = useCallback(() => {
     if (!window.google) return;

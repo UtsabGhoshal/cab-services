@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 
 export default function Places() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("map");
   const [selectedPlace, setSelectedPlace] = useState<FoursquarePlace | null>(
@@ -69,9 +70,21 @@ export default function Places() {
   };
 
   const handlePlaceSelect = (place: FoursquarePlace) => {
-    setSelectedPlace(place);
-    // You could navigate to booking page with this place as destination
-    console.log("Selected place:", place);
+    // Store the selected place and navigate to booking page
+    const destinationData = {
+      lat: place.geocodes.main.latitude,
+      lng: place.geocodes.main.longitude,
+      address: place.location.formatted_address || place.name,
+      name: place.name,
+    };
+
+    // Navigate to booking page with destination data
+    navigate("/booking", {
+      state: {
+        destination: destinationData,
+        fromPlaces: true,
+      },
+    });
   };
 
   const handleGetDirections = (place: FoursquarePlace) => {
