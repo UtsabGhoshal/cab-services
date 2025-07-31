@@ -889,17 +889,14 @@ export default function DriverDashboard() {
                           <div className="flex space-x-3 lg:flex-col lg:space-x-0 lg:space-y-2 lg:w-32">
                             <Button
                               onClick={() => handleAcceptRequest(request.id)}
-                              disabled={driverService.loading.acceptRide}
                               className="flex-1 lg:w-full bg-yellow-600 hover:bg-yellow-700 text-white"
                             >
                               <CheckCircle className="w-4 h-4 mr-2" />
-                              {driverService.loading.acceptRide
-                                ? "Accepting..."
-                                : "Accept"}
+                              Accept
                             </Button>
                             <Button
                               variant="outline"
-                              onClick={() => {/* handleRejectRequest */}}
+                              onClick={() => handleCancelRide(request.id, "Driver rejected")}
                               className="flex-1 lg:w-full border-red-200 text-red-600 hover:bg-red-50"
                             >
                               <XCircle className="w-4 h-4 mr-2" />
