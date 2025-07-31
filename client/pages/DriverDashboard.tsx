@@ -458,19 +458,29 @@ export default function DriverDashboard() {
           {/* Connection Status */}
           {driverService.error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-center space-x-2 text-red-700">
-                <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">Connection Error: {driverService.error}</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 text-red-700">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm">Connection Error: {driverService.error}</span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                  className="text-xs"
+                >
+                  Retry
+                </Button>
               </div>
             </div>
           )}
 
-          {driverService.isConnected && (
+          {driverService.isConnected && !driverService.error && (
             <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-center space-x-2 text-green-700">
                 <CheckCircle className="w-4 h-4" />
                 <span className="text-sm">
-                  Connected to Firebase • Last update: {driverService.lastUpdate ? formatTime(driverService.lastUpdate) : 'Never'}
+                  Connected to Firebase • Last update: {driverService.lastUpdate ? formatTime(driverService.lastUpdate) : 'Initializing...'}
                 </span>
               </div>
             </div>
