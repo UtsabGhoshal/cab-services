@@ -172,6 +172,9 @@ export default function DriverDashboard() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("requests");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isOnlineState, setIsOnlineState] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Use Firebase driver service
   const driverService = useDriverService({
