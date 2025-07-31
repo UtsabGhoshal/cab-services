@@ -207,11 +207,11 @@ export class DriverService {
   subscribeToOngoingRides(callback: (rides: OngoingRide[]) => void): () => void {
     try {
       const ridesRef = collection(db, 'ongoingRides');
+      // Simplified query to avoid index requirements
       const q = query(
         ridesRef,
         where('driverId', '==', this.driverId),
-        where('status', 'in', ['picking_up', 'en_route', 'arrived']),
-        orderBy('startTime', 'desc')
+        limit(10)
       );
 
       const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
