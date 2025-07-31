@@ -169,7 +169,14 @@ export default function DriverDashboard() {
     },
   ]);
 
-  const [ongoingRides, setOngoingRides] = useState<OngoingRide[]>([
+  // Use Firebase data or fallback to demo data
+  const rideRequests = driverService.rideRequests.length > 0 ? driverService.rideRequests : fallbackRequests;
+  const ongoingRides = driverService.ongoingRides;
+  const rideHistory = driverService.rideHistory;
+  const isOnline = driverService.isOnline;
+
+  // Sample fallback data for ongoing rides (demo purposes)
+  const [fallbackOngoingRides] = useState<OngoingRide[]>([
     {
       id: "ride_1",
       passengerName: "Amit Kumar",
@@ -191,7 +198,7 @@ export default function DriverDashboard() {
     },
   ]);
 
-  const [rideHistory, setRideHistory] = useState<RideHistory[]>([
+  const [fallbackHistory] = useState<RideHistory[]>([
     {
       id: "hist_1",
       passengerName: "Sneha Gupta",
