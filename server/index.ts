@@ -63,6 +63,13 @@ export async function createServer() {
   app.post("/api/auth/login", loginHandler);
   app.post("/api/auth/signup", signupHandler);
 
+  // Driver authentication routes
+  app.post("/api/driver/login", driverLoginHandler);
+  app.post("/api/driver/signup", driverSignupHandler);
+  app.get("/api/driver/:driverId/profile", getDriverProfileHandler);
+  app.put("/api/driver/:driverId/status", updateDriverStatusHandler);
+  app.get("/api/drivers", getDriversHandler);
+
   // Admin/Security routes
   app.post("/api/auth/migrate-passwords", migratePasswordsHandler);
 
