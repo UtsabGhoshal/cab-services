@@ -26,7 +26,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { MapsConfigResponse, BookingLocation, PricingInfo } from "@shared/maps";
-import { FallbackMap } from "@/components/FallbackMap";
+import { SimpleFallbackMap } from "@/components/SimpleFallbackMap";
 
 interface GoogleMapsProps {
   onLocationSelect: (location: BookingLocation, isPickup: boolean) => void;
