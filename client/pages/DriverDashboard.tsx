@@ -117,12 +117,18 @@ interface DriverProfile {
 export default function DriverDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isOnline, setIsOnline] = useState(false);
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("requests");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Sample data - In real app, this would come from Firebase
-  const [rideRequests, setRideRequests] = useState<RideRequest[]>([
+  // Use Firebase driver service
+  const driverService = useDriverService({
+    driverId: user?.id || "driver_123", // Use actual user ID or fallback
+    autoStart: true,
+  });
+
+  // Sample fallback data for demo purposes
+  const [fallbackRequests] = useState<RideRequest[]>([
     {
       id: "req_1",
       passengerName: "Rahul Sharma",
