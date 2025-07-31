@@ -353,20 +353,44 @@ export default function Booking() {
             // Check for billing issues by attempting to create a simple map
             try {
               const testDiv = document.createElement('div');
+              testDiv.style.width = '1px';
+              testDiv.style.height = '1px';
+              testDiv.style.visibility = 'hidden';
+              document.body.appendChild(testDiv);
+
               const testMap = new window.google.maps.Map(testDiv, {
                 center: { lat: 0, lng: 0 },
                 zoom: 1
               });
+
+              // Clean up test div
+              document.body.removeChild(testDiv);
+
               // If we get here without error, Google Maps is working
+              console.log('✅ Google Maps API is working correctly');
               setLoading(false);
               setTimeout(initializeAutocomplete, 100);
             } catch (error: any) {
-              console.error('Google Maps initialization error:', error);
-              if (error.message && error.message.includes('BillingNotEnabledMapError')) {
-                setMapsError('Google Maps billing not enabled. Using free fallback map.');
+              console.error('❌ Google Maps initialization error:', error);
+
+              // Check for specific error types
+              if (error.message) {
+                if (error.message.includes('BillingNotEnabledMapError')) {
+                  setMapsError('Google Maps billing not enabled. Please enable billing in Google Cloud Console or use the free alternative below.');
+                  console.warn('🔔 Solution: Enable billing at https://console.cloud.google.com/');
+                } else if (error.message.includes('ApiNotActivatedMapError')) {
+                  setMapsError('Google Maps API not activated. Please enable the Maps JavaScript API in Google Cloud Console.');
+                } else if (error.message.includes('InvalidKeyMapError')) {
+                  setMapsError('Invalid Google Maps API key. Please check your API key configuration.');
+                } else if (error.message.includes('RefererNotAllowedMapError')) {
+                  setMapsError('Google Maps API key not authorized for this domain. Please update API key restrictions.');
+                } else {
+                  setMapsError(`Google Maps error: ${error.message}. Using alternative map service.`);
+                }
               } else {
-                setMapsError('Google Maps not available. Using fallback map.');
+                setMapsError('Google Maps not available. Using alternative map service.');
               }
+
               setUseFallbackMap(true);
               setLoading(false);
             }
