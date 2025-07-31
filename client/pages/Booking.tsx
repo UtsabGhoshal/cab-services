@@ -340,19 +340,57 @@ export default function Booking() {
         script.async = true;
         script.defer = true;
         script.onload = () => {
-          setLoading(false);
-          // Initialize autocomplete after map loads
-          setTimeout(initializeAutocomplete, 100);
+          // Check for Google Maps API errors after loading
+          if (window.google && window.google.maps) {
+            // Listen for Google Maps API errors
+            window.google.maps.event.addDomListener(window, 'gm_authFailure', () => {
+              console.error('Google Maps API authentication failed');
+              setMapsError('Google Maps API authentication failed. Using fallback map.');
+              setUseFallbackMap(true);
+              setLoading(false);
+            });
+
+            // Check for billing issues by attempting to create a simple map
+            try {
+              const testDiv = document.createElement('div');
+              const testMap = new window.google.maps.Map(testDiv, {
+                center: { lat: 0, lng: 0 },
+                zoom: 1
+              });
+              // If we get here without error, Google Maps is working
+              setLoading(false);
+              setTimeout(initializeAutocomplete, 100);
+            } catch (error: any) {
+              console.error('Google Maps initialization error:', error);
+              if (error.message && error.message.includes('BillingNotEnabledMapError')) {
+                setMapsError('Google Maps billing not enabled. Using free fallback map.');
+              } else {
+                setMapsError('Google Maps not available. Using fallback map.');
+              }
+              setUseFallbackMap(true);
+              setLoading(false);
+            }
+          } else {
+            throw new Error('Google Maps API failed to load properly');
+          }
         };
         script.onerror = () => {
-          toast({
-            title: "Error",
-            description: "Failed to load Google Maps API",
-            variant: "destructive",
-          });
+          console.error("Failed to load Google Maps API script");
+          setMapsError('Google Maps API unavailable. Using fallback map.');
+          setUseFallbackMap(true);
           setLoading(false);
         };
         document.head.appendChild(script);
+
+        // Add a timeout fallback
+        setTimeout(() => {
+          if (loading && !window.google) {
+            console.warn('Google Maps loading timeout');
+            setMapsError('Google Maps loading timeout. Using fallback map.');
+            setUseFallbackMap(true);
+            setLoading(false);
+          }
+        }, 10000);
       } else {
         setLoading(false);
         // Initialize autocomplete if Google Maps is already loaded
@@ -360,14 +398,11 @@ export default function Booking() {
       }
     } catch (error) {
       console.error("Error loading Google Maps API:", error);
-      toast({
-        title: "Error",
-        description: "Failed to initialize Google Maps API",
-        variant: "destructive",
-      });
+      setMapsError('Failed to initialize maps. Using fallback map.');
+      setUseFallbackMap(true);
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, loading]);
 
   useEffect(() => {
     loadGoogleMaps();
