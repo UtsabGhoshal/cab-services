@@ -43,7 +43,14 @@ import {
   BarChart3,
 } from "lucide-react";
 
-// Types for driver data
+// Enhanced types for the new driver system
+interface DriverType {
+  type: "owner" | "fleet";
+  vehicleId?: string;
+  commissionRate?: number; // For vehicle owners (e.g., 0.05 for 5%)
+  salaryPerKm?: number; // For fleet drivers (e.g., 12 for ₹12/km)
+}
+
 interface RideRequest {
   id: string;
   passengerName: string;
@@ -58,10 +65,19 @@ interface RideRequest {
     lng: number;
   };
   estimatedEarnings: number;
+  driverEarnings: number; // After commission/salary calculation
   distance: number;
   duration: number;
   timestamp: Date;
   rideType: "economy" | "premium" | "luxury";
+  fareBreakdown?: {
+    baseFare: number;
+    distanceFare: number;
+    timeFare: number;
+    total: number;
+    commission?: number;
+    driverPayout: number;
+  };
 }
 
 interface OngoingRide {
@@ -78,10 +94,12 @@ interface OngoingRide {
     lat: number;
     lng: number;
   };
-  earnings: number;
+  totalFare: number;
+  driverEarnings: number;
   status: "picking_up" | "en_route" | "arrived";
   startTime: Date;
   estimatedArrival: Date;
+  distance: number;
 }
 
 interface RideHistory {
@@ -89,7 +107,10 @@ interface RideHistory {
   passengerName: string;
   pickup: string;
   destination: string;
-  earnings: number;
+  totalFare: number;
+  driverEarnings: number;
+  commission?: number; // For vehicle owners
+  kmDriven?: number; // For fleet drivers
   rating: number;
   date: Date;
   duration: number;
@@ -97,16 +118,31 @@ interface RideHistory {
 }
 
 interface DriverStats {
+  // Earnings
   totalEarnings: number;
   todayEarnings: number;
   weeklyEarnings: number;
   monthlyEarnings: number;
+  
+  // Commission/Salary breakdown
+  totalCommissionPaid?: number; // For vehicle owners
+  totalKmSalary?: number; // For fleet drivers
+  
+  // Rides
   totalRides: number;
   todayRides: number;
+  totalKmDriven: number;
+  todayKmDriven: number;
+  
+  // Performance
   averageRating: number;
   onlineHours: number;
   acceptanceRate: number;
   completionRate: number;
+  
+  // Goals
+  monthlyTarget?: number;
+  targetProgress?: number;
 }
 
 interface DriverProfile {
@@ -114,12 +150,19 @@ interface DriverProfile {
   name: string;
   phone: string;
   email: string;
-  vehicleNumber: string;
-  vehicleModel: string;
+  driverType: DriverType;
+  vehicleNumber?: string; // For vehicle owners
+  vehicleModel?: string; // For vehicle owners
+  assignedVehicle?: string; // For fleet drivers
   licenseNumber: string;
   rating: number;
   joinDate: Date;
   profilePhoto?: string;
+  currentShift?: {
+    startTime: Date;
+    targetKm?: number;
+    completedKm?: number;
+  };
 }
 
 export default function DriverDashboard() {
@@ -131,11 +174,80 @@ export default function DriverDashboard() {
 
   // Use Firebase driver service
   const driverService = useDriverService({
-    driverId: user?.id || "driver_123", // Use actual user ID or fallback
+    driverId: user?.id || "driver_123",
     autoStart: true,
   });
 
-  // Sample fallback data for demo purposes
+  // Enhanced demo data with new earnings model
+  const [driverProfile] = useState<DriverProfile>({
+    id: "driver_123",
+    name: "Rajesh Kumar",
+    phone: "+91 99999 12345",
+    email: "rajesh.driver@uride.com",
+    driverType: {
+      type: "owner", // Can be "owner" or "fleet"
+      commissionRate: 0.05, // 5% for vehicle owners
+      salaryPerKm: undefined,
+    },
+    vehicleNumber: "DL 01 AB 1234",
+    vehicleModel: "Honda City 2022",
+    licenseNumber: "DL1420110012345",
+    rating: 4.8,
+    joinDate: new Date("2024-01-15"),
+    currentShift: {
+      startTime: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+      targetKm: 150,
+      completedKm: 85,
+    },
+  });
+
+  // Fleet driver demo profile
+  const [fleetDriverProfile] = useState<DriverProfile>({
+    id: "driver_456",
+    name: "Amit Singh",
+    phone: "+91 88888 12345",
+    email: "amit.fleet@uride.com",
+    driverType: {
+      type: "fleet",
+      salaryPerKm: 12, // ₹12 per km for fleet drivers
+      commissionRate: undefined,
+    },
+    assignedVehicle: "URide Fleet #FL-089",
+    vehicleModel: "Maruti Swift Dzire 2023",
+    licenseNumber: "DL1420110054321",
+    rating: 4.7,
+    joinDate: new Date("2024-02-20"),
+    currentShift: {
+      startTime: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+      targetKm: 120,
+      completedKm: 65,
+    },
+  });
+
+  // Use owner profile for demo, but could be fleet based on user type
+  const currentProfile = driverProfile;
+  const isFleetDriver = currentProfile.driverType.type === "fleet";
+
+  const [driverStats] = useState<DriverStats>({
+    totalEarnings: isFleetDriver ? 28450 : 42180, // Lower for fleet due to salary model
+    todayEarnings: isFleetDriver ? 1020 : 1450,
+    weeklyEarnings: isFleetDriver ? 7200 : 10800,
+    monthlyEarnings: isFleetDriver ? 24300 : 32140,
+    totalCommissionPaid: isFleetDriver ? undefined : 2100,
+    totalKmSalary: isFleetDriver ? 24300 : undefined,
+    totalRides: 487,
+    todayRides: 8,
+    totalKmDriven: isFleetDriver ? 2025 : 1890, // Fleet drivers typically drive more
+    todayKmDriven: isFleetDriver ? 85 : 72,
+    averageRating: 4.8,
+    onlineHours: 6.5,
+    acceptanceRate: 92,
+    completionRate: 98,
+    monthlyTarget: isFleetDriver ? 2500 : 2000, // Higher target for fleet
+    targetProgress: isFleetDriver ? 65 : 78,
+  });
+
+  // Sample ride requests with new earnings calculation
   const [fallbackRequests] = useState<RideRequest[]>([
     {
       id: "req_1",
@@ -151,10 +263,19 @@ export default function DriverDashboard() {
         lng: 77.1,
       },
       estimatedEarnings: 450,
+      driverEarnings: isFleetDriver ? 182 : 427.5, // Fleet: ₹12 × 15.2km = 182, Owner: 450 - 5% = 427.5
       distance: 15.2,
       duration: 35,
       timestamp: new Date(),
       rideType: "economy",
+      fareBreakdown: {
+        baseFare: 50,
+        distanceFare: 320,
+        timeFare: 80,
+        total: 450,
+        commission: isFleetDriver ? undefined : 22.5,
+        driverPayout: isFleetDriver ? 182 : 427.5,
+      },
     },
     {
       id: "req_2",
@@ -170,14 +291,22 @@ export default function DriverDashboard() {
         lng: 77.2066,
       },
       estimatedEarnings: 280,
+      driverEarnings: isFleetDriver ? 102 : 266,
       distance: 8.5,
       duration: 22,
       timestamp: new Date(Date.now() - 2 * 60 * 1000),
       rideType: "premium",
+      fareBreakdown: {
+        baseFare: 60,
+        distanceFare: 170,
+        timeFare: 50,
+        total: 280,
+        commission: isFleetDriver ? undefined : 14,
+        driverPayout: isFleetDriver ? 102 : 266,
+      },
     },
   ]);
 
-  // Use Firebase data or fallback to demo data
   const isDevelopmentMode = import.meta.env.DEV || !driverService.isConnected;
   const rideRequests =
     driverService.rideRequests.length > 0
@@ -185,100 +314,7 @@ export default function DriverDashboard() {
       : isDevelopmentMode
         ? fallbackRequests
         : [];
-  const ongoingRides = driverService.ongoingRides;
-  const rideHistory = driverService.rideHistory;
   const isOnline = driverService.isOnline;
-
-  // Sample fallback data for ongoing rides (demo purposes)
-  const [fallbackOngoingRides] = useState<OngoingRide[]>([
-    {
-      id: "ride_1",
-      passengerName: "Amit Kumar",
-      passengerPhone: "+91 98765 43210",
-      pickup: {
-        address: "Karol Bagh Metro Station",
-        lat: 28.6444,
-        lng: 77.1908,
-      },
-      destination: {
-        address: "Red Fort",
-        lat: 28.6562,
-        lng: 77.241,
-      },
-      earnings: 320,
-      status: "en_route",
-      startTime: new Date(Date.now() - 15 * 60 * 1000),
-      estimatedArrival: new Date(Date.now() + 10 * 60 * 1000),
-    },
-  ]);
-
-  const [fallbackHistory] = useState<RideHistory[]>([
-    {
-      id: "hist_1",
-      passengerName: "Sneha Gupta",
-      pickup: "Gurgaon Cyber City",
-      destination: "New Delhi Railway Station",
-      earnings: 520,
-      rating: 5,
-      date: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      duration: 45,
-      distance: 18.2,
-    },
-    {
-      id: "hist_2",
-      passengerName: "Vikas Agarwal",
-      pickup: "Lajpat Nagar",
-      destination: "Nehru Place",
-      earnings: 180,
-      rating: 4,
-      date: new Date(Date.now() - 4 * 60 * 60 * 1000),
-      duration: 25,
-      distance: 7.8,
-    },
-    {
-      id: "hist_3",
-      passengerName: "Mohan Das",
-      pickup: "Janakpuri West",
-      destination: "Dwarka Sector 21",
-      earnings: 250,
-      rating: 5,
-      date: new Date(Date.now() - 6 * 60 * 60 * 1000),
-      duration: 30,
-      distance: 12.5,
-    },
-  ]);
-
-  const [driverStats, setDriverStats] = useState<DriverStats>({
-    totalEarnings: 45280,
-    todayEarnings: 1250,
-    weeklyEarnings: 8960,
-    monthlyEarnings: 32140,
-    totalRides: 487,
-    todayRides: 8,
-    averageRating: 4.8,
-    onlineHours: 6.5,
-    acceptanceRate: 92,
-    completionRate: 98,
-  });
-
-  const [driverProfile, setDriverProfile] = useState<DriverProfile>({
-    id: "driver_123",
-    name: "Rajesh Kumar",
-    phone: "+91 99999 12345",
-    email: "rajesh.driver@uride.com",
-    vehicleNumber: "DL 01 AB 1234",
-    vehicleModel: "Honda City 2022",
-    licenseNumber: "DL1420110012345",
-    rating: 4.8,
-    joinDate: new Date("2024-01-15"),
-    profilePhoto: undefined,
-  });
-
-  // Use fallback data if Firebase data is empty (for demo)
-  const displayOngoingRides =
-    ongoingRides.length > 0 ? ongoingRides : fallbackOngoingRides;
-  const displayRideHistory =
-    rideHistory.length > 0 ? rideHistory : fallbackHistory;
 
   // Handle online/offline toggle
   const handleOnlineToggle = async (checked: boolean) => {
@@ -308,58 +344,12 @@ export default function DriverDashboard() {
       const request = rideRequests.find((r) => r.id === requestId);
       toast({
         title: "Ride Accepted!",
-        description: `You've accepted the ride to ${request?.destination.address || "destination"}`,
+        description: `You've accepted the ride. Earnings: ₹${request?.driverEarnings || 0}`,
       });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to accept ride. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleRejectRequest = async (requestId: string) => {
-    try {
-      await driverService.rejectRide(requestId);
-      toast({
-        title: "Ride Rejected",
-        description: "The ride request has been declined",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to reject ride. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Handle ongoing ride actions
-  const handleCompleteRide = async (rideId: string) => {
-    try {
-      const ride = displayOngoingRides.find((r) => r.id === rideId);
-      if (ride) {
-        await driverService.completeRide(rideId, ride.earnings);
-
-        // Update stats
-        setDriverStats((prev) => ({
-          ...prev,
-          todayEarnings: prev.todayEarnings + ride.earnings,
-          todayRides: prev.todayRides + 1,
-          totalEarnings: prev.totalEarnings + ride.earnings,
-          totalRides: prev.totalRides + 1,
-        }));
-
-        toast({
-          title: "Ride Completed!",
-          description: `You earned ₹${ride.earnings} for this ride`,
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to complete ride. Please try again.",
         variant: "destructive",
       });
     }
@@ -380,32 +370,6 @@ export default function DriverDashboard() {
     });
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "picking_up":
-        return "bg-blue-100 text-blue-800";
-      case "en_route":
-        return "bg-green-100 text-green-800";
-      case "arrived":
-        return "bg-purple-100 text-purple-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "picking_up":
-        return "Picking Up";
-      case "en_route":
-        return "En Route";
-      case "arrived":
-        return "Arrived";
-      default:
-        return status;
-    }
-  };
-
   const getRideTypeColor = (type: string) => {
     switch (type) {
       case "economy":
@@ -413,27 +377,33 @@ export default function DriverDashboard() {
       case "premium":
         return "bg-purple-100 text-purple-800";
       case "luxury":
-        return "bg-gold-100 text-gold-800";
+        return "bg-yellow-100 text-yellow-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
 
+  const calculateShiftProgress = () => {
+    if (!currentProfile.currentShift) return 0;
+    const { targetKm = 100, completedKm = 0 } = currentProfile.currentShift;
+    return Math.min((completedKm / targetKm) * 100, 100);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50">
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-md border-b border-white/20 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4 lg:px-8">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-600 to-green-600 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
                 <Car className="w-6 h-6 text-white" />
               </div>
               <div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                <span className="text-2xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
                   URide
                 </span>
-                <div className="text-xs text-slate-500 font-medium">
+                <div className="text-xs text-gray-500 font-medium">
                   Driver Panel
                 </div>
               </div>
@@ -441,8 +411,23 @@ export default function DriverDashboard() {
 
             {/* Desktop Header Actions */}
             <div className="hidden md:flex items-center space-x-6">
+              {/* Driver Type Badge */}
+              <div className="flex items-center space-x-2">
+                {isFleetDriver ? (
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                    <Building className="w-3 h-3 mr-1" />
+                    Fleet Driver
+                  </Badge>
+                ) : (
+                  <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                    <Crown className="w-3 h-3 mr-1" />
+                    Vehicle Owner
+                  </Badge>
+                )}
+              </div>
+
               <div className="flex items-center space-x-3">
-                <div className="text-sm text-slate-600">
+                <div className="text-sm text-gray-600">
                   {isOnline ? "Online" : "Offline"}
                 </div>
                 <Switch
@@ -457,20 +442,25 @@ export default function DriverDashboard() {
               </div>
 
               <div className="text-right">
-                <div className="text-sm text-slate-600">Today's Earnings</div>
+                <div className="text-sm text-gray-600">Today's Earnings</div>
                 <div className="text-xl font-bold text-green-600">
                   ₹{driverStats.todayEarnings.toLocaleString()}
                 </div>
+                {isFleetDriver && (
+                  <div className="text-xs text-gray-500">
+                    {driverStats.todayKmDriven} km @ ₹{currentProfile.driverType.salaryPerKm}/km
+                  </div>
+                )}
               </div>
 
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/driver-login")}
                 className="border-red-200 text-red-600 hover:bg-red-50"
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                Exit Driver Mode
+                Exit
               </Button>
             </div>
 
@@ -485,134 +475,69 @@ export default function DriverDashboard() {
             </Button>
           </div>
 
-          {/* Connection Status */}
-          {driverService.error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 text-red-700">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">
-                    Connection Error: {driverService.error}
-                  </span>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => window.location.reload()}
-                  className="text-xs"
-                >
-                  Retry
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {driverService.isConnected && !driverService.error && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center space-x-2 text-green-700">
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm">
-                  Connected to Firebase • Last update:{" "}
-                  {driverService.lastUpdate
-                    ? formatTime(driverService.lastUpdate)
-                    : "Initializing..."}
-                </span>
-              </div>
-            </div>
-          )}
-
           {/* Mobile Header Info */}
-          <div className="md:hidden mt-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Switch
-                checked={isOnline}
-                onCheckedChange={handleOnlineToggle}
-                disabled={driverService.loading.toggleStatus}
-                className="data-[state=checked]:bg-green-600"
-              />
-              <span className="text-sm text-slate-600">
-                {isOnline ? "Online" : "Offline"}
-              </span>
-              <div
-                className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}
-              />
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-slate-600">Today</div>
-              <div className="text-lg font-bold text-green-600">
-                ₹{driverStats.todayEarnings.toLocaleString()}
+          <div className="md:hidden mt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Switch
+                  checked={isOnline}
+                  onCheckedChange={handleOnlineToggle}
+                  disabled={driverService.loading.toggleStatus}
+                  className="data-[state=checked]:bg-green-600"
+                />
+                <span className="text-sm text-gray-600">
+                  {isOnline ? "Online" : "Offline"}
+                </span>
+                <div
+                  className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}
+                />
               </div>
+              <div className="flex items-center space-x-2">
+                {isFleetDriver ? (
+                  <Badge className="bg-blue-100 text-blue-800 text-xs">
+                    <Building className="w-3 h-3 mr-1" />
+                    Fleet
+                  </Badge>
+                ) : (
+                  <Badge className="bg-yellow-100 text-yellow-800 text-xs">
+                    <Crown className="w-3 h-3 mr-1" />
+                    Owner
+                  </Badge>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm text-gray-600">Today's Earnings</div>
+                <div className="text-lg font-bold text-green-600">
+                  ₹{driverStats.todayEarnings.toLocaleString()}
+                </div>
+              </div>
+              {isFleetDriver && (
+                <div className="text-right">
+                  <div className="text-xs text-gray-500">Today's Distance</div>
+                  <div className="text-sm font-medium">{driverStats.todayKmDriven} km</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div
-            className="fixed inset-0 bg-black/50"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          <div className="fixed top-0 right-0 h-full w-80 bg-white p-6 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold">Driver Menu</h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="p-4 bg-slate-50 rounded-lg">
-                <h3 className="font-medium mb-2">Profile</h3>
-                <p className="text-sm text-slate-600">{driverProfile.name}</p>
-                <p className="text-sm text-slate-600">
-                  {driverProfile.vehicleModel}
-                </p>
-              </div>
-
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => navigate("/")}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Exit Driver Mode
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6 lg:px-8">
-        {/* Stats Cards */}
+        {/* Enhanced Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card>
+          <Card className="border-l-4 border-l-green-500">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Today's Rides</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {driverStats.todayRides}
-                  </p>
-                </div>
-                <Car className="w-8 h-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600">Today's Earnings</p>
+                  <p className="text-sm text-gray-600">Today's Earnings</p>
                   <p className="text-2xl font-bold text-green-600">
                     ₹{driverStats.todayEarnings}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {driverStats.todayRides} rides • {driverStats.todayKmDriven} km
                   </p>
                 </div>
                 <IndianRupee className="w-8 h-8 text-green-600" />
@@ -620,13 +545,42 @@ export default function DriverDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-l-4 border-l-blue-500">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Rating</p>
+                  <p className="text-sm text-gray-600">
+                    {isFleetDriver ? "Distance Today" : "Total Rides"}
+                  </p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {isFleetDriver ? `${driverStats.todayKmDriven} km` : driverStats.todayRides}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {isFleetDriver 
+                      ? `₹${currentProfile.driverType.salaryPerKm}/km rate`
+                      : `${driverStats.totalRides} total rides`
+                    }
+                  </p>
+                </div>
+                {isFleetDriver ? (
+                  <Route className="w-8 h-8 text-blue-600" />
+                ) : (
+                  <Car className="w-8 h-8 text-blue-600" />
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-purple-500">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Rating</p>
                   <p className="text-2xl font-bold text-purple-600">
                     {driverStats.averageRating}★
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {driverStats.acceptanceRate}% acceptance
                   </p>
                 </div>
                 <Star className="w-8 h-8 text-purple-600" />
@@ -634,20 +588,59 @@ export default function DriverDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-l-4 border-l-orange-500">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Online Hours</p>
+                  <p className="text-sm text-gray-600">
+                    {isFleetDriver ? "Shift Progress" : "Online Hours"}
+                  </p>
                   <p className="text-2xl font-bold text-orange-600">
-                    {driverStats.onlineHours}h
+                    {isFleetDriver 
+                      ? `${Math.round(calculateShiftProgress())}%`
+                      : `${driverStats.onlineHours}h`
+                    }
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {isFleetDriver 
+                      ? `${currentProfile.currentShift?.completedKm}/${currentProfile.currentShift?.targetKm} km`
+                      : `${driverStats.completionRate}% completion`
+                    }
                   </p>
                 </div>
-                <Clock className="w-8 h-8 text-orange-600" />
+                {isFleetDriver ? (
+                  <Target className="w-8 h-8 text-orange-600" />
+                ) : (
+                  <Clock className="w-8 h-8 text-orange-600" />
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Shift Progress Bar for Fleet Drivers */}
+        {isFleetDriver && currentProfile.currentShift && (
+          <Card className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-blue-900">Current Shift Progress</h3>
+                  <p className="text-sm text-blue-700">
+                    Started {formatTime(currentProfile.currentShift.startTime)} • Target: {currentProfile.currentShift.targetKm} km
+                  </p>
+                </div>
+                <Badge className="bg-blue-100 text-blue-800">
+                  {Math.round(calculateShiftProgress())}% Complete
+                </Badge>
+              </div>
+              <Progress value={calculateShiftProgress()} className="h-3 mb-2" />
+              <div className="flex justify-between text-sm text-blue-700">
+                <span>{currentProfile.currentShift.completedKm} km completed</span>
+                <span>{(currentProfile.currentShift.targetKm || 0) - (currentProfile.currentShift.completedKm || 0)} km remaining</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Main Tabs */}
         <Tabs
@@ -665,18 +658,13 @@ export default function DriverDashboard() {
               )}
             </TabsTrigger>
             <TabsTrigger value="ongoing" className="text-xs sm:text-sm">
-              Ongoing
-              {displayOngoingRides.length > 0 && (
-                <Badge className="ml-2 bg-blue-500 text-white">
-                  {displayOngoingRides.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="history" className="text-xs sm:text-sm">
-              History
+              Active
             </TabsTrigger>
             <TabsTrigger value="earnings" className="text-xs sm:text-sm">
               Earnings
+            </TabsTrigger>
+            <TabsTrigger value="profile" className="text-xs sm:text-sm">
+              Profile
             </TabsTrigger>
           </TabsList>
 
@@ -684,7 +672,7 @@ export default function DriverDashboard() {
           <TabsContent value="requests">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-slate-800">
+                <h2 className="text-2xl font-bold text-gray-800">
                   Ride Requests
                 </h2>
                 {!isOnline && (
@@ -701,11 +689,11 @@ export default function DriverDashboard() {
               {rideRequests.length === 0 ? (
                 <Card>
                   <CardContent className="p-8 text-center">
-                    <Car className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-slate-600 mb-2">
+                    <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-600 mb-2">
                       No ride requests
                     </h3>
-                    <p className="text-slate-500">
+                    <p className="text-gray-500">
                       {isOnline
                         ? "You'll see new ride requests here when passengers book rides near you"
                         : "Turn on your online status to start receiving ride requests"}
@@ -717,7 +705,7 @@ export default function DriverDashboard() {
                   {rideRequests.map((request) => (
                     <Card
                       key={request.id}
-                      className="border-l-4 border-l-blue-500"
+                      className="border-l-4 border-l-yellow-500 bg-yellow-50/30"
                     >
                       <CardContent className="p-6">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
@@ -737,9 +725,7 @@ export default function DriverDashboard() {
                               <div className="flex items-start space-x-2">
                                 <div className="w-3 h-3 bg-green-500 rounded-full mt-2" />
                                 <div>
-                                  <p className="text-sm text-slate-600">
-                                    Pickup
-                                  </p>
+                                  <p className="text-sm text-gray-600">Pickup</p>
                                   <p className="font-medium">
                                     {request.pickup.address}
                                   </p>
@@ -748,7 +734,7 @@ export default function DriverDashboard() {
                               <div className="flex items-start space-x-2">
                                 <div className="w-3 h-3 bg-red-500 rounded-full mt-2" />
                                 <div>
-                                  <p className="text-sm text-slate-600">
+                                  <p className="text-sm text-gray-600">
                                     Destination
                                   </p>
                                   <p className="font-medium">
@@ -758,7 +744,7 @@ export default function DriverDashboard() {
                               </div>
                             </div>
 
-                            <div className="flex items-center space-x-6 text-sm text-slate-600">
+                            <div className="flex items-center space-x-6 text-sm text-gray-600">
                               <div className="flex items-center space-x-1">
                                 <Route className="w-4 h-4" />
                                 <span>{request.distance} km</span>
@@ -767,12 +753,34 @@ export default function DriverDashboard() {
                                 <Timer className="w-4 h-4" />
                                 <span>{request.duration} min</span>
                               </div>
-                              <div className="flex items-center space-x-1">
-                                <IndianRupee className="w-4 h-4" />
-                                <span className="font-semibold text-green-600">
-                                  ₹{request.estimatedEarnings}
-                                </span>
+                            </div>
+
+                            {/* Earnings Breakdown */}
+                            <div className="bg-white rounded-lg p-4 border">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <p className="text-sm text-gray-600">Total Fare</p>
+                                  <p className="text-lg font-semibold">₹{request.estimatedEarnings}</p>
+                                </div>
+                                <div>
+                                  <p className="text-sm text-gray-600">
+                                    {isFleetDriver ? "Your Salary" : "Your Earnings"}
+                                  </p>
+                                  <p className="text-lg font-bold text-green-600">
+                                    ₹{request.driverEarnings}
+                                  </p>
+                                </div>
                               </div>
+                              
+                              {request.fareBreakdown && (
+                                <div className="mt-3 pt-3 border-t text-xs text-gray-500">
+                                  {isFleetDriver ? (
+                                    <p>Salary: {request.distance} km × ₹{currentProfile.driverType.salaryPerKm}/km = ₹{request.driverEarnings}</p>
+                                  ) : (
+                                    <p>After 5% commission: ₹{request.estimatedEarnings} - ₹{request.fareBreakdown.commission} = ₹{request.driverEarnings}</p>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
 
@@ -780,7 +788,7 @@ export default function DriverDashboard() {
                             <Button
                               onClick={() => handleAcceptRequest(request.id)}
                               disabled={driverService.loading.acceptRide}
-                              className="flex-1 lg:w-full bg-green-600 hover:bg-green-700 text-white"
+                              className="flex-1 lg:w-full bg-yellow-600 hover:bg-yellow-700 text-white"
                             >
                               <CheckCircle className="w-4 h-4 mr-2" />
                               {driverService.loading.acceptRide
@@ -789,14 +797,11 @@ export default function DriverDashboard() {
                             </Button>
                             <Button
                               variant="outline"
-                              onClick={() => handleRejectRequest(request.id)}
-                              disabled={driverService.loading.rejectRide}
+                              onClick={() => {/* handleRejectRequest */}}
                               className="flex-1 lg:w-full border-red-200 text-red-600 hover:bg-red-50"
                             >
                               <XCircle className="w-4 h-4 mr-2" />
-                              {driverService.loading.rejectRide
-                                ? "Rejecting..."
-                                : "Reject"}
+                              Reject
                             </Button>
                           </div>
                         </div>
@@ -808,229 +813,57 @@ export default function DriverDashboard() {
             </div>
           </TabsContent>
 
-          {/* Ongoing Rides Tab */}
+          {/* Active Rides Tab */}
           <TabsContent value="ongoing">
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Ongoing Rides
-              </h2>
-
-              {displayOngoingRides.length === 0 ? (
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <Activity className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-slate-600 mb-2">
-                      No ongoing rides
-                    </h3>
-                    <p className="text-slate-500">
-                      Your active rides will appear here
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid gap-4">
-                  {displayOngoingRides.map((ride) => (
-                    <Card
-                      key={ride.id}
-                      className="border-l-4 border-l-green-500"
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-                          <div className="flex-1 space-y-3">
-                            <div className="flex items-center justify-between">
-                              <h3 className="font-semibold text-lg">
-                                {ride.passengerName}
-                              </h3>
-                              <Badge className={getStatusColor(ride.status)}>
-                                {getStatusText(ride.status)}
-                              </Badge>
-                            </div>
-
-                            <div className="space-y-2">
-                              <div className="flex items-start space-x-2">
-                                <div className="w-3 h-3 bg-green-500 rounded-full mt-2" />
-                                <div>
-                                  <p className="text-sm text-slate-600">
-                                    Pickup
-                                  </p>
-                                  <p className="font-medium">
-                                    {ride.pickup.address}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex items-start space-x-2">
-                                <div className="w-3 h-3 bg-red-500 rounded-full mt-2" />
-                                <div>
-                                  <p className="text-sm text-slate-600">
-                                    Destination
-                                  </p>
-                                  <p className="font-medium">
-                                    {ride.destination.address}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center space-x-6 text-sm text-slate-600">
-                              <div className="flex items-center space-x-1">
-                                <Clock className="w-4 h-4" />
-                                <span>
-                                  Started {formatTime(ride.startTime)}
-                                </span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <Target className="w-4 h-4" />
-                                <span>
-                                  ETA {formatTime(ride.estimatedArrival)}
-                                </span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <IndianRupee className="w-4 h-4" />
-                                <span className="font-semibold text-green-600">
-                                  ₹{ride.earnings}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex space-x-3 lg:flex-col lg:space-x-0 lg:space-y-2 lg:w-40">
-                            <Button
-                              variant="outline"
-                              className="flex-1 lg:w-full border-blue-200 text-blue-600 hover:bg-blue-50"
-                            >
-                              <Phone className="w-4 h-4 mr-2" />
-                              Call
-                            </Button>
-                            <Button
-                              variant="outline"
-                              className="flex-1 lg:w-full border-purple-200 text-purple-600 hover:bg-purple-50"
-                            >
-                              <Navigation className="w-4 h-4 mr-2" />
-                              Navigate
-                            </Button>
-                            <Button
-                              onClick={() => handleCompleteRide(ride.id)}
-                              disabled={driverService.loading.completeRide}
-                              className="flex-1 lg:w-full bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <CheckCircle className="w-4 h-4 mr-2" />
-                              {driverService.loading.completeRide
-                                ? "Completing..."
-                                : "Complete"}
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-          </TabsContent>
-
-          {/* Ride History Tab */}
-          <TabsContent value="history">
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Ride History
-              </h2>
-
-              {displayRideHistory.length === 0 ? (
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <Calendar className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-slate-600 mb-2">
-                      No ride history
-                    </h3>
-                    <p className="text-slate-500">
-                      Your completed rides will appear here
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="grid gap-4">
-                  {displayRideHistory.map((ride) => (
-                    <Card key={ride.id}>
-                      <CardContent className="p-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <h3 className="font-semibold text-lg">
-                                {ride.passengerName}
-                              </h3>
-                              <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                                <span className="font-medium">
-                                  {ride.rating}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="text-sm text-slate-600">
-                              <p>
-                                <span className="font-medium">From:</span>{" "}
-                                {ride.pickup}
-                              </p>
-                              <p>
-                                <span className="font-medium">To:</span>{" "}
-                                {ride.destination}
-                              </p>
-                            </div>
-
-                            <div className="flex items-center space-x-4 text-sm text-slate-600">
-                              <span>
-                                {formatDate(ride.date)} at{" "}
-                                {formatTime(ride.date)}
-                              </span>
-                              <span>•</span>
-                              <span>{ride.distance} km</span>
-                              <span>•</span>
-                              <span>{ride.duration} min</span>
-                            </div>
-                          </div>
-
-                          <div className="text-right sm:ml-4">
-                            <div className="text-2xl font-bold text-green-600">
-                              ₹{ride.earnings}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
+              <h2 className="text-2xl font-bold text-gray-800">Active Rides</h2>
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Activity className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-600 mb-2">
+                    No active rides
+                  </h3>
+                  <p className="text-gray-500">
+                    Your ongoing rides will appear here
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
           {/* Earnings Tab */}
           <TabsContent value="earnings">
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Earnings Summary
-              </h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Earnings Overview
+                </h2>
+                <Badge className={isFleetDriver ? "bg-blue-100 text-blue-800" : "bg-yellow-100 text-yellow-800"}>
+                  {isFleetDriver ? "Fleet Driver" : "Vehicle Owner"}
+                </Badge>
+              </div>
 
-              {/* Earnings Cards */}
+              {/* Earnings Summary Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
+                <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-600">
-                      Today
+                    <CardTitle className="text-sm font-medium text-green-700">
+                      Today's Earnings
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="text-3xl font-bold text-green-600">
                       ₹{driverStats.todayEarnings.toLocaleString()}
                     </div>
-                    <p className="text-sm text-slate-600 mt-1">
-                      {driverStats.todayRides} rides completed
+                    <p className="text-sm text-green-600 mt-1">
+                      {driverStats.todayRides} rides • {driverStats.todayKmDriven} km
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-600">
+                    <CardTitle className="text-sm font-medium text-blue-700">
                       This Week
                     </CardTitle>
                   </CardHeader>
@@ -1038,16 +871,15 @@ export default function DriverDashboard() {
                     <div className="text-3xl font-bold text-blue-600">
                       ₹{driverStats.weeklyEarnings.toLocaleString()}
                     </div>
-                    <p className="text-sm text-slate-600 mt-1">
-                      Average ₹{Math.round(driverStats.weeklyEarnings / 7)} per
-                      day
+                    <p className="text-sm text-blue-600 mt-1">
+                      Average ₹{Math.round(driverStats.weeklyEarnings / 7)} per day
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-600">
+                    <CardTitle className="text-sm font-medium text-purple-700">
                       This Month
                     </CardTitle>
                   </CardHeader>
@@ -1055,35 +887,240 @@ export default function DriverDashboard() {
                     <div className="text-3xl font-bold text-purple-600">
                       ₹{driverStats.monthlyEarnings.toLocaleString()}
                     </div>
-                    <p className="text-sm text-slate-600 mt-1">
-                      Average ₹{Math.round(driverStats.monthlyEarnings / 30)}{" "}
-                      per day
+                    <p className="text-sm text-purple-600 mt-1">
+                      {Math.round(driverStats.targetProgress || 0)}% of target
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-orange-200">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-slate-600">
-                      Total
+                    <CardTitle className="text-sm font-medium text-orange-700">
+                      Total Earnings
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="text-3xl font-bold text-orange-600">
                       ₹{driverStats.totalEarnings.toLocaleString()}
                     </div>
-                    <p className="text-sm text-slate-600 mt-1">
+                    <p className="text-sm text-orange-600 mt-1">
                       {driverStats.totalRides} total rides
                     </p>
                   </CardContent>
                 </Card>
               </div>
 
+              {/* Earnings Model Explanation */}
+              <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-yellow-800">
+                    <Calculator className="w-5 h-5 mr-2" />
+                    Your Earnings Model
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isFleetDriver ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4">
+                        <Building className="w-8 h-8 text-blue-600" />
+                        <div>
+                          <h3 className="font-semibold text-blue-900">Fleet Driver - Salary Model</h3>
+                          <p className="text-blue-700">₹{currentProfile.driverType.salaryPerKm} per kilometer driven</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div className="text-center p-3 bg-blue-100 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">{driverStats.totalKmDriven}</div>
+                          <div className="text-sm text-blue-700">Total KM Driven</div>
+                        </div>
+                        <div className="text-center p-3 bg-green-100 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600">₹{currentProfile.driverType.salaryPerKm}</div>
+                          <div className="text-sm text-green-700">Per KM Rate</div>
+                        </div>
+                        <div className="text-center p-3 bg-purple-100 rounded-lg">
+                          <div className="text-2xl font-bold text-purple-600">₹{driverStats.totalKmSalary}</div>
+                          <div className="text-sm text-purple-700">Total Salary</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-2 p-3 bg-blue-50 rounded-lg">
+                        <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+                        <div className="text-sm text-blue-700">
+                          <p className="font-medium">Benefits Included:</p>
+                          <ul className="mt-1 space-y-1">
+                            <li>• Vehicle maintenance covered</li>
+                            <li>• Fuel expenses covered</li>
+                            <li>• Insurance provided</li>
+                            <li>• No commission deductions</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-4">
+                        <Crown className="w-8 h-8 text-yellow-600" />
+                        <div>
+                          <h3 className="font-semibold text-yellow-900">Vehicle Owner - Commission Model</h3>
+                          <p className="text-yellow-700">Keep 95% of ride earnings (5% commission)</p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div className="text-center p-3 bg-green-100 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600">95%</div>
+                          <div className="text-sm text-green-700">You Keep</div>
+                        </div>
+                        <div className="text-center p-3 bg-red-100 rounded-lg">
+                          <div className="text-2xl font-bold text-red-600">5%</div>
+                          <div className="text-sm text-red-700">Commission</div>
+                        </div>
+                        <div className="text-center p-3 bg-yellow-100 rounded-lg">
+                          <div className="text-2xl font-bold text-yellow-600">₹{driverStats.totalCommissionPaid}</div>
+                          <div className="text-sm text-yellow-700">Total Commission</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start space-x-2 p-3 bg-yellow-50 rounded-lg">
+                        <Crown className="w-5 h-5 text-yellow-600 mt-0.5" />
+                        <div className="text-sm text-yellow-700">
+                          <p className="font-medium">Your Responsibilities:</p>
+                          <ul className="mt-1 space-y-1">
+                            <li>• Vehicle maintenance and fuel</li>
+                            <li>• Insurance coverage</li>
+                            <li>• Flexible working hours</li>
+                            <li>• Choose your preferred routes</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Monthly Target Progress */}
+              {driverStats.monthlyTarget && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Target className="w-5 h-5 mr-2 text-orange-600" />
+                      Monthly Target Progress
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">
+                          Target: {isFleetDriver ? `${driverStats.monthlyTarget} km` : `₹${driverStats.monthlyTarget.toLocaleString()}`}
+                        </span>
+                        <Badge className="bg-orange-100 text-orange-800">
+                          {Math.round(driverStats.targetProgress || 0)}% Complete
+                        </Badge>
+                      </div>
+                      <Progress value={driverStats.targetProgress} className="h-3" />
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-600">Achieved: </span>
+                          <span className="font-semibold">
+                            {isFleetDriver 
+                              ? `${Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget)} km`
+                              : `₹${Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget).toLocaleString()}`
+                            }
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Remaining: </span>
+                          <span className="font-semibold">
+                            {isFleetDriver 
+                              ? `${driverStats.monthlyTarget - Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget)} km`
+                              : `₹${(driverStats.monthlyTarget - Math.round(((driverStats.targetProgress || 0) / 100) * driverStats.monthlyTarget)).toLocaleString()}`
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-800">Driver Profile</h2>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <User className="w-5 h-5 mr-2 text-blue-600" />
+                    Personal Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-6">
+                    <div className="w-24 h-24 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-2xl font-bold text-white mx-auto md:mx-0">
+                      {currentProfile.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </div>
+                    <div className="flex-1 space-y-2 text-center md:text-left">
+                      <h3 className="text-xl font-bold text-gray-800">
+                        {currentProfile.name}
+                      </h3>
+                      <div className="flex items-center justify-center md:justify-start space-x-2">
+                        {isFleetDriver ? (
+                          <Badge className="bg-blue-100 text-blue-800">
+                            <Building className="w-3 h-3 mr-1" />
+                            Fleet Driver
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-yellow-100 text-yellow-800">
+                            <Crown className="w-3 h-3 mr-1" />
+                            Vehicle Owner
+                          </Badge>
+                        )}
+                        <Badge className="bg-green-100 text-green-800">
+                          <Star className="w-3 h-3 mr-1" />
+                          {currentProfile.rating} Rating
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600 mt-4">
+                        <div>
+                          <p><span className="font-medium">Phone:</span> {currentProfile.phone}</p>
+                          <p><span className="font-medium">Email:</span> {currentProfile.email}</p>
+                          <p><span className="font-medium">License:</span> {currentProfile.licenseNumber}</p>
+                        </div>
+                        <div>
+                          <p>
+                            <span className="font-medium">Vehicle:</span>{" "}
+                            {isFleetDriver ? currentProfile.assignedVehicle : currentProfile.vehicleModel}
+                          </p>
+                          {!isFleetDriver && (
+                            <p><span className="font-medium">Number:</span> {currentProfile.vehicleNumber}</p>
+                          )}
+                          <p><span className="font-medium">Member since:</span> {formatDate(currentProfile.joinDate)}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="border-yellow-200 text-yellow-600 hover:bg-yellow-50"
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Edit Profile
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Performance Metrics */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
+                    <BarChart3 className="w-5 h-5 mr-2 text-green-600" />
                     Performance Metrics
                   </CardTitle>
                 </CardHeader>
@@ -1093,7 +1130,7 @@ export default function DriverDashboard() {
                       <div className="text-3xl font-bold text-blue-600 mb-2">
                         {driverStats.averageRating}★
                       </div>
-                      <div className="text-sm text-slate-600">
+                      <div className="text-sm text-gray-600">
                         Average Rating
                       </div>
                     </div>
@@ -1101,7 +1138,7 @@ export default function DriverDashboard() {
                       <div className="text-3xl font-bold text-green-600 mb-2">
                         {driverStats.acceptanceRate}%
                       </div>
-                      <div className="text-sm text-slate-600">
+                      <div className="text-sm text-gray-600">
                         Acceptance Rate
                       </div>
                     </div>
@@ -1109,80 +1146,18 @@ export default function DriverDashboard() {
                       <div className="text-3xl font-bold text-purple-600 mb-2">
                         {driverStats.completionRate}%
                       </div>
-                      <div className="text-sm text-slate-600">
+                      <div className="text-sm text-gray-600">
                         Completion Rate
                       </div>
                     </div>
                     <div className="text-center p-4 bg-orange-50 rounded-lg">
                       <div className="text-3xl font-bold text-orange-600 mb-2">
-                        {driverStats.onlineHours}h
+                        {driverStats.totalKmDriven}
                       </div>
-                      <div className="text-sm text-slate-600">
-                        Hours Online Today
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Driver Profile */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <User className="w-5 h-5 mr-2 text-blue-600" />
-                    Driver Profile
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-6">
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center text-2xl font-bold text-white mx-auto md:mx-0">
-                      {driverProfile.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </div>
-                    <div className="flex-1 space-y-2 text-center md:text-left">
-                      <h3 className="text-xl font-bold text-slate-800">
-                        {driverProfile.name}
-                      </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-600">
-                        <div>
-                          <p>
-                            <span className="font-medium">Phone:</span>{" "}
-                            {driverProfile.phone}
-                          </p>
-                          <p>
-                            <span className="font-medium">Email:</span>{" "}
-                            {driverProfile.email}
-                          </p>
-                          <p>
-                            <span className="font-medium">License:</span>{" "}
-                            {driverProfile.licenseNumber}
-                          </p>
-                        </div>
-                        <div>
-                          <p>
-                            <span className="font-medium">Vehicle:</span>{" "}
-                            {driverProfile.vehicleModel}
-                          </p>
-                          <p>
-                            <span className="font-medium">Number:</span>{" "}
-                            {driverProfile.vehicleNumber}
-                          </p>
-                          <p>
-                            <span className="font-medium">Member since:</span>{" "}
-                            {formatDate(driverProfile.joinDate)}
-                          </p>
-                        </div>
+                      <div className="text-sm text-gray-600">
+                        Total KM Driven
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                    >
-                      <Settings className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
