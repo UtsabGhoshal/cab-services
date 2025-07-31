@@ -65,19 +65,29 @@ export default function Dashboard() {
   };
 
   const fetchUserData = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.log("❌ No user ID available for fetching data");
+      return;
+    }
 
     try {
       setIsLoading(true);
+      console.log(`🔍 Fetching user data for user ID: ${user.id}`);
       const response = await fetch(`/api/user/${user.id}/data`);
       const data = await response.json();
 
+      console.log(`📊 Dashboard API response:`, data);
+
       if (data.success) {
+        console.log(`🚗 Found ${data.recentRides?.length || 0} recent rides`);
+        console.log(`📈 User stats:`, data.stats);
         setRecentRides(data.recentRides || []);
         setUserStats(data.stats || null);
+      } else {
+        console.error("❌ API returned unsuccessful response:", data);
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("❌ Error fetching user data:", error);
     } finally {
       setIsLoading(false);
     }
