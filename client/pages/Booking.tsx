@@ -198,7 +198,7 @@ const CarTypeSelector = ({
     {
       id: "suv",
       name: "SUV",
-      price: "�����60 base",
+      price: "���60 base",
       capacity: "6 passengers",
       description: "Spacious for groups or luggage",
     },
@@ -1055,10 +1055,10 @@ export default function Booking() {
               {bookingLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Booking...
+                  {purpose === "emergency" ? "Finding Nearest Driver..." : "Searching for Drivers..."}
                 </>
               ) : (
-                "Confirm Booking"
+                purpose === "emergency" ? "Request Emergency Ride" : "Find Driver"
               )}
             </Button>
           </div>
