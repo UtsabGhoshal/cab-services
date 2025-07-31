@@ -100,22 +100,74 @@ export default function DriverLogin() {
       owner: {
         email: "rajesh.driver@uride.com",
         password: "demo123",
-        type: "Vehicle Owner Driver"
+        type: "Vehicle Owner Driver",
+        profile: {
+          id: "demo_owner_123",
+          name: "Rajesh Kumar",
+          email: "rajesh.driver@uride.com",
+          phone: "+91 99999 12345",
+          driverType: {
+            type: "owner",
+            commissionRate: 0.05,
+          },
+          vehicleNumber: "DL 01 AB 1234",
+          vehicleModel: "Honda City 2022",
+          licenseNumber: "DL1420110012345",
+          averageRating: 4.8,
+          totalRides: 487,
+          totalEarnings: 42180,
+          totalKmDriven: 1890,
+          acceptanceRate: 92,
+          completionRate: 98,
+          onlineHours: 250,
+          status: "active",
+          joinDate: "2024-01-15T00:00:00.000Z",
+          createdAt: "2024-01-15T00:00:00.000Z"
+        }
       },
       fleet: {
-        email: "amit.fleet@uride.com", 
+        email: "amit.fleet@uride.com",
         password: "demo123",
-        type: "Fleet Driver"
+        type: "Fleet Driver",
+        profile: {
+          id: "demo_fleet_456",
+          name: "Amit Singh",
+          email: "amit.fleet@uride.com",
+          phone: "+91 88888 12345",
+          driverType: {
+            type: "fleet",
+            salaryPerKm: 12,
+          },
+          vehicleModel: "URide Fleet Vehicle",
+          licenseNumber: "DL1420110054321",
+          averageRating: 4.7,
+          totalRides: 392,
+          totalEarnings: 28450,
+          totalKmDriven: 2025,
+          acceptanceRate: 89,
+          completionRate: 95,
+          onlineHours: 180,
+          status: "active",
+          joinDate: "2024-02-20T00:00:00.000Z",
+          createdAt: "2024-02-20T00:00:00.000Z"
+        }
       }
     };
 
     const demo = demoCredentials[type];
     setFormData(prev => ({ ...prev, email: demo.email, password: demo.password }));
-    
+
+    // Store demo profile directly
+    localStorage.setItem("uride_driver", JSON.stringify(demo.profile));
+
     toast({
-      title: "Demo Login",
-      description: `Using ${demo.type} demo credentials`,
+      title: "Demo Login Successful! 🚗",
+      description: `Logged in as ${demo.type}`,
     });
+
+    setTimeout(() => {
+      navigate("/driver-dashboard");
+    }, 1000);
   };
 
   return (
