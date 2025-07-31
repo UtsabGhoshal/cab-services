@@ -174,19 +174,27 @@ export const validateUserCredentials = async (
   try {
     const user = await getUserByEmail(email);
     if (!user) {
+      console.log(`🔍 Login attempt: User with email ${email} not found`);
       return null;
     }
 
+    console.log(`🔍 Login attempt for user: ${user.name} (${user.email})`);
+
     // Check if password is hashed (bcrypt hashes start with $2a$, $2b$, or $2y$)
     const isHashed = user.password.startsWith('$2a$') || user.password.startsWith('$2b$') || user.password.startsWith('$2y$');
+    console.log(`🔐 Password type: ${isHashed ? 'Hashed (bcrypt)' : 'Plain text'}`);
 
     if (isHashed) {
       // Use bcrypt for hashed passwords
       const isValid = await bcrypt.compare(password, user.password);
+      console.log(`✅ Bcrypt validation result: ${isValid}`);
       return isValid ? user : null;
     } else {
       // Direct comparison for plain text passwords (legacy users)
-      return user.password === password ? user : null;
+      const isValid = user.password === password;
+      console.log(`✅ Plain text validation result: ${isValid}`);
+      console.log(`🔍 Stored password: "${user.password}", Provided password: "${password}"`);
+      return isValid ? user : null;
     }
   } catch (error) {
     console.error("Error validating credentials:", error);
