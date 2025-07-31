@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/config";
+import { firebaseDriverService } from "@/services/firebaseDriverService";
 import {
   Car,
   Mail,
@@ -30,7 +32,7 @@ interface LoginFormData {
 export default function DriverLogin() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login, isLoading } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
@@ -54,44 +56,93 @@ export default function DriverLogin() {
       return;
     }
 
+    setIsLoading(true);
     try {
-      // Use driver-specific login endpoint
-      const response = await fetch("/api/driver/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
+      // Sign in with Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
 
-      const data = await response.json();
+      const user = userCredential.user;
 
-      if (data.success && data.driver) {
-        // Store driver info in localStorage (similar to regular user)
-        localStorage.setItem("uride_driver", JSON.stringify(data.driver));
+      // Get driver profile from Firestore
+      const driver = await firebaseDriverService.getDriverByEmail(formData.email);
 
+      if (!driver) {
         toast({
-          title: "Welcome Back! 🚗",
-          description: "Login successful. Redirecting to dashboard...",
-        });
-        navigate("/driver-dashboard");
-      } else {
-        toast({
-          title: "Login Failed",
-          description: data.error || "Invalid email or password. Please try again.",
+          title: "Driver Not Found",
+          description: "No driver account found with this email. Please contact support.",
           variant: "destructive",
         });
+        return;
       }
+
+      if (driver.status !== "active") {
+        toast({
+          title: "Account Inactive",
+          description: "Your driver account is pending approval or inactive. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Store driver info in localStorage
+      const driverSession = {
+        id: driver.id,
+        uid: user.uid,
+        email: user.email,
+        name: driver.name,
+        phone: driver.phone,
+        driverType: driver.driverType,
+        status: driver.status,
+        vehicleNumber: driver.vehicleNumber,
+        vehicleModel: driver.vehicleModel,
+        licenseNumber: driver.licenseNumber,
+        averageRating: driver.averageRating,
+        totalRides: driver.totalRides,
+        totalEarnings: driver.totalEarnings,
+        totalKmDriven: driver.totalKmDriven,
+        acceptanceRate: driver.acceptanceRate,
+        completionRate: driver.completionRate,
+        onlineHours: driver.onlineHours,
+        joinDate: driver.joinDate,
+        createdAt: driver.createdAt
+      };
+
+      localStorage.setItem("uride_driver", JSON.stringify(driverSession));
+      localStorage.setItem("uride_driver_token", await user.getIdToken());
+
+      if (formData.rememberMe) {
+        localStorage.setItem("uride_driver_remember", "true");
+      }
+
+      toast({
+        title: "Welcome Back! 🚗",
+        description: "Login successful. Redirecting to dashboard...",
+      });
+      navigate("/driver-dashboard");
+
     } catch (error: any) {
       console.error("Driver login error:", error);
+      let errorMessage = "An error occurred during login. Please try again.";
+
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        errorMessage = "Invalid email or password. Please try again.";
+      } else if (error.code === "auth/too-many-requests") {
+        errorMessage = "Too many failed login attempts. Please try again later.";
+      } else if (error.code === "auth/user-disabled") {
+        errorMessage = "This account has been disabled. Please contact support.";
+      }
+
       toast({
-        title: "Login Error",
-        description: "An error occurred during login. Please try again.",
+        title: "Login Failed",
+        description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
