@@ -17,6 +17,7 @@ import Places from "./pages/Places";
 import DriverDashboard from "./pages/DriverDashboard";
 import DriverLogin from "./pages/DriverLogin";
 import DriverSignup from "./pages/DriverSignup";
+import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
