@@ -225,6 +225,12 @@ export class DriverService {
 
   // Listen to ongoing rides for this driver
   subscribeToOngoingRides(callback: (rides: OngoingRide[]) => void): () => void {
+    if (!this.checkFirebaseConnection()) {
+      console.warn('Firebase connection not available for ongoing rides');
+      callback([]); // Return empty array as fallback
+      return () => {}; // Return empty unsubscribe function
+    }
+
     try {
       const ridesRef = collection(db, 'ongoingRides');
       // Simplified query to avoid index requirements
