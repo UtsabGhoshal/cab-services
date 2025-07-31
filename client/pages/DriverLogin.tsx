@@ -290,6 +290,7 @@ export default function DriverLogin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50">
+      <DevModeNotification />
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-md border-b border-white/20">
         <div className="max-w-6xl mx-auto px-4 py-4">
