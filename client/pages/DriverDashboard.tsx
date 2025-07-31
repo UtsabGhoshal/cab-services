@@ -178,27 +178,23 @@ export default function DriverDashboard() {
     autoStart: true,
   });
 
-  // Enhanced demo data with new earnings model
-  const [driverProfile] = useState<DriverProfile>({
-    id: "driver_123",
-    name: "Rajesh Kumar",
-    phone: "+91 99999 12345",
-    email: "rajesh.driver@uride.com",
+  // Real driver profile from database
+  const [driverProfile, setDriverProfile] = useState<DriverProfile>({
+    id: user?.id || "driver_123",
+    name: user?.name || "New Driver",
+    phone: user?.phone || "",
+    email: user?.email || "",
     driverType: {
-      type: "owner", // Can be "owner" or "fleet"
+      type: "owner", // Will be loaded from database
       commissionRate: 0.05, // 5% for vehicle owners
       salaryPerKm: undefined,
     },
-    vehicleNumber: "DL 01 AB 1234",
-    vehicleModel: "Honda City 2022",
-    licenseNumber: "DL1420110012345",
-    rating: 4.8,
-    joinDate: new Date("2024-01-15"),
-    currentShift: {
-      startTime: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-      targetKm: 150,
-      completedKm: 85,
-    },
+    vehicleNumber: "",
+    vehicleModel: "",
+    licenseNumber: "",
+    rating: 0, // Start with 0
+    joinDate: new Date(),
+    currentShift: undefined,
   });
 
   // Fleet driver demo profile
