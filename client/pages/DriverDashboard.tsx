@@ -771,10 +771,11 @@ export default function DriverDashboard() {
                             </Button>
                             <Button
                               onClick={() => handleCompleteRide(ride.id)}
+                              disabled={driverService.loading.completeRide}
                               className="flex-1 lg:w-full bg-green-600 hover:bg-green-700 text-white"
                             >
                               <CheckCircle className="w-4 h-4 mr-2" />
-                              Complete
+                              {driverService.loading.completeRide ? "Completing..." : "Complete"}
                             </Button>
                           </div>
                         </div>
