@@ -1,15 +1,15 @@
-import React, { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import UserAvatar from '@/components/UserAvatar';
-import SimpleMap from '@/components/SimpleMap';
-import { PlacesList } from '@/components/PlaceCard';
-import { usePlaces, usePopularCategories } from '@/hooks/usePlaces';
-import { FoursquarePlace } from '@/lib/foursquare';
+import React, { useState, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import UserAvatar from "@/components/UserAvatar";
+import SimpleMap from "@/components/SimpleMap";
+import { PlacesList } from "@/components/PlaceCard";
+import { usePlaces, usePopularCategories } from "@/hooks/usePlaces";
+import { FoursquarePlace } from "@/lib/foursquare";
 import {
   Car,
   MapPin,
@@ -23,13 +23,15 @@ import {
   Star,
   Clock,
   AlertCircle,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function Places() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('map');
-  const [selectedPlace, setSelectedPlace] = useState<FoursquarePlace | null>(null);
-  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("map");
+  const [selectedPlace, setSelectedPlace] = useState<FoursquarePlace | null>(
+    null,
+  );
+
   const {
     places,
     loading,
@@ -56,7 +58,7 @@ export default function Places() {
   }, [searchQuery, searchPlaces, refetch]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSearch();
     }
   };
@@ -69,13 +71,13 @@ export default function Places() {
   const handlePlaceSelect = (place: FoursquarePlace) => {
     setSelectedPlace(place);
     // You could navigate to booking page with this place as destination
-    console.log('Selected place:', place);
+    console.log("Selected place:", place);
   };
 
   const handleGetDirections = (place: FoursquarePlace) => {
     if (userLocation) {
       const directionsUrl = `https://www.google.com/maps/dir/${userLocation.latitude},${userLocation.longitude}/${place.geocodes.main.latitude},${place.geocodes.main.longitude}`;
-      window.open(directionsUrl, '_blank');
+      window.open(directionsUrl, "_blank");
     }
   };
 
@@ -115,10 +117,14 @@ export default function Places() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-2">
-                Explore <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">Nearby Places</span>
+                Explore{" "}
+                <span className="bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                  Nearby Places
+                </span>
               </h1>
               <p className="text-slate-600 text-lg">
-                Discover interesting places around you with Foursquare integration
+                Discover interesting places around you with Foursquare
+                integration
               </p>
             </div>
             <Button
@@ -139,18 +145,21 @@ export default function Places() {
                   <div className="flex items-center space-x-2 text-amber-700">
                     <AlertCircle className="w-5 h-5" />
                     <span className="text-sm">
-                      Location access denied. Using default location (New Delhi). Please enable location services for better results.
+                      Location access denied. Using default location (New
+                      Delhi). Please enable location services for better
+                      results.
                     </span>
                   </div>
                 </CardContent>
               </Card>
             )}
-            
+
             {userLocation && (
               <div className="flex items-center space-x-2 text-green-600 text-sm">
                 <MapPin className="w-4 h-4" />
                 <span>
-                  Current location: {userLocation.latitude.toFixed(4)}, {userLocation.longitude.toFixed(4)}
+                  Current location: {userLocation.latitude.toFixed(4)},{" "}
+                  {userLocation.longitude.toFixed(4)}
                 </span>
               </div>
             )}
@@ -169,7 +178,7 @@ export default function Places() {
                 className="pl-10 h-12 text-lg border-gray-300 focus:border-yellow-500 focus:ring-yellow-500"
               />
             </div>
-            <Button 
+            <Button
               onClick={handleSearch}
               disabled={loading}
               className="bg-yellow-500 hover:bg-yellow-600 text-white h-12 px-8"
@@ -187,7 +196,9 @@ export default function Places() {
 
           {/* Popular Categories */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Popular Categories</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">
+              Popular Categories
+            </h3>
             <div className="flex flex-wrap gap-2">
               {popularCategories.map((category) => (
                 <Badge
@@ -205,7 +216,11 @@ export default function Places() {
         </div>
 
         {/* Main Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-2">
             <TabsTrigger value="map" className="flex items-center space-x-2">
               <MapIcon className="w-4 h-4" />
@@ -278,7 +293,7 @@ export default function Places() {
                           </Badge>
                         )}
                       </div>
-                      
+
                       {selectedPlace.location.formatted_address && (
                         <p className="text-gray-600">
                           {selectedPlace.location.formatted_address}
@@ -336,24 +351,36 @@ export default function Places() {
             <CardContent className="p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-yellow-600">{places.length}</div>
+                  <div className="text-2xl font-bold text-yellow-600">
+                    {places.length}
+                  </div>
                   <div className="text-sm text-gray-600">Places Found</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-green-600">
-                    {new Set(places.flatMap(p => p.categories.map(c => c.name))).size}
+                    {
+                      new Set(
+                        places.flatMap((p) => p.categories.map((c) => c.name)),
+                      ).size
+                    }
                   </div>
                   <div className="text-sm text-gray-600">Categories</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-blue-600">
-                    {places.filter(p => p.distance && p.distance < 1000).length}
+                    {
+                      places.filter((p) => p.distance && p.distance < 1000)
+                        .length
+                    }
                   </div>
                   <div className="text-sm text-gray-600">Within 1km</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-orange-600">
-                    {places.filter(p => p.chains && p.chains.length > 0).length}
+                    {
+                      places.filter((p) => p.chains && p.chains.length > 0)
+                        .length
+                    }
                   </div>
                   <div className="text-sm text-gray-600">Chain Stores</div>
                 </div>

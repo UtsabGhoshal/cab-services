@@ -143,13 +143,13 @@ export const migratePasswordsHandler: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Passwords migrated to hashed format successfully"
+      message: "Passwords migrated to hashed format successfully",
     });
   } catch (error) {
     console.error("Migration error:", error);
     res.status(500).json({
       success: false,
-      error: "An error occurred during password migration"
+      error: "An error occurred during password migration",
     });
   }
 };

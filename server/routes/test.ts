@@ -21,7 +21,7 @@ export const addSampleRidesHandler: RequestHandler<
       {
         userId,
         from: "Connaught Place",
-        to: "IGI Airport Terminal 3", 
+        to: "IGI Airport Terminal 3",
         amount: 520.0,
         carType: "Premium",
         purpose: "Airport Transfer",
@@ -58,7 +58,9 @@ export const addSampleRidesHandler: RequestHandler<
       }
     }
 
-    console.log(`✅ Created ${createdRides.length} sample rides for user ${userId}`);
+    console.log(
+      `✅ Created ${createdRides.length} sample rides for user ${userId}`,
+    );
 
     res.json({
       success: true,

@@ -1,7 +1,11 @@
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { loginHandler, signupHandler, migratePasswordsHandler } from "./routes/auth";
+import {
+  loginHandler,
+  signupHandler,
+  migratePasswordsHandler,
+} from "./routes/auth";
 import { getUserDataHandler, getUserRidesHandler } from "./routes/user";
 import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
@@ -102,7 +106,7 @@ export async function createServer() {
           purpose: "Business",
           distance: "8.5",
           estimatedTime: "20",
-        }
+        },
       ];
 
       const createdRides = [];
@@ -111,7 +115,11 @@ export async function createServer() {
         if (ride) createdRides.push(ride);
       }
 
-      res.json({ success: true, message: `Created ${createdRides.length} test rides`, rides: createdRides });
+      res.json({
+        success: true,
+        message: `Created ${createdRides.length} test rides`,
+        rides: createdRides,
+      });
     } catch (error) {
       console.error("Test rides error:", error);
       res.json({ success: false, error: "Failed to create test rides" });
@@ -123,10 +131,15 @@ export async function createServer() {
     try {
       const { email, newPassword } = req.body;
       if (!email || !newPassword) {
-        return res.json({ success: false, error: "Email and new password required" });
+        return res.json({
+          success: false,
+          error: "Email and new password required",
+        });
       }
 
-      const { getUserByEmail, db } = await import("./firebase/firebaseDatabase");
+      const { getUserByEmail, db } = await import(
+        "./firebase/firebaseDatabase"
+      );
       const { doc, updateDoc, collection } = await import("firebase/firestore");
       const bcrypt = await import("bcryptjs");
 

@@ -24,7 +24,7 @@ export const getUserDataHandler: RequestHandler<
 
     // Get user data
     const user = await getUserById(userId);
-    console.log(`👤 User found: ${user ? 'Yes' : 'No'}`);
+    console.log(`👤 User found: ${user ? "Yes" : "No"}`);
     if (!user) {
       return res.json({
         success: false,

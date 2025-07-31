@@ -7,6 +7,7 @@ If you encounter the error `BillingNotEnabledMapError`, this means your Google M
 ### Solution Options:
 
 #### Option 1: Enable Billing (Recommended for Production)
+
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Select your project
 3. Navigate to "Billing" in the left sidebar
@@ -18,6 +19,7 @@ If you encounter the error `BillingNotEnabledMapError`, this means your Google M
    - Geocoding API
 
 #### Option 2: Use Fallback Map (Already Implemented)
+
 The application automatically falls back to a free alternative when Google Maps fails:
 
 - **Search-based location selection** using OpenStreetMap's Nominatim service
@@ -38,7 +40,7 @@ The application automatically falls back to a free alternative when Google Maps 
 ✅ **Current Location**: Use GPS to set pickup/destination  
 ✅ **Quick Shortcuts**: Predefined locations (Connaught Place, IGI Airport, etc.)  
 ✅ **Fare Calculation**: Accurate distance-based pricing  
-✅ **Ride Booking**: Complete booking functionality maintained  
+✅ **Ride Booking**: Complete booking functionality maintained
 
 ### User Experience:
 
@@ -50,6 +52,7 @@ The application automatically falls back to a free alternative when Google Maps 
 ### For Developers:
 
 The fallback system is implemented in:
+
 - `client/components/SimpleFallbackMap.tsx` - Fallback map component
 - `client/pages/Booking.tsx` - Main booking page with conditional rendering
 - Error detection and graceful handling built-in
@@ -57,6 +60,7 @@ The fallback system is implemented in:
 ### Testing the Fallback:
 
 To test the fallback manually, you can:
+
 1. Disable your internet connection temporarily
 2. Use an invalid Google Maps API key
 3. Block the Google Maps script in browser dev tools

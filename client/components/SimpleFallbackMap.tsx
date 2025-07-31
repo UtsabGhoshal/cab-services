@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { BookingLocation } from '@shared/maps';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { MapPin, Search, Navigation, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { BookingLocation } from "@shared/maps";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { MapPin, Search, Navigation, AlertCircle } from "lucide-react";
 
 interface SimpleFallbackMapProps {
   onLocationSelect: (location: BookingLocation, isPickup: boolean) => void;
@@ -18,10 +18,13 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
   destination,
   locationMode,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<BookingLocation[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
   // Get user's current location
   useEffect(() => {
@@ -34,14 +37,14 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
           });
         },
         (error) => {
-          console.warn('Geolocation error:', error);
+          console.warn("Geolocation error:", error);
           // Fallback to Delhi
-          setUserLocation({ lat: 28.6139, lng: 77.2090 });
-        }
+          setUserLocation({ lat: 28.6139, lng: 77.209 });
+        },
       );
     } else {
       // Fallback to Delhi
-      setUserLocation({ lat: 28.6139, lng: 77.2090 });
+      setUserLocation({ lat: 28.6139, lng: 77.209 });
     }
   }, []);
 
@@ -55,19 +58,19 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
     setIsSearching(true);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=8&countrycodes=in`
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=8&countrycodes=in`,
       );
       const data = await response.json();
-      
+
       const results: BookingLocation[] = data.map((item: any) => ({
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),
         address: item.display_name,
       }));
-      
+
       setSearchResults(results);
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -77,26 +80,28 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
   const handleSearchResultClick = (location: BookingLocation) => {
     onLocationSelect(location, locationMode === "pickup");
     setSearchResults([]);
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
   const handleUseCurrentLocation = () => {
     if (userLocation) {
       // Reverse geocode current location
       fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${userLocation.lat}&lon=${userLocation.lng}&format=json`
+        `https://nominatim.openstreetmap.org/reverse?lat=${userLocation.lat}&lon=${userLocation.lng}&format=json`,
       )
-        .then(response => response.json())
-        .then(data => {
+        .then((response) => response.json())
+        .then((data) => {
           const location: BookingLocation = {
             lat: userLocation.lat,
             lng: userLocation.lng,
-            address: data.display_name || `${userLocation.lat.toFixed(6)}, ${userLocation.lng.toFixed(6)}`,
+            address:
+              data.display_name ||
+              `${userLocation.lat.toFixed(6)}, ${userLocation.lng.toFixed(6)}`,
           };
           onLocationSelect(location, locationMode === "pickup");
         })
-        .catch(error => {
-          console.error('Reverse geocoding error:', error);
+        .catch((error) => {
+          console.error("Reverse geocoding error:", error);
           const location: BookingLocation = {
             lat: userLocation.lat,
             lng: userLocation.lng,
@@ -122,7 +127,8 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
       {/* Search Bar */}
       <div className="relative">
         <Label htmlFor="location-search">
-          Search for {locationMode === "pickup" ? "pickup" : "destination"} location
+          Search for {locationMode === "pickup" ? "pickup" : "destination"}{" "}
+          location
         </Label>
         <div className="relative mt-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -135,7 +141,7 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
             className="pl-10"
           />
         </div>
-        
+
         {/* Search Results */}
         {searchResults.length > 0 && (
           <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
@@ -155,7 +161,7 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
             ))}
           </div>
         )}
-        
+
         {isSearching && (
           <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg p-4 text-center">
             <span className="text-sm text-gray-500">Searching...</span>
@@ -182,8 +188,9 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
             Location Selection Available
           </h3>
           <p className="text-sm text-gray-600 max-w-sm">
-            Use the search bar above to find specific places, or click "Use Current Location" 
-            to set your current position as the {locationMode === "pickup" ? "pickup" : "destination"} point.
+            Use the search bar above to find specific places, or click "Use
+            Current Location" to set your current position as the{" "}
+            {locationMode === "pickup" ? "pickup" : "destination"} point.
           </p>
         </div>
       </div>
@@ -194,14 +201,20 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
           <h4 className="font-medium text-gray-800">Selected Locations:</h4>
           {pickup && (
             <div className="flex items-start space-x-2">
-              <span className="font-medium text-blue-600 flex-shrink-0">Pickup:</span>
+              <span className="font-medium text-blue-600 flex-shrink-0">
+                Pickup:
+              </span>
               <span className="text-xs leading-relaxed">{pickup.address}</span>
             </div>
           )}
           {destination && (
             <div className="flex items-start space-x-2">
-              <span className="font-medium text-red-600 flex-shrink-0">Destination:</span>
-              <span className="text-xs leading-relaxed">{destination.address}</span>
+              <span className="font-medium text-red-600 flex-shrink-0">
+                Destination:
+              </span>
+              <span className="text-xs leading-relaxed">
+                {destination.address}
+              </span>
             </div>
           )}
         </div>
@@ -210,11 +223,13 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
       {/* Quick Location Suggestions */}
       <div className="grid grid-cols-2 gap-2">
         <Button
-          onClick={() => handleSearchResultClick({
-            lat: 28.6139,
-            lng: 77.2090,
-            address: "Connaught Place, New Delhi, India"
-          })}
+          onClick={() =>
+            handleSearchResultClick({
+              lat: 28.6139,
+              lng: 77.209,
+              address: "Connaught Place, New Delhi, India",
+            })
+          }
           variant="outline"
           size="sm"
           className="text-xs"
@@ -222,11 +237,13 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
           Connaught Place
         </Button>
         <Button
-          onClick={() => handleSearchResultClick({
-            lat: 28.5562,
-            lng: 77.1000,
-            address: "IGI Airport, New Delhi, India"
-          })}
+          onClick={() =>
+            handleSearchResultClick({
+              lat: 28.5562,
+              lng: 77.1,
+              address: "IGI Airport, New Delhi, India",
+            })
+          }
           variant="outline"
           size="sm"
           className="text-xs"
@@ -234,11 +251,13 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
           IGI Airport
         </Button>
         <Button
-          onClick={() => handleSearchResultClick({
-            lat: 28.6508,
-            lng: 77.2311,
-            address: "India Gate, New Delhi, India"
-          })}
+          onClick={() =>
+            handleSearchResultClick({
+              lat: 28.6508,
+              lng: 77.2311,
+              address: "India Gate, New Delhi, India",
+            })
+          }
           variant="outline"
           size="sm"
           className="text-xs"
@@ -246,11 +265,13 @@ export const SimpleFallbackMap: React.FC<SimpleFallbackMapProps> = ({
           India Gate
         </Button>
         <Button
-          onClick={() => handleSearchResultClick({
-            lat: 28.6692,
-            lng: 77.4538,
-            address: "Ghaziabad, Uttar Pradesh, India"
-          })}
+          onClick={() =>
+            handleSearchResultClick({
+              lat: 28.6692,
+              lng: 77.4538,
+              address: "Ghaziabad, Uttar Pradesh, India",
+            })
+          }
           variant="outline"
           size="sm"
           className="text-xs"

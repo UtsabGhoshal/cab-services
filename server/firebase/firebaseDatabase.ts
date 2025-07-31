@@ -75,7 +75,9 @@ export const createUser = async (
 
     // Filter out undefined values that Firebase doesn't accept
     const cleanedUserData = Object.fromEntries(
-      Object.entries({...userData, password: hashedPassword}).filter(([_, value]) => value !== undefined),
+      Object.entries({ ...userData, password: hashedPassword }).filter(
+        ([_, value]) => value !== undefined,
+      ),
     );
 
     const newUser = {
@@ -105,10 +107,7 @@ export const getUserRides = async (
   try {
     const ridesRef = collection(db, RIDES_COLLECTION);
     // Remove orderBy to avoid composite index requirement
-    const q = query(
-      ridesRef,
-      where("userId", "==", userId)
-    );
+    const q = query(ridesRef, where("userId", "==", userId));
 
     const querySnapshot = await getDocs(q);
     const rides: Ride[] = [];
@@ -127,7 +126,9 @@ export const getUserRides = async (
       .sort((a, b) => b.date.getTime() - a.date.getTime())
       .slice(0, limitCount);
 
-    console.log(`📋 Returning ${sortedRides.length} sorted rides for user ${userId}`);
+    console.log(
+      `📋 Returning ${sortedRides.length} sorted rides for user ${userId}`,
+    );
     return sortedRides;
   } catch (error) {
     console.error("Error getting user rides:", error);
@@ -181,8 +182,13 @@ export const validateUserCredentials = async (
     console.log(`🔍 Login attempt for user: ${user.name} (${user.email})`);
 
     // Check if password is hashed (bcrypt hashes start with $2a$, $2b$, or $2y$)
-    const isHashed = user.password.startsWith('$2a$') || user.password.startsWith('$2b$') || user.password.startsWith('$2y$');
-    console.log(`🔐 Password type: ${isHashed ? 'Hashed (bcrypt)' : 'Plain text'}`);
+    const isHashed =
+      user.password.startsWith("$2a$") ||
+      user.password.startsWith("$2b$") ||
+      user.password.startsWith("$2y$");
+    console.log(
+      `🔐 Password type: ${isHashed ? "Hashed (bcrypt)" : "Plain text"}`,
+    );
 
     if (isHashed) {
       // Use bcrypt for hashed passwords
@@ -193,19 +199,25 @@ export const validateUserCredentials = async (
       // Direct comparison for plain text passwords (legacy users)
       const isValid = user.password === password;
       console.log(`✅ Plain text validation result: ${isValid}`);
-      console.log(`🔍 Stored password length: ${user.password.length}, Provided password length: ${password.length}`);
-      console.log(`🔍 Stored password first 5 chars: "${user.password.substring(0, 5)}..."`);
-      console.log(`🔍 Provided password first 5 chars: "${password.substring(0, 5)}..."`);
+      console.log(
+        `🔍 Stored password length: ${user.password.length}, Provided password length: ${password.length}`,
+      );
+      console.log(
+        `🔍 Stored password first 5 chars: "${user.password.substring(0, 5)}..."`,
+      );
+      console.log(
+        `🔍 Provided password first 5 chars: "${password.substring(0, 5)}..."`,
+      );
 
       // Try some common variations
       const variations = [
         password.trim(),
         password.toLowerCase(),
         password.toUpperCase(),
-        'utsab@2004',
-        'password123',
-        'utsab123',
-        'test123'
+        "utsab@2004",
+        "password123",
+        "utsab123",
+        "test123",
       ];
 
       let matchedPassword = null;
@@ -214,7 +226,9 @@ export const validateUserCredentials = async (
       } else {
         for (const variation of variations) {
           if (user.password === variation) {
-            console.log(`🎯 Password match found with variation: "${variation}"`);
+            console.log(
+              `🎯 Password match found with variation: "${variation}"`,
+            );
             matchedPassword = variation;
             break;
           }
@@ -230,12 +244,17 @@ export const validateUserCredentials = async (
           const userRef = doc(db, USERS_COLLECTION, user.id);
           await updateDoc(userRef, { password: hashedPassword });
 
-          console.log(`✅ Password auto-migrated to hashed format for: ${user.email}`);
+          console.log(
+            `✅ Password auto-migrated to hashed format for: ${user.email}`,
+          );
 
           // Return user with updated password hash (for consistency)
           user.password = hashedPassword;
         } catch (migrationError) {
-          console.error(`❌ Failed to auto-migrate password for ${user.email}:`, migrationError);
+          console.error(
+            `❌ Failed to auto-migrate password for ${user.email}:`,
+            migrationError,
+          );
           // Still return the user since login was successful
         }
         return user;
@@ -384,9 +403,10 @@ export const migratePasswordsToHashed = async (): Promise<void> => {
       const userId = docSnapshot.id;
 
       // Check if password is already hashed
-      const isHashed = userData.password?.startsWith('$2a$') ||
-                      userData.password?.startsWith('$2b$') ||
-                      userData.password?.startsWith('$2y$');
+      const isHashed =
+        userData.password?.startsWith("$2a$") ||
+        userData.password?.startsWith("$2b$") ||
+        userData.password?.startsWith("$2y$");
 
       if (!isHashed && userData.password) {
         console.log(`🔄 Migrating password for user: ${userData.email}`);
@@ -397,7 +417,7 @@ export const migratePasswordsToHashed = async (): Promise<void> => {
         // Update the user document with hashed password
         const userRef = doc(db, USERS_COLLECTION, userId);
         await updateDoc(userRef, {
-          password: hashedPassword
+          password: hashedPassword,
         });
 
         migratedCount++;
@@ -407,7 +427,9 @@ export const migratePasswordsToHashed = async (): Promise<void> => {
       }
     }
 
-    console.log(`🎉 Password migration completed! Migrated ${migratedCount} users.`);
+    console.log(
+      `🎉 Password migration completed! Migrated ${migratedCount} users.`,
+    );
   } catch (error) {
     console.error("❌ Error during password migration:", error);
     throw error;

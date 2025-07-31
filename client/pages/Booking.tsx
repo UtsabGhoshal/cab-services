@@ -343,64 +343,86 @@ export default function Booking() {
           // Check for Google Maps API errors after loading
           if (window.google && window.google.maps) {
             // Listen for Google Maps API errors
-            window.google.maps.event.addDomListener(window, 'gm_authFailure', () => {
-              console.error('Google Maps API authentication failed');
-              setMapsError('Google Maps API authentication failed. Using fallback map.');
-              setUseFallbackMap(true);
-              setLoading(false);
-            });
+            window.google.maps.event.addDomListener(
+              window,
+              "gm_authFailure",
+              () => {
+                console.error("Google Maps API authentication failed");
+                setMapsError(
+                  "Google Maps API authentication failed. Using fallback map.",
+                );
+                setUseFallbackMap(true);
+                setLoading(false);
+              },
+            );
 
             // Check for billing issues by attempting to create a simple map
             try {
-              const testDiv = document.createElement('div');
-              testDiv.style.width = '1px';
-              testDiv.style.height = '1px';
-              testDiv.style.visibility = 'hidden';
+              const testDiv = document.createElement("div");
+              testDiv.style.width = "1px";
+              testDiv.style.height = "1px";
+              testDiv.style.visibility = "hidden";
               document.body.appendChild(testDiv);
 
               const testMap = new window.google.maps.Map(testDiv, {
                 center: { lat: 0, lng: 0 },
-                zoom: 1
+                zoom: 1,
               });
 
               // Clean up test div
               document.body.removeChild(testDiv);
 
               // If we get here without error, GoMaps Pro is working
-              console.log('✅ GoMaps Pro is working correctly');
+              console.log("✅ GoMaps Pro is working correctly");
               setLoading(false);
               setTimeout(initializeAutocomplete, 100);
             } catch (error: any) {
-              console.error('❌ GoMaps Pro initialization error:', error);
+              console.error("❌ GoMaps Pro initialization error:", error);
 
               // Check for specific error types
               if (error.message) {
-                if (error.message.includes('BillingNotEnabledMapError')) {
-                  setMapsError('Google Maps billing not enabled. Please enable billing in Google Cloud Console or use the free alternative below.');
-                  console.warn('🔔 Solution: Enable billing at https://console.cloud.google.com/');
-                } else if (error.message.includes('ApiNotActivatedMapError')) {
-                  setMapsError('Google Maps API not activated. Please enable the Maps JavaScript API in Google Cloud Console.');
-                } else if (error.message.includes('InvalidKeyMapError')) {
-                  setMapsError('Invalid Google Maps API key. Please check your API key configuration.');
-                } else if (error.message.includes('RefererNotAllowedMapError')) {
-                  setMapsError('Google Maps API key not authorized for this domain. Please update API key restrictions.');
+                if (error.message.includes("BillingNotEnabledMapError")) {
+                  setMapsError(
+                    "Google Maps billing not enabled. Please enable billing in Google Cloud Console or use the free alternative below.",
+                  );
+                  console.warn(
+                    "🔔 Solution: Enable billing at https://console.cloud.google.com/",
+                  );
+                } else if (error.message.includes("ApiNotActivatedMapError")) {
+                  setMapsError(
+                    "Google Maps API not activated. Please enable the Maps JavaScript API in Google Cloud Console.",
+                  );
+                } else if (error.message.includes("InvalidKeyMapError")) {
+                  setMapsError(
+                    "Invalid Google Maps API key. Please check your API key configuration.",
+                  );
+                } else if (
+                  error.message.includes("RefererNotAllowedMapError")
+                ) {
+                  setMapsError(
+                    "Google Maps API key not authorized for this domain. Please update API key restrictions.",
+                  );
                 } else {
-                  setMapsError(`Google Maps error: ${error.message}. Using alternative map service.`);
+                  setMapsError(
+                    `Google Maps error: ${error.message}. Using alternative map service.`,
+                  );
                 }
               } else {
-                setMapsError('Google Maps not available. Using alternative map service.');
+                setMapsError(
+                  "Google Maps not available. Using alternative map service.",
+                );
               }
 
               setUseFallbackMap(true);
               setLoading(false);
             }
           } else {
-            throw new Error('Google Maps API failed to load properly');
+            throw new Error("Google Maps API failed to load properly");
           }
         };
         script.onerror = () => {
           console.error("Failed to load GoMaps Pro script");
-          setMapsError('GoMaps Pro unavailable. Using fallback map.');
+          setMapsError("GoMaps Pro unavailable. Using fallback map.");
           setUseFallbackMap(true);
           setLoading(false);
         };
@@ -409,8 +431,8 @@ export default function Booking() {
         // Add a timeout fallback
         setTimeout(() => {
           if (loading && !window.google) {
-            console.warn('GoMaps Pro loading timeout');
-            setMapsError('GoMaps Pro loading timeout. Using fallback map.');
+            console.warn("GoMaps Pro loading timeout");
+            setMapsError("GoMaps Pro loading timeout. Using fallback map.");
             setUseFallbackMap(true);
             setLoading(false);
           }
@@ -422,7 +444,7 @@ export default function Booking() {
       }
     } catch (error) {
       console.error("Error loading GoMaps Pro:", error);
-      setMapsError('Failed to initialize maps. Using fallback map.');
+      setMapsError("Failed to initialize maps. Using fallback map.");
       setUseFallbackMap(true);
       setLoading(false);
     }
@@ -452,7 +474,10 @@ export default function Booking() {
               if (element.status === "OK") {
                 const distanceValue = element.distance.value / 1000; // Convert to km
                 const durationValue = element.duration.value / 60; // Convert to minutes
-                calculateFareWithDistance(distanceValue, Math.ceil(durationValue));
+                calculateFareWithDistance(
+                  distanceValue,
+                  Math.ceil(durationValue),
+                );
                 return;
               }
             }
@@ -461,7 +486,7 @@ export default function Booking() {
           },
         );
       } catch (error) {
-        console.error('Google Maps Distance Matrix error:', error);
+        console.error("Google Maps Distance Matrix error:", error);
         fallbackDistanceCalculation();
       }
     } else {
@@ -478,10 +503,12 @@ export default function Booking() {
     const dLat = toRadians(destination.lat - pickup.lat);
     const dLng = toRadians(destination.lng - pickup.lng);
     const a =
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(toRadians(pickup.lat)) * Math.cos(toRadians(destination.lat)) *
-      Math.sin(dLng/2) * Math.sin(dLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRadians(pickup.lat)) *
+        Math.cos(toRadians(destination.lat)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c;
 
     // Estimate time based on average city speed (25 km/h)
@@ -731,7 +758,8 @@ export default function Booking() {
                           Map Service Notice
                         </p>
                         <p className="text-xs text-amber-700 mt-1">
-                          {mapsError} Location selection is still fully functional.
+                          {mapsError} Location selection is still fully
+                          functional.
                         </p>
                       </div>
                     </div>
@@ -759,7 +787,9 @@ export default function Booking() {
                 {!useFallbackMap && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
-                      <Label htmlFor="pickup-autocomplete">Pickup Location</Label>
+                      <Label htmlFor="pickup-autocomplete">
+                        Pickup Location
+                      </Label>
                       <Input
                         id="pickup-autocomplete"
                         value={pickupInputValue}

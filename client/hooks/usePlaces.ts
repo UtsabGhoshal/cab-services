@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { foursquareService, FoursquarePlace } from '@/lib/foursquare';
-import { locationService, Location } from '@/lib/location';
+import { useState, useEffect, useCallback } from "react";
+import { foursquareService, FoursquarePlace } from "@/lib/foursquare";
+import { locationService, Location } from "@/lib/location";
 
 export interface UsePlacesOptions {
   radius?: number;
@@ -26,7 +26,7 @@ export const usePlaces = (options: UsePlacesOptions = {}): UsePlacesReturn => {
   const {
     radius = 2000,
     limit = 20,
-    query = '',
+    query = "",
     autoFetch = true,
     categories,
   } = options;
@@ -35,7 +35,9 @@ export const usePlaces = (options: UsePlacesOptions = {}): UsePlacesReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userLocation, setUserLocation] = useState<Location | null>(null);
-  const [locationPermission, setLocationPermission] = useState<boolean | null>(null);
+  const [locationPermission, setLocationPermission] = useState<boolean | null>(
+    null,
+  );
   const [currentQuery, setCurrentQuery] = useState(query);
 
   // Request location permission and get user location
@@ -48,9 +50,9 @@ export const usePlaces = (options: UsePlacesOptions = {}): UsePlacesReturn => {
       setUserLocation(location);
       return location;
     } catch (err) {
-      console.error('Error getting user location:', err);
-      setError('Unable to get your location. Using default location.');
-      
+      console.error("Error getting user location:", err);
+      setError("Unable to get your location. Using default location.");
+
       // Use default location as fallback
       const defaultLocation = locationService.getDefaultLocation();
       setUserLocation(defaultLocation);
@@ -59,93 +61,110 @@ export const usePlaces = (options: UsePlacesOptions = {}): UsePlacesReturn => {
   }, []);
 
   // Fetch places from Foursquare API
-  const fetchPlaces = useCallback(async (location?: Location) => {
-    setLoading(true);
-    setError(null);
+  const fetchPlaces = useCallback(
+    async (location?: Location) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const targetLocation = location || userLocation || await getUserLocation();
-      if (!targetLocation) {
-        throw new Error('No location available');
-      }
-
-      // Temporarily disable Foursquare API due to authentication issues
-      // const fetchedPlaces = await foursquareService.getNearbyPlaces(
-      //   targetLocation.latitude,
-      //   targetLocation.longitude,
-      //   radius,
-      //   limit,
-      //   currentQuery || undefined
-      // );
-
-      // Use mock data instead
-      const fetchedPlaces: FoursquarePlace[] = [
-        {
-          fsq_id: 'mock-1',
-          name: 'Central Park Restaurant',
-          categories: [{
-            id: 13065,
-            name: 'Restaurant',
-            short_name: 'Restaurant',
-            plural_name: 'Restaurants',
-            icon: { prefix: 'https://ss3.4sqi.net/img/categories_v2/food/default_', suffix: '.png' }
-          }],
-          location: {
-            address: '123 Park Street',
-            country: 'IN',
-            formatted_address: '123 Park Street, New Delhi, India'
-          },
-          geocodes: {
-            main: {
-              latitude: targetLocation.latitude + 0.01,
-              longitude: targetLocation.longitude + 0.01
-            }
-          }
-        },
-        {
-          fsq_id: 'mock-2',
-          name: 'Coffee Corner Cafe',
-          categories: [{
-            id: 16032,
-            name: 'Coffee Shop',
-            short_name: 'Coffee',
-            plural_name: 'Coffee Shops',
-            icon: { prefix: 'https://ss3.4sqi.net/img/categories_v2/food/coffeeshop_', suffix: '.png' }
-          }],
-          location: {
-            address: '456 Main Road',
-            country: 'IN',
-            formatted_address: '456 Main Road, New Delhi, India'
-          },
-          geocodes: {
-            main: {
-              latitude: targetLocation.latitude - 0.005,
-              longitude: targetLocation.longitude + 0.005
-            }
-          }
+      try {
+        const targetLocation =
+          location || userLocation || (await getUserLocation());
+        if (!targetLocation) {
+          throw new Error("No location available");
         }
-      ];
 
-      // Calculate distances and add to places
-      const placesWithDistance = fetchedPlaces.map((place) => ({
-        ...place,
-        distance: foursquareService.calculateDistance(
-          targetLocation.latitude,
-          targetLocation.longitude,
-          place.geocodes.main.latitude,
-          place.geocodes.main.longitude
-        ) * 1000, // Convert to meters
-      }));
+        // Temporarily disable Foursquare API due to authentication issues
+        // const fetchedPlaces = await foursquareService.getNearbyPlaces(
+        //   targetLocation.latitude,
+        //   targetLocation.longitude,
+        //   radius,
+        //   limit,
+        //   currentQuery || undefined
+        // );
 
-      setPlaces(placesWithDistance);
-    } catch (err) {
-      console.error('Error fetching places:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch places');
-      setPlaces([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [userLocation, radius, limit, currentQuery, getUserLocation]);
+        // Use mock data instead
+        const fetchedPlaces: FoursquarePlace[] = [
+          {
+            fsq_id: "mock-1",
+            name: "Central Park Restaurant",
+            categories: [
+              {
+                id: 13065,
+                name: "Restaurant",
+                short_name: "Restaurant",
+                plural_name: "Restaurants",
+                icon: {
+                  prefix:
+                    "https://ss3.4sqi.net/img/categories_v2/food/default_",
+                  suffix: ".png",
+                },
+              },
+            ],
+            location: {
+              address: "123 Park Street",
+              country: "IN",
+              formatted_address: "123 Park Street, New Delhi, India",
+            },
+            geocodes: {
+              main: {
+                latitude: targetLocation.latitude + 0.01,
+                longitude: targetLocation.longitude + 0.01,
+              },
+            },
+          },
+          {
+            fsq_id: "mock-2",
+            name: "Coffee Corner Cafe",
+            categories: [
+              {
+                id: 16032,
+                name: "Coffee Shop",
+                short_name: "Coffee",
+                plural_name: "Coffee Shops",
+                icon: {
+                  prefix:
+                    "https://ss3.4sqi.net/img/categories_v2/food/coffeeshop_",
+                  suffix: ".png",
+                },
+              },
+            ],
+            location: {
+              address: "456 Main Road",
+              country: "IN",
+              formatted_address: "456 Main Road, New Delhi, India",
+            },
+            geocodes: {
+              main: {
+                latitude: targetLocation.latitude - 0.005,
+                longitude: targetLocation.longitude + 0.005,
+              },
+            },
+          },
+        ];
+
+        // Calculate distances and add to places
+        const placesWithDistance = fetchedPlaces.map((place) => ({
+          ...place,
+          distance:
+            foursquareService.calculateDistance(
+              targetLocation.latitude,
+              targetLocation.longitude,
+              place.geocodes.main.latitude,
+              place.geocodes.main.longitude,
+            ) * 1000, // Convert to meters
+        }));
+
+        setPlaces(placesWithDistance);
+      } catch (err) {
+        console.error("Error fetching places:", err);
+        setError(err instanceof Error ? err.message : "Failed to fetch places");
+        setPlaces([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [userLocation, radius, limit, currentQuery, getUserLocation],
+  );
 
   // Refetch places with current location
   const refetch = useCallback(async () => {
@@ -153,10 +172,13 @@ export const usePlaces = (options: UsePlacesOptions = {}): UsePlacesReturn => {
   }, [fetchPlaces]);
 
   // Search places with a specific query
-  const searchPlaces = useCallback(async (searchQuery: string) => {
-    setCurrentQuery(searchQuery);
-    await fetchPlaces();
-  }, [fetchPlaces]);
+  const searchPlaces = useCallback(
+    async (searchQuery: string) => {
+      setCurrentQuery(searchQuery);
+      await fetchPlaces();
+    },
+    [fetchPlaces],
+  );
 
   // Clear places
   const clearPlaces = useCallback(() => {
@@ -179,7 +201,7 @@ export const usePlaces = (options: UsePlacesOptions = {}): UsePlacesReturn => {
   useEffect(() => {
     if (userLocation && currentQuery !== query) {
       setCurrentQuery(query);
-      if (query !== '') {
+      if (query !== "") {
         fetchPlaces();
       }
     }
@@ -201,14 +223,14 @@ export const usePlaces = (options: UsePlacesOptions = {}): UsePlacesReturn => {
 // Hook for getting popular categories
 export const usePopularCategories = () => {
   const categories = [
-    { id: '13065', name: 'Restaurant', icon: '🍽️' },
-    { id: '17069', name: 'Gas Station', icon: '⛽' },
-    { id: '19014', name: 'Hotel', icon: '🏨' },
-    { id: '16032', name: 'Coffee Shop', icon: '☕' },
-    { id: '17043', name: 'Grocery Store', icon: '🛒' },
-    { id: '15010', name: 'Hospital', icon: '🏥' },
-    { id: '16003', name: 'Bank', icon: '🏦' },
-    { id: '10032', name: 'Shopping Mall', icon: '🛍️' },
+    { id: "13065", name: "Restaurant", icon: "🍽️" },
+    { id: "17069", name: "Gas Station", icon: "⛽" },
+    { id: "19014", name: "Hotel", icon: "🏨" },
+    { id: "16032", name: "Coffee Shop", icon: "☕" },
+    { id: "17043", name: "Grocery Store", icon: "🛒" },
+    { id: "15010", name: "Hospital", icon: "🏥" },
+    { id: "16003", name: "Bank", icon: "🏦" },
+    { id: "10032", name: "Shopping Mall", icon: "🛍️" },
   ];
 
   return categories;
@@ -228,8 +250,8 @@ export const useLocationWatcher = () => {
         setCurrentLocation(location);
       },
       (error) => {
-        console.error('Location watch error:', error);
-      }
+        console.error("Location watch error:", error);
+      },
     );
 
     if (id) {
