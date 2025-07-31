@@ -146,32 +146,6 @@ export default function Index() {
                   </div>
 
                   <div className="space-y-5">
-                    <div className="relative group/input">
-                      <div className="flex items-center space-x-4 p-5 bg-gradient-to-r from-slate-50 to-yellow-50 rounded-xl border border-slate-200 group-hover/input:border-yellow-300 transition-all duration-300 group-hover/input:shadow-lg">
-                        <div className="p-2 bg-yellow-100 rounded-lg group-hover/input:bg-yellow-200 transition-colors">
-                          <MapPin className="w-5 h-5 text-yellow-600" />
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="Connaught Place, New Delhi"
-                          className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500 text-lg"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="relative group/input">
-                      <div className="flex items-center space-x-4 p-5 bg-gradient-to-r from-slate-50 to-orange-50 rounded-xl border border-slate-200 group-hover/input:border-orange-300 transition-all duration-300 group-hover/input:shadow-lg">
-                        <div className="p-2 bg-orange-100 rounded-lg group-hover/input:bg-orange-200 transition-colors">
-                          <MapPin className="w-5 h-5 text-orange-600" />
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="IGI Airport, Terminal 3"
-                          className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder-slate-500 text-lg"
-                        />
-                      </div>
-                    </div>
-
                     <div className="space-y-3">
                       <Link to="/booking">
                         <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-7 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group relative overflow-hidden">
