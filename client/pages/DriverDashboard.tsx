@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { useDriverService } from "@/hooks/useDriverService";
 import { useAuth } from "@/contexts/AuthContext";
+import { driverMatchingService } from "@/services/driverMatchingService";
 import {
   Car,
   MapPin,
