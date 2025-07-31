@@ -716,7 +716,7 @@ export default function Booking() {
 
                 {/* Conditional Map Rendering */}
                 {useFallbackMap ? (
-                  <FallbackMap
+                  <SimpleFallbackMap
                     onLocationSelect={handleLocationSelect}
                     pickup={pickup}
                     destination={destination}
