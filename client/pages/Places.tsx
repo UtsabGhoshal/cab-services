@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserAvatar from '@/components/UserAvatar';
-import Map from '@/components/Map';
+import SimpleMap from '@/components/SimpleMap';
 import { PlacesList } from '@/components/PlaceCard';
 import { usePlaces, usePopularCategories } from '@/hooks/usePlaces';
 import { FoursquarePlace } from '@/lib/foursquare';
