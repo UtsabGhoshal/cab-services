@@ -323,53 +323,86 @@ export default function DriverSignup() {
 
     setIsSubmitting(true);
     try {
-      // Submit to driver registration endpoint
-      const response = await fetch("/api/driver/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          password: "temp123", // Generate a temporary password
-          dateOfBirth: formData.dateOfBirth,
-          address: formData.address,
-          licenseNumber: formData.licenseNumber,
-          licenseExpiry: formData.licenseExpiry,
-          hasVehicle: formData.hasVehicle,
-          vehicleMake: formData.vehicleMake,
-          vehicleModel: formData.vehicleModel,
-          vehicleYear: formData.vehicleYear,
-          vehicleColor: formData.vehicleColor,
-          vehicleNumber: formData.vehicleNumber,
-          idProofType: formData.idProofType,
-          idProofNumber: formData.idProofNumber,
-          hasCleanRecord: formData.hasCleanRecord,
-          backgroundCheckConsent: formData.backgroundCheckConsent,
-          acceptTerms: formData.acceptTerms,
-          acceptPrivacyPolicy: formData.acceptPrivacyPolicy,
-        }),
+      // Create Firebase Auth user
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      const user = userCredential.user;
+
+      // Determine driver type
+      const driverType = {
+        type: formData.hasVehicle === "yes" ? "owner" : "fleet" as "owner" | "fleet",
+        commissionRate: formData.hasVehicle === "yes" ? 0.05 : undefined,
+        salaryPerKm: formData.hasVehicle === "no" ? 12 : undefined,
+      };
+
+      // Create driver document in Firestore
+      const driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt"> = {
+        name: formData.fullName,
+        email: formData.email.toLowerCase(),
+        phone: formData.phone,
+        driverType,
+        status: "pending",
+        rating: 0,
+        totalRides: 0,
+        totalEarnings: 0,
+        totalKmDriven: 0,
+        joinDate: Timestamp.now(),
+
+        // Vehicle Information
+        vehicleNumber: formData.hasVehicle === "yes" ? formData.vehicleNumber?.toUpperCase() : undefined,
+        vehicleModel: formData.hasVehicle === "yes" ? `${formData.vehicleMake} ${formData.vehicleModel} ${formData.vehicleYear}` : undefined,
+
+        // License and Documents
+        licenseNumber: formData.licenseNumber.toUpperCase(),
+        licenseExpiry: Timestamp.fromDate(new Date(formData.licenseExpiry)),
+        documentsVerified: false,
+
+        // ID Verification
+        idProofType: formData.idProofType,
+        idProofNumber: formData.idProofNumber,
+
+        // Background Check
+        hasCleanRecord: formData.hasCleanRecord,
+        backgroundCheckCompleted: false,
+
+        // Performance Metrics (initial values)
+        acceptanceRate: 0,
+        completionRate: 0,
+        averageRating: 0,
+        onlineHours: 0,
+      };
+
+      const driverId = await firebaseDriverService.createDriver(driverData);
+
+      toast({
+        title: "Application Submitted! 🎉",
+        description: "Your driver application has been submitted successfully. You will be contacted within 24-48 hours for verification.",
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        toast({
-          title: "Application Submitted! 🎉",
-          description: data.message || "Your driver application has been submitted for review. You'll receive an email within 24-48 hours.",
-        });
-
+      setTimeout(() => {
         navigate("/driver-login");
-      } else {
-        throw new Error(data.error || "Failed to submit application");
-      }
+      }, 2000);
+
     } catch (error: any) {
       console.error("Driver signup error:", error);
+
+      let errorMessage = "An error occurred while submitting your application. Please try again.";
+
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "An account with this email already exists. Please try logging in instead.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Password is too weak. Please choose a stronger password.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Please enter a valid email address.";
+      }
+
       toast({
         title: "Submission Failed",
-        description: error.message || "Failed to submit application. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
