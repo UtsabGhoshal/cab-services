@@ -70,9 +70,12 @@ export const createUser = async (
   userData: Omit<User, "id" | "joinDate" | "memberLevel" | "isActive">,
 ): Promise<User> => {
   try {
+    // Hash the password before storing
+    const hashedPassword = await bcrypt.hash(userData.password, 12);
+
     // Filter out undefined values that Firebase doesn't accept
     const cleanedUserData = Object.fromEntries(
-      Object.entries(userData).filter(([_, value]) => value !== undefined),
+      Object.entries({...userData, password: hashedPassword}).filter(([_, value]) => value !== undefined),
     );
 
     const newUser = {
