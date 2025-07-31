@@ -260,85 +260,91 @@ export default function DriverDashboard() {
     profilePhoto: undefined,
   });
 
-  // Handle online/offline toggle
-  const handleOnlineToggle = (checked: boolean) => {
-    setIsOnline(checked);
-    toast({
-      title: checked ? "You're now online!" : "You're now offline",
-      description: checked 
-        ? "You'll start receiving ride requests" 
-        : "You won't receive new ride requests",
-    });
-  };
+  // Use fallback data if Firebase data is empty (for demo)
+  const displayOngoingRides = ongoingRides.length > 0 ? ongoingRides : fallbackOngoingRides;
+  const displayRideHistory = rideHistory.length > 0 ? rideHistory : fallbackHistory;
 
-  // Handle ride request actions
-  const handleAcceptRequest = (requestId: string) => {
-    const request = rideRequests.find(r => r.id === requestId);
-    if (request) {
-      // Move to ongoing rides
-      const newOngoingRide: OngoingRide = {
-        id: `ride_${Date.now()}`,
-        passengerName: request.passengerName,
-        passengerPhone: "+91 98765 43210", // Would come from API
-        pickup: request.pickup,
-        destination: request.destination,
-        earnings: request.estimatedEarnings,
-        status: "picking_up",
-        startTime: new Date(),
-        estimatedArrival: new Date(Date.now() + request.duration * 60 * 1000),
-      };
-      
-      setOngoingRides(prev => [newOngoingRide, ...prev]);
-      setRideRequests(prev => prev.filter(r => r.id !== requestId));
-      setActiveTab("ongoing");
-      
+  // Handle online/offline toggle
+  const handleOnlineToggle = async (checked: boolean) => {
+    try {
+      await driverService.toggleOnlineStatus();
       toast({
-        title: "Ride Accepted!",
-        description: `You've accepted the ride to ${request.destination.address}`,
+        title: checked ? "You're now online!" : "You're now offline",
+        description: checked
+          ? "You'll start receiving ride requests"
+          : "You won't receive new ride requests",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update online status. Please try again.",
+        variant: "destructive",
       });
     }
   };
 
-  const handleRejectRequest = (requestId: string) => {
-    setRideRequests(prev => prev.filter(r => r.id !== requestId));
-    toast({
-      title: "Ride Rejected",
-      description: "The ride request has been declined",
-    });
+  // Handle ride request actions
+  const handleAcceptRequest = async (requestId: string) => {
+    try {
+      await driverService.acceptRide(requestId);
+      setActiveTab("ongoing");
+
+      const request = rideRequests.find(r => r.id === requestId);
+      toast({
+        title: "Ride Accepted!",
+        description: `You've accepted the ride to ${request?.destination.address || 'destination'}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to accept ride. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRejectRequest = async (requestId: string) => {
+    try {
+      await driverService.rejectRide(requestId);
+      toast({
+        title: "Ride Rejected",
+        description: "The ride request has been declined",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to reject ride. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Handle ongoing ride actions
-  const handleCompleteRide = (rideId: string) => {
-    const ride = ongoingRides.find(r => r.id === rideId);
-    if (ride) {
-      // Move to history
-      const historyEntry: RideHistory = {
-        id: ride.id,
-        passengerName: ride.passengerName,
-        pickup: ride.pickup.address,
-        destination: ride.destination.address,
-        earnings: ride.earnings,
-        rating: 5, // Would be set by passenger
-        date: new Date(),
-        duration: Math.floor((Date.now() - ride.startTime.getTime()) / 60000),
-        distance: 10, // Would be calculated
-      };
-      
-      setRideHistory(prev => [historyEntry, ...prev]);
-      setOngoingRides(prev => prev.filter(r => r.id !== rideId));
-      
-      // Update stats
-      setDriverStats(prev => ({
-        ...prev,
-        todayEarnings: prev.todayEarnings + ride.earnings,
-        todayRides: prev.todayRides + 1,
-        totalEarnings: prev.totalEarnings + ride.earnings,
-        totalRides: prev.totalRides + 1,
-      }));
-      
+  const handleCompleteRide = async (rideId: string) => {
+    try {
+      const ride = displayOngoingRides.find(r => r.id === rideId);
+      if (ride) {
+        await driverService.completeRide(rideId, ride.earnings);
+
+        // Update stats
+        setDriverStats(prev => ({
+          ...prev,
+          todayEarnings: prev.todayEarnings + ride.earnings,
+          todayRides: prev.todayRides + 1,
+          totalEarnings: prev.totalEarnings + ride.earnings,
+          totalRides: prev.totalRides + 1,
+        }));
+
+        toast({
+          title: "Ride Completed!",
+          description: `You earned ₹${ride.earnings} for this ride`,
+        });
+      }
+    } catch (error) {
       toast({
-        title: "Ride Completed!",
-        description: `You earned ₹${ride.earnings} for this ride`,
+        title: "Error",
+        description: "Failed to complete ride. Please try again.",
+        variant: "destructive",
       });
     }
   };
