@@ -399,8 +399,8 @@ export default function Booking() {
           }
         };
         script.onerror = () => {
-          console.error("Failed to load Google Maps API script");
-          setMapsError('Google Maps API unavailable. Using fallback map.');
+          console.error("Failed to load GoMaps Pro script");
+          setMapsError('GoMaps Pro unavailable. Using fallback map.');
           setUseFallbackMap(true);
           setLoading(false);
         };
