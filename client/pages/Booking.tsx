@@ -421,7 +421,7 @@ export default function Booking() {
         setTimeout(initializeAutocomplete, 100);
       }
     } catch (error) {
-      console.error("Error loading Google Maps API:", error);
+      console.error("Error loading GoMaps Pro:", error);
       setMapsError('Failed to initialize maps. Using fallback map.');
       setUseFallbackMap(true);
       setLoading(false);
