@@ -65,6 +65,9 @@ export async function createServer() {
   // Rides routes
   app.use("/api/rides", ridesRouter);
 
+  // Test routes (for development)
+  app.post("/api/test/user/:userId/sample-rides", addSampleRidesHandler);
+
   // Admin/Debug routes (for development)
   app.get("/api/admin/users", async (_req, res) => {
     try {
