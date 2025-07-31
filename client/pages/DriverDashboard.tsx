@@ -695,7 +695,7 @@ export default function DriverDashboard() {
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-slate-800">Ongoing Rides</h2>
 
-              {ongoingRides.length === 0 ? (
+              {displayOngoingRides.length === 0 ? (
                 <Card>
                   <CardContent className="p-8 text-center">
                     <Activity className="w-16 h-16 text-slate-400 mx-auto mb-4" />
