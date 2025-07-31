@@ -232,7 +232,7 @@ export default function Places() {
                   </CardHeader>
                   <CardContent className="p-0">
                     {userLocation ? (
-                      <Map
+                      <SimpleMap
                         center={userLocation}
                         places={places}
                         userLocation={userLocation}
