@@ -371,7 +371,7 @@ export default function Booking() {
               setLoading(false);
               setTimeout(initializeAutocomplete, 100);
             } catch (error: any) {
-              console.error('❌ Google Maps initialization error:', error);
+              console.error('❌ GoMaps Pro initialization error:', error);
 
               // Check for specific error types
               if (error.message) {
