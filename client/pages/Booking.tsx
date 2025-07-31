@@ -333,10 +333,10 @@ export default function Booking() {
         throw new Error("Failed to get maps configuration");
       }
 
-      // Load Google Maps API script
+      // Load GoMaps Pro script
       if (!window.google) {
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places`;
+        script.src = `https://maps.gomaps.pro/maps/api/js?key=${data.apiKey}&libraries=places`;
         script.async = true;
         script.defer = true;
         script.onload = () => {
