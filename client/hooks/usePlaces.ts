@@ -69,13 +69,62 @@ export const usePlaces = (options: UsePlacesOptions = {}): UsePlacesReturn => {
         throw new Error('No location available');
       }
 
-      const fetchedPlaces = await foursquareService.getNearbyPlaces(
-        targetLocation.latitude,
-        targetLocation.longitude,
-        radius,
-        limit,
-        currentQuery || undefined
-      );
+      // Temporarily disable Foursquare API due to authentication issues
+      // const fetchedPlaces = await foursquareService.getNearbyPlaces(
+      //   targetLocation.latitude,
+      //   targetLocation.longitude,
+      //   radius,
+      //   limit,
+      //   currentQuery || undefined
+      // );
+
+      // Use mock data instead
+      const fetchedPlaces: FoursquarePlace[] = [
+        {
+          fsq_id: 'mock-1',
+          name: 'Central Park Restaurant',
+          categories: [{
+            id: 13065,
+            name: 'Restaurant',
+            short_name: 'Restaurant',
+            plural_name: 'Restaurants',
+            icon: { prefix: 'https://ss3.4sqi.net/img/categories_v2/food/default_', suffix: '.png' }
+          }],
+          location: {
+            address: '123 Park Street',
+            country: 'IN',
+            formatted_address: '123 Park Street, New Delhi, India'
+          },
+          geocodes: {
+            main: {
+              latitude: targetLocation.latitude + 0.01,
+              longitude: targetLocation.longitude + 0.01
+            }
+          }
+        },
+        {
+          fsq_id: 'mock-2',
+          name: 'Coffee Corner Cafe',
+          categories: [{
+            id: 16032,
+            name: 'Coffee Shop',
+            short_name: 'Coffee',
+            plural_name: 'Coffee Shops',
+            icon: { prefix: 'https://ss3.4sqi.net/img/categories_v2/food/coffeeshop_', suffix: '.png' }
+          }],
+          location: {
+            address: '456 Main Road',
+            country: 'IN',
+            formatted_address: '456 Main Road, New Delhi, India'
+          },
+          geocodes: {
+            main: {
+              latitude: targetLocation.latitude - 0.005,
+              longitude: targetLocation.longitude + 0.005
+            }
+          }
+        }
+      ];
 
       // Calculate distances and add to places
       const placesWithDistance = fetchedPlaces.map((place) => ({
