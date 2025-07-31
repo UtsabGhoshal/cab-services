@@ -12,8 +12,10 @@ export const getUserDataHandler: RequestHandler<
 > = async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log(`🔍 Fetching user data for userId: ${userId}`);
 
     if (!userId) {
+      console.log("❌ No userId provided");
       return res.json({
         success: false,
         error: "User ID is required",
@@ -22,6 +24,7 @@ export const getUserDataHandler: RequestHandler<
 
     // Get user data
     const user = await getUserById(userId);
+    console.log(`👤 User found: ${user ? 'Yes' : 'No'}`);
     if (!user) {
       return res.json({
         success: false,
@@ -31,9 +34,11 @@ export const getUserDataHandler: RequestHandler<
 
     // Get recent rides
     const recentRides = await getUserRides(userId, 5);
+    console.log(`🚗 Found ${recentRides.length} rides for user ${userId}`);
 
     // Get user stats
     const stats = await getUserStats(userId);
+    console.log(`📊 Stats calculated:`, stats);
 
     // Remove password from user object
     const { password: _, ...userWithoutPassword } = user;
