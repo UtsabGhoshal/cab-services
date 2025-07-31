@@ -175,6 +175,19 @@ export default function DriverDashboard() {
   const [isOnlineState, setIsOnlineState] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [driverData, setDriverData] = useState<any>(null);
+
+  // Load driver data from localStorage
+  useEffect(() => {
+    const storedDriver = localStorage.getItem("uride_driver");
+    if (storedDriver) {
+      const driver = JSON.parse(storedDriver);
+      setDriverData(driver);
+    } else if (!user) {
+      // Redirect to login if no driver data
+      navigate("/driver-login");
+    }
+  }, [user, navigate]);
 
   // Use Firebase driver service
   const driverService = useDriverService({
@@ -636,7 +649,7 @@ export default function DriverDashboard() {
                 <div>
                   <p className="text-sm text-gray-600">Today's Earnings</p>
                   <p className="text-2xl font-bold text-green-600">
-                    ₹{driverStats.todayEarnings}
+                    ���{driverStats.todayEarnings}
                   </p>
                   <p className="text-xs text-gray-500">
                     {driverStats.todayRides} rides • {driverStats.todayKmDriven} km
