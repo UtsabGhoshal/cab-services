@@ -409,37 +409,65 @@ export default function Booking() {
   }, []); // Empty dependency array - only run on mount
 
   const calculatePricing = () => {
-    if (!pickup || !destination || !window.google) return;
+    if (!pickup || !destination) return;
 
-    // Use Google Maps Distance Matrix API for accurate distance and duration
-    const service = new google.maps.DistanceMatrixService();
-    service.getDistanceMatrix(
-      {
-        origins: [{ lat: pickup.lat, lng: pickup.lng }],
-        destinations: [{ lat: destination.lat, lng: destination.lng }],
-        travelMode: google.maps.TravelMode.DRIVING,
-        unitSystem: google.maps.UnitSystem.METRIC,
-      },
-      (response, status) => {
-        if (status === google.maps.DistanceMatrixStatus.OK && response) {
-          const element = response.rows[0].elements[0];
-          if (element.status === "OK") {
-            const distanceValue = element.distance.value / 1000; // Convert to km
-            const durationValue = element.duration.value / 60; // Convert to minutes
-            calculateFareWithDistance(distanceValue, Math.ceil(durationValue));
-            return;
-          }
-        }
+    // If Google Maps is available and working, use it for accurate calculations
+    if (window.google && !useFallbackMap) {
+      try {
+        const service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix(
+          {
+            origins: [{ lat: pickup.lat, lng: pickup.lng }],
+            destinations: [{ lat: destination.lat, lng: destination.lng }],
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: google.maps.UnitSystem.METRIC,
+          },
+          (response, status) => {
+            if (status === google.maps.DistanceMatrixStatus.OK && response) {
+              const element = response.rows[0].elements[0];
+              if (element.status === "OK") {
+                const distanceValue = element.distance.value / 1000; // Convert to km
+                const durationValue = element.duration.value / 60; // Convert to minutes
+                calculateFareWithDistance(distanceValue, Math.ceil(durationValue));
+                return;
+              }
+            }
+            // If Google Maps fails, fallback to simple calculation
+            fallbackDistanceCalculation();
+          },
+        );
+      } catch (error) {
+        console.error('Google Maps Distance Matrix error:', error);
+        fallbackDistanceCalculation();
+      }
+    } else {
+      // Use fallback distance calculation
+      fallbackDistanceCalculation();
+    }
+  };
 
-        // Fallback to simple calculation if API fails
-        const distance =
-          Math.sqrt(
-            Math.pow(pickup.lat - destination.lat, 2) +
-              Math.pow(pickup.lng - destination.lng, 2),
-          ) * 111; // rough conversion to km
-        calculateFareWithDistance(distance, Math.ceil(distance * 3));
-      },
-    );
+  const fallbackDistanceCalculation = () => {
+    if (!pickup || !destination) return;
+
+    // Haversine formula for distance calculation
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = toRadians(destination.lat - pickup.lat);
+    const dLng = toRadians(destination.lng - pickup.lng);
+    const a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(toRadians(pickup.lat)) * Math.cos(toRadians(destination.lat)) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c;
+
+    // Estimate time based on average city speed (25 km/h)
+    const estimatedMinutes = Math.ceil((distance / 25) * 60);
+
+    calculateFareWithDistance(distance, estimatedMinutes);
+  };
+
+  const toRadians = (degrees: number) => {
+    return degrees * (Math.PI / 180);
   };
 
   const calculateFareWithDistance = (
