@@ -299,19 +299,53 @@ export default function DriverSignup() {
 
     setIsSubmitting(true);
     try {
-      // In a real app, this would submit to your backend API
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-      
-      toast({
-        title: "Application Submitted",
-        description: "Your driver application has been submitted for review. You'll receive an email within 24-48 hours.",
+      // Submit to driver registration endpoint
+      const response = await fetch("/api/driver/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          password: "temp123", // Generate a temporary password
+          dateOfBirth: formData.dateOfBirth,
+          address: formData.address,
+          licenseNumber: formData.licenseNumber,
+          licenseExpiry: formData.licenseExpiry,
+          hasVehicle: formData.hasVehicle,
+          vehicleMake: formData.vehicleMake,
+          vehicleModel: formData.vehicleModel,
+          vehicleYear: formData.vehicleYear,
+          vehicleColor: formData.vehicleColor,
+          vehicleNumber: formData.vehicleNumber,
+          idProofType: formData.idProofType,
+          idProofNumber: formData.idProofNumber,
+          hasCleanRecord: formData.hasCleanRecord,
+          backgroundCheckConsent: formData.backgroundCheckConsent,
+          acceptTerms: formData.acceptTerms,
+          acceptPrivacyPolicy: formData.acceptPrivacyPolicy,
+        }),
       });
-      
-      navigate("/driver-dashboard");
-    } catch (error) {
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Application Submitted! 🎉",
+          description: data.message || "Your driver application has been submitted for review. You'll receive an email within 24-48 hours.",
+        });
+
+        navigate("/driver-login");
+      } else {
+        throw new Error(data.error || "Failed to submit application");
+      }
+    } catch (error: any) {
+      console.error("Driver signup error:", error);
       toast({
         title: "Submission Failed",
-        description: "Failed to submit application. Please try again.",
+        description: error.message || "Failed to submit application. Please try again.",
         variant: "destructive",
       });
     } finally {
