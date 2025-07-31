@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import { loginHandler, signupHandler } from "./routes/auth";
+import { loginHandler, signupHandler, migratePasswordsHandler } from "./routes/auth";
 import { getUserDataHandler, getUserRidesHandler } from "./routes/user";
 import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
