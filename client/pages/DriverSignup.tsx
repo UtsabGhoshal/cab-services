@@ -169,10 +169,26 @@ export default function DriverSignup() {
   const validateCurrentStep = () => {
     switch (currentStep) {
       case 1: // Personal Info & Phone Verification
-        if (!formData.fullName || !formData.email || !formData.phone || !formData.dateOfBirth || !formData.address) {
+        if (!formData.fullName || !formData.email || !formData.phone || !formData.password || !formData.confirmPassword || !formData.dateOfBirth || !formData.address) {
           toast({
             title: "Missing Information",
             description: "Please fill in all required fields",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (formData.password.length < 6) {
+          toast({
+            title: "Weak Password",
+            description: "Password must be at least 6 characters long",
+            variant: "destructive",
+          });
+          return false;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          toast({
+            title: "Password Mismatch",
+            description: "Passwords do not match",
             variant: "destructive",
           });
           return false;
