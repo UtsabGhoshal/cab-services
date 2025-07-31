@@ -424,6 +424,31 @@ export default function DriverSignup() {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="password">Password *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => updateFormData("password", e.target.value)}
+                  placeholder="Enter a strong password (min 6 characters)"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => updateFormData("confirmPassword", e.target.value)}
+                  placeholder="Confirm your password"
+                />
+                {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                  <p className="text-sm text-red-600">Passwords do not match</p>
+                )}
+              </div>
+
               {formData.phone && !phoneVerified && (
                 <div className="space-y-2">
                   <Label htmlFor="verificationCode">Verification Code *</Label>
