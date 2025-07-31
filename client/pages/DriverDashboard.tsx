@@ -197,22 +197,61 @@ export default function DriverDashboard() {
 
   // Real driver profile from database
   const [driverProfile, setDriverProfile] = useState<DriverProfile>({
-    id: user?.id || "driver_123",
-    name: user?.name || "New Driver",
-    phone: user?.phone || "",
-    email: user?.email || "",
-    driverType: {
+    id: driverData?.id || user?.id || "driver_123",
+    name: driverData?.name || user?.name || "New Driver",
+    phone: driverData?.phone || user?.phone || "",
+    email: driverData?.email || user?.email || "",
+    driverType: driverData?.driverType || {
       type: "owner", // Will be loaded from database
       commissionRate: 0.05, // 5% for vehicle owners
       salaryPerKm: undefined,
     },
-    vehicleNumber: "",
-    vehicleModel: "",
-    licenseNumber: "",
-    rating: 0, // Start with 0
-    joinDate: new Date(),
-    currentShift: undefined,
+    vehicleNumber: driverData?.vehicleNumber || "",
+    vehicleModel: driverData?.vehicleModel || "",
+    licenseNumber: driverData?.licenseNumber || "",
+    rating: driverData?.averageRating || 0, // Start with 0
+    joinDate: driverData?.joinDate ? new Date(driverData.joinDate) : new Date(),
+    currentShift: driverData?.currentShift,
   });
+
+  // Update profile when driverData changes
+  useEffect(() => {
+    if (driverData) {
+      setDriverProfile({
+        id: driverData.id,
+        name: driverData.name,
+        phone: driverData.phone,
+        email: driverData.email,
+        driverType: driverData.driverType,
+        vehicleNumber: driverData.vehicleNumber || "",
+        vehicleModel: driverData.vehicleModel || "",
+        licenseNumber: driverData.licenseNumber,
+        rating: driverData.averageRating || 0,
+        joinDate: new Date(driverData.joinDate || driverData.createdAt),
+        currentShift: driverData.currentShift,
+      });
+
+      // Update driver stats from database
+      setDriverStats({
+        totalEarnings: driverData.totalEarnings || 0,
+        todayEarnings: 0, // This would come from today's rides
+        weeklyEarnings: 0, // This would be calculated
+        monthlyEarnings: 0, // This would be calculated
+        totalCommissionPaid: 0,
+        totalKmSalary: 0,
+        totalRides: driverData.totalRides || 0,
+        todayRides: 0,
+        totalKmDriven: driverData.totalKmDriven || 0,
+        todayKmDriven: 0,
+        averageRating: driverData.averageRating || 0,
+        onlineHours: driverData.onlineHours || 0,
+        acceptanceRate: driverData.acceptanceRate || 100,
+        completionRate: driverData.completionRate || 100,
+        monthlyTarget: driverData.driverType?.type === "fleet" ? 2000 : 1500,
+        targetProgress: 0,
+      });
+    }
+  }, [driverData]);
 
   // Fleet driver demo profile
   const [fleetDriverProfile] = useState<DriverProfile>({
@@ -649,7 +688,7 @@ export default function DriverDashboard() {
                 <div>
                   <p className="text-sm text-gray-600">Today's Earnings</p>
                   <p className="text-2xl font-bold text-green-600">
-                    ���{driverStats.todayEarnings}
+                    ₹{driverStats.todayEarnings}
                   </p>
                   <p className="text-xs text-gray-500">
                     {driverStats.todayRides} rides • {driverStats.todayKmDriven} km
