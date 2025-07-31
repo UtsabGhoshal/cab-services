@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./config";
 import { User, Ride, UserStats } from "@shared/database";
+import bcrypt from "bcryptjs";
 
 // Collections
 const USERS_COLLECTION = "users";
