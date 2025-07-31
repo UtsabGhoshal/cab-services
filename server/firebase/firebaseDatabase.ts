@@ -343,6 +343,51 @@ export const createRide = async (rideData: {
   }
 };
 
+// Migration function to hash plain text passwords
+export const migratePasswordsToHashed = async (): Promise<void> => {
+  try {
+    console.log("🔐 Starting password migration to hashed format...");
+
+    const usersRef = collection(db, USERS_COLLECTION);
+    const querySnapshot = await getDocs(usersRef);
+
+    let migratedCount = 0;
+
+    for (const docSnapshot of querySnapshot.docs) {
+      const userData = docSnapshot.data();
+      const userId = docSnapshot.id;
+
+      // Check if password is already hashed
+      const isHashed = userData.password?.startsWith('$2a$') ||
+                      userData.password?.startsWith('$2b$') ||
+                      userData.password?.startsWith('$2y$');
+
+      if (!isHashed && userData.password) {
+        console.log(`🔄 Migrating password for user: ${userData.email}`);
+
+        // Hash the plain text password
+        const hashedPassword = await bcrypt.hash(userData.password, 12);
+
+        // Update the user document with hashed password
+        const userRef = doc(db, USERS_COLLECTION, userId);
+        await updateDoc(userRef, {
+          password: hashedPassword
+        });
+
+        migratedCount++;
+        console.log(`✅ Password migrated for user: ${userData.email}`);
+      } else {
+        console.log(`⏭️  Password already hashed for user: ${userData.email}`);
+      }
+    }
+
+    console.log(`🎉 Password migration completed! Migrated ${migratedCount} users.`);
+  } catch (error) {
+    console.error("❌ Error during password migration:", error);
+    throw error;
+  }
+};
+
 // Initialize database with sample data
 export const initializeDatabase = async (): Promise<void> => {
   try {
