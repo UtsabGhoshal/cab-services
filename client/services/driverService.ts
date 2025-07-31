@@ -311,16 +311,16 @@ export class DriverService {
 
   // Get driver's ride history
   subscribeToRideHistory(
-    limit: number = 50,
+    limitCount: number = 50,
     callback: (history: any[]) => void
   ): () => void {
     try {
       const historyRef = collection(db, 'rideHistory');
+      // Simplified query to avoid index requirements
       const q = query(
         historyRef,
         where('driverId', '==', this.driverId),
-        orderBy('completedAt', 'desc'),
-        limit(limit)
+        limit(limitCount)
       );
 
       const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
