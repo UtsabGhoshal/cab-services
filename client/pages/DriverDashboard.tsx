@@ -224,23 +224,23 @@ export default function DriverDashboard() {
   const currentProfile = driverProfile;
   const isFleetDriver = currentProfile.driverType.type === "fleet";
 
-  const [driverStats] = useState<DriverStats>({
-    totalEarnings: isFleetDriver ? 28450 : 42180, // Lower for fleet due to salary model
-    todayEarnings: isFleetDriver ? 1020 : 1450,
-    weeklyEarnings: isFleetDriver ? 7200 : 10800,
-    monthlyEarnings: isFleetDriver ? 24300 : 32140,
-    totalCommissionPaid: isFleetDriver ? undefined : 2100,
-    totalKmSalary: isFleetDriver ? 24300 : undefined,
-    totalRides: 487,
-    todayRides: 8,
-    totalKmDriven: isFleetDriver ? 2025 : 1890, // Fleet drivers typically drive more
-    todayKmDriven: isFleetDriver ? 85 : 72,
-    averageRating: 4.8,
-    onlineHours: 6.5,
-    acceptanceRate: 92,
-    completionRate: 98,
-    monthlyTarget: isFleetDriver ? 2500 : 2000, // Higher target for fleet
-    targetProgress: isFleetDriver ? 65 : 78,
+  const [driverStats, setDriverStats] = useState<DriverStats>({
+    totalEarnings: 0, // Start with 0
+    todayEarnings: 0,
+    weeklyEarnings: 0,
+    monthlyEarnings: 0,
+    totalCommissionPaid: 0,
+    totalKmSalary: 0,
+    totalRides: 0,
+    todayRides: 0,
+    totalKmDriven: 0,
+    todayKmDriven: 0,
+    averageRating: 0,
+    onlineHours: 0,
+    acceptanceRate: 100, // Start with 100%
+    completionRate: 100, // Start with 100%
+    monthlyTarget: isFleetDriver ? 2000 : 1500, // Realistic targets
+    targetProgress: 0,
   });
 
   // Sample ride requests with new earnings calculation
