@@ -55,22 +55,38 @@ export default function DriverLogin() {
     }
 
     try {
-      const success = await login(formData.email, formData.password);
-      
-      if (success) {
+      // Use driver-specific login endpoint
+      const response = await fetch("/api/driver/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.driver) {
+        // Store driver info in localStorage (similar to regular user)
+        localStorage.setItem("uride_driver", JSON.stringify(data.driver));
+
         toast({
-          title: "Welcome Back!",
+          title: "Welcome Back! 🚗",
           description: "Login successful. Redirecting to dashboard...",
         });
         navigate("/driver-dashboard");
       } else {
         toast({
           title: "Login Failed",
-          description: "Invalid email or password. Please try again.",
+          description: data.error || "Invalid email or password. Please try again.",
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Driver login error:", error);
       toast({
         title: "Login Error",
         description: "An error occurred during login. Please try again.",
