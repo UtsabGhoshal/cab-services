@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 
-// Store the API key securely on the server
+// Store the Google Maps API key securely on the server
 const GOOGLE_MAPS_API_KEY = "AIzaSyCsw5vml-R1o2c5jVvmjMyQkCi0RYwxC_c";
 
 export interface MapsConfigResponse {
