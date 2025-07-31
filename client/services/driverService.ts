@@ -104,10 +104,11 @@ export class DriverService {
   ): () => void {
     try {
       const ridesRef = collection(db, 'rideRequests');
+      // Simplified query to avoid index requirements
       const q = query(
         ridesRef,
         where('status', '==', 'pending'),
-        orderBy('timestamp', 'desc')
+        limit(20)
       );
 
       const unsubscribe = onSnapshot(q, (snapshot: QuerySnapshot<DocumentData>) => {
