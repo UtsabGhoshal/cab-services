@@ -195,7 +195,7 @@ const CarTypeSelector = ({
     {
       id: "suv",
       name: "SUV",
-      price: "₹60 base",
+      price: "���60 base",
       capacity: "6 passengers",
       description: "Spacious for groups or luggage",
     },
@@ -354,10 +354,10 @@ export default function Booking() {
         setTimeout(initializeAutocomplete, 100);
       }
     } catch (error) {
-      console.error("Error loading Go Maps Pro:", error);
+      console.error("Error loading Google Maps API:", error);
       toast({
         title: "Error",
-        description: "Failed to initialize Go Maps Pro",
+        description: "Failed to initialize Google Maps API",
         variant: "destructive",
       });
       setLoading(false);
