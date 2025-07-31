@@ -238,6 +238,7 @@ const CarTypeSelector = ({
 
 export default function Booking() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
