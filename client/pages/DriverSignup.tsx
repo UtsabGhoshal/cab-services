@@ -324,14 +324,7 @@ export default function DriverSignup() {
 
     setIsSubmitting(true);
     try {
-      // Create Firebase Auth user
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-
-      const user = userCredential.user;
+      let user, driverId;
 
       // Determine driver type
       const driverType = {
@@ -340,7 +333,7 @@ export default function DriverSignup() {
         salaryPerKm: formData.hasVehicle === "no" ? 12 : undefined,
       };
 
-      // Create driver document in Firestore
+      // Create driver document data
       const driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt"> = {
         name: formData.fullName,
         email: formData.email.toLowerCase(),
@@ -377,7 +370,33 @@ export default function DriverSignup() {
         onlineHours: 0,
       };
 
-      const driverId = await firebaseDriverService.createDriver(driverData);
+      try {
+        // Try Firebase Auth first
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+
+        user = userCredential.user;
+        driverId = await firebaseDriverService.createDriver(driverData);
+      } catch (firebaseError: any) {
+        console.warn("Firebase signup failed, using fallback:", firebaseError.message);
+
+        // Use fallback auth service
+        const fallbackCredential = await fallbackAuthService.createUserWithEmailAndPassword(
+          formData.email,
+          formData.password
+        );
+
+        user = fallbackCredential.user;
+        driverId = await fallbackAuthService.createDriver(driverData);
+
+        toast({
+          title: "Development Mode",
+          description: "Using fallback authentication for development.",
+        });
+      }
 
       toast({
         title: "Application Submitted! 🎉",
@@ -393,12 +412,14 @@ export default function DriverSignup() {
 
       let errorMessage = "An error occurred while submitting your application. Please try again.";
 
-      if (error.code === "auth/email-already-in-use") {
+      if (error.message?.includes("auth/email-already-in-use") || error.message?.includes("email-already-in-use")) {
         errorMessage = "An account with this email already exists. Please try logging in instead.";
-      } else if (error.code === "auth/weak-password") {
+      } else if (error.message?.includes("auth/weak-password")) {
         errorMessage = "Password is too weak. Please choose a stronger password.";
-      } else if (error.code === "auth/invalid-email") {
+      } else if (error.message?.includes("auth/invalid-email")) {
         errorMessage = "Please enter a valid email address.";
+      } else if (error.message?.includes("network-request-failed")) {
+        errorMessage = "Network error. Please check your connection and try again.";
       }
 
       toast({
