@@ -366,8 +366,8 @@ export default function Booking() {
               // Clean up test div
               document.body.removeChild(testDiv);
 
-              // If we get here without error, Google Maps is working
-              console.log('✅ Google Maps API is working correctly');
+              // If we get here without error, GoMaps Pro is working
+              console.log('✅ GoMaps Pro is working correctly');
               setLoading(false);
               setTimeout(initializeAutocomplete, 100);
             } catch (error: any) {
