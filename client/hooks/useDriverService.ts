@@ -124,28 +124,40 @@ export const useDriverService = ({
       // Get current location
       const location = await getCurrentLocation();
 
-      // Subscribe to ongoing rides
-      driverService.current.subscribeToOngoingRides((rides) => {
-        setOngoingRides(rides);
-        setLastUpdate(new Date());
-      });
+      // Subscribe to ongoing rides with error handling
+      try {
+        driverService.current.subscribeToOngoingRides((rides) => {
+          setOngoingRides(rides);
+          setLastUpdate(new Date());
+        });
+      } catch (err) {
+        console.warn('Error subscribing to ongoing rides:', err);
+      }
 
-      // Subscribe to ride history
-      driverService.current.subscribeToRideHistory(50, (history) => {
-        setRideHistory(history);
-        setLastUpdate(new Date());
-      });
+      // Subscribe to ride history with error handling
+      try {
+        driverService.current.subscribeToRideHistory(50, (history) => {
+          setRideHistory(history);
+          setLastUpdate(new Date());
+        });
+      } catch (err) {
+        console.warn('Error subscribing to ride history:', err);
+      }
 
       // Subscribe to ride requests if online
       if (isOnline && location) {
-        driverService.current.subscribeToRideRequests(
-          location,
-          10, // 10km radius
-          (requests) => {
-            setRideRequests(requests);
-            setLastUpdate(new Date());
-          }
-        );
+        try {
+          driverService.current.subscribeToRideRequests(
+            location,
+            10, // 10km radius
+            (requests) => {
+              setRideRequests(requests);
+              setLastUpdate(new Date());
+            }
+          );
+        } catch (err) {
+          console.warn('Error subscribing to ride requests:', err);
+        }
       }
 
       setError(null);
