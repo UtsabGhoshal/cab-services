@@ -115,9 +115,10 @@ export async function createServer() {
 
   app.get("/api/admin/rides", async (_req, res) => {
     try {
-      const { getAllRides } = await import("./database/databaseService");
-      const rides = await getAllRides();
-      res.json({ success: true, rides });
+      res.status(501).json({
+        success: false,
+        error: "Admin routes moved to Supabase. Please use client-side queries.",
+      });
     } catch (error) {
       console.error("Error fetching all rides:", error);
       res.status(500).json({ success: false, error: "Failed to fetch rides" });
