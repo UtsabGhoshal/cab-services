@@ -77,47 +77,9 @@ export async function createServer() {
   // Quick test endpoint to add rides for logged-in user
   app.post("/api/test/add-rides", async (req, res) => {
     try {
-      const { userId } = req.body;
-      if (!userId) {
-        return res.json({ success: false, error: "User ID required" });
-      }
-
-      const { createRide } = await import("./database/databaseService");
-
-      // Create test rides
-      const testRides = [
-        {
-          userId,
-          from: "Connaught Place",
-          to: "IGI Airport Terminal 3",
-          amount: 520.0,
-          carType: "Premium",
-          purpose: "Airport Transfer",
-          distance: "22.3",
-          estimatedTime: "35",
-        },
-        {
-          userId,
-          from: "India Gate",
-          to: "Karol Bagh Metro",
-          amount: 180.0,
-          carType: "Standard",
-          purpose: "Business",
-          distance: "8.5",
-          estimatedTime: "20",
-        },
-      ];
-
-      const createdRides = [];
-      for (const rideData of testRides) {
-        const ride = await createRide(rideData);
-        if (ride) createdRides.push(ride);
-      }
-
-      res.json({
-        success: true,
-        message: `Created ${createdRides.length} test rides`,
-        rides: createdRides,
+      res.status(501).json({
+        success: false,
+        error: "Test rides moved to Supabase. Please use client-side operations.",
       });
     } catch (error) {
       console.error("Test rides error:", error);
