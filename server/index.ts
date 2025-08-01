@@ -53,8 +53,10 @@ export async function createServer() {
   app.put("/api/driver/:driverId/status", updateDriverStatusHandler);
   app.get("/api/drivers", getDriversHandler);
 
-  // Admin/Security routes
-  app.post("/api/auth/migrate-passwords", migratePasswordsHandler);
+  // Admin/Security routes (deprecated)
+  app.post("/api/auth/migrate-passwords", (req, res) => {
+    res.status(501).json({ success: false, error: "Migration moved to Supabase" });
+  });
 
   // Maps configuration route (secure API key delivery)
   app.get("/api/maps/config", getMapsConfigHandler);
