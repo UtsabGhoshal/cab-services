@@ -6,7 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
+import { SupabaseAuthProvider } from "./contexts/SupabaseAuthContext";
 import DriverAccessButton from "./components/DriverAccessButton";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -53,11 +53,11 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
+      <SupabaseAuthProvider>
         <BrowserRouter>
           <AppContent />
         </BrowserRouter>
-      </AuthProvider>
+      </SupabaseAuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

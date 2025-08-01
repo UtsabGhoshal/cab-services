@@ -2,17 +2,26 @@ import React, { useState, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { checkFirebaseConnection } from "@/utils/firebaseCheck";
+import { supabase } from "@/supabase/config";
 
 export const DevModeNotification: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
-  const [isFirebaseDown, setIsFirebaseDown] = useState(false);
+  const [isSupabaseDown, setIsSupabaseDown] = useState(false);
 
   useEffect(() => {
     const checkConnection = async () => {
-      const available = await checkFirebaseConnection();
-      if (!available) {
-        setIsFirebaseDown(true);
+      try {
+        // Test Supabase connection
+        const { error } = await supabase
+          .from("drivers")
+          .select("count")
+          .limit(1);
+        if (error) {
+          setIsSupabaseDown(true);
+          setShowNotification(true);
+        }
+      } catch (error) {
+        setIsSupabaseDown(true);
         setShowNotification(true);
       }
     };
@@ -23,7 +32,7 @@ export const DevModeNotification: React.FC = () => {
     }
   }, []);
 
-  if (!showNotification || !isFirebaseDown) {
+  if (!showNotification || !isSupabaseDown) {
     return null;
   }
 
@@ -37,8 +46,9 @@ export const DevModeNotification: React.FC = () => {
               Development Mode
             </AlertTitle>
             <AlertDescription className="text-orange-700 text-sm mt-1">
-              Firebase is unavailable. Using local fallback authentication for
-              development. Demo accounts are available for testing.
+              Supabase connection is unavailable. Using local fallback
+              authentication for development. Demo accounts are available for
+              testing.
             </AlertDescription>
           </div>
           <Button

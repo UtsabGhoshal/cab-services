@@ -1,9 +1,6 @@
-// Fallback authentication service for development when Firebase is unavailable
-import {
-  firebaseDriverService,
-  type FirebaseDriver,
-} from "./firebaseDriverService";
-import { Timestamp } from "firebase/firestore";
+// Fallback authentication service for development when Supabase is unavailable
+import { localDatabaseService } from "./localDatabase";
+import type { FirebaseDriver } from "@/shared/driverTypes";
 
 interface FallbackUser {
   uid: string;
@@ -22,123 +19,116 @@ class FallbackAuthService {
   }
 
   private initializeDemoUsers() {
-    // Demo owner driver
-    const ownerDriver: FirebaseDriver = {
-      id: "demo_owner_123",
-      name: "Rajesh Kumar",
-      email: "rajesh.driver@uride.com",
-      phone: "+91 99999 12345",
-      driverType: {
-        type: "owner",
-        commissionRate: 0.05,
+    const demoUsers = [
+      {
+        email: "driver1@example.com",
+        password: "password123",
+        driver: {
+          id: "demo-driver-1",
+          email: "driver1@example.com",
+          fullName: "John Doe",
+          phoneNumber: "+1-234-567-8901",
+          licenseNumber: "DL123456789",
+          vehicleInfo: {
+            make: "Toyota",
+            model: "Camry",
+            year: 2020,
+            color: "Blue",
+            licensePlate: "ABC-123",
+          },
+          isApproved: true,
+          isActive: true,
+          rating: 4.8,
+          totalRides: 150,
+          status: "online" as const,
+          currentLocation: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        } as FirebaseDriver,
       },
-      status: "active",
-      rating: 4.8,
-      totalRides: 487,
-      totalEarnings: 42180,
-      totalKmDriven: 1890,
-      joinDate: Timestamp.now(),
-      vehicleNumber: "DL 01 AB 1234",
-      vehicleModel: "Honda City 2022",
-      licenseNumber: "DL1420110012345",
-      documentsVerified: true,
-      idProofType: "aadhar",
-      idProofNumber: "1234-5678-9012",
-      hasCleanRecord: true,
-      backgroundCheckCompleted: true,
-      acceptanceRate: 92,
-      completionRate: 98,
-      averageRating: 4.8,
-      onlineHours: 250,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
+      {
+        email: "driver2@example.com",
+        password: "password123",
+        driver: {
+          id: "demo-driver-2",
+          email: "driver2@example.com",
+          fullName: "Jane Smith",
+          phoneNumber: "+1-234-567-8902",
+          licenseNumber: "DL987654321",
+          vehicleInfo: {
+            make: "Honda",
+            model: "Civic",
+            year: 2021,
+            color: "Red",
+            licensePlate: "XYZ-789",
+          },
+          isApproved: true,
+          isActive: true,
+          rating: 4.9,
+          totalRides: 200,
+          status: "offline" as const,
+          currentLocation: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        } as FirebaseDriver,
+      },
+    ];
+
+    for (const user of demoUsers) {
+      this.mockUsers.set(user.email, {
+        password: user.password,
+        driver: user.driver,
+      });
+    }
+
+    console.log("✅ Fallback auth demo users initialized");
+  }
+
+  async signInWithEmailAndPassword(
+    email: string,
+    password: string,
+  ): Promise<{ user: FallbackUser; driver?: FirebaseDriver }> {
+    const userData = this.mockUsers.get(email);
+
+    if (!userData || userData.password !== password) {
+      const error = new Error("Invalid email or password");
+      (error as any).code = "auth/user-not-found";
+      throw error;
+    }
+
+    this.currentUser = {
+      uid: userData.driver.id,
+      email,
+      getIdToken: async () => `fallback-token-${userData.driver.id}`,
     };
 
-    // Demo fleet driver
-    const fleetDriver: FirebaseDriver = {
-      id: "demo_fleet_456",
-      name: "Amit Singh",
-      email: "amit.fleet@uride.com",
-      phone: "+91 88888 12345",
-      driverType: {
-        type: "fleet",
-        salaryPerKm: 12,
-      },
-      status: "active",
-      rating: 4.7,
-      totalRides: 392,
-      totalEarnings: 28450,
-      totalKmDriven: 2025,
-      joinDate: Timestamp.now(),
-      vehicleModel: "URide Fleet Vehicle",
-      licenseNumber: "DL1420110054321",
-      documentsVerified: true,
-      idProofType: "aadhar",
-      idProofNumber: "9876-5432-1098",
-      hasCleanRecord: true,
-      backgroundCheckCompleted: true,
-      acceptanceRate: 89,
-      completionRate: 95,
-      averageRating: 4.7,
-      onlineHours: 180,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-    };
+    // Store in local database
+    await localDatabaseService.storeDriverData(userData.driver);
 
-    this.mockUsers.set("rajesh.driver@uride.com", {
-      password: "demo123",
-      driver: ownerDriver,
-    });
-    this.mockUsers.set("amit.fleet@uride.com", {
-      password: "demo123",
-      driver: fleetDriver,
-    });
+    return { user: this.currentUser, driver: userData.driver };
   }
 
   async createUserWithEmailAndPassword(
     email: string,
     password: string,
   ): Promise<{ user: FallbackUser }> {
-    // Simulate Firebase user creation
-    await this.delay(500); // Simulate network delay
-
     if (this.mockUsers.has(email)) {
-      throw new Error("auth/email-already-in-use");
+      const error = new Error("Email already in use");
+      (error as any).code = "auth/email-already-in-use";
+      throw error;
     }
 
-    const user: FallbackUser = {
-      uid: `fallback_${Date.now()}`,
+    const newUser = {
+      uid: `fallback-user-${Date.now()}`,
       email,
-      getIdToken: async () => `fallback_token_${Date.now()}`,
+      getIdToken: async () => `fallback-token-${Date.now()}`,
     };
 
-    this.currentUser = user;
-    return { user };
-  }
-
-  async signInWithEmailAndPassword(
-    email: string,
-    password: string,
-  ): Promise<{ user: FallbackUser }> {
-    await this.delay(500); // Simulate network delay
-
-    const userData = this.mockUsers.get(email);
-    if (!userData || userData.password !== password) {
-      throw new Error("auth/user-not-found");
-    }
-
-    const user: FallbackUser = {
-      uid: `fallback_${userData.driver.id}`,
-      email,
-      getIdToken: async () => `fallback_token_${Date.now()}`,
-    };
-
-    this.currentUser = user;
-    return { user };
+    this.currentUser = newUser;
+    return { user: newUser };
   }
 
   async signOut(): Promise<void> {
-    await this.delay(200);
     this.currentUser = null;
   }
 
@@ -146,32 +136,20 @@ class FallbackAuthService {
     return this.currentUser;
   }
 
-  // Mock driver service methods
   async getDriverByEmail(email: string): Promise<FirebaseDriver | null> {
-    await this.delay(300);
     const userData = this.mockUsers.get(email);
-    return userData ? userData.driver : null;
+    if (userData) {
+      return userData.driver;
+    }
+
+    // Try to get from local database
+    return await localDatabaseService.getDriverByEmail(email);
   }
 
   async createDriver(
     driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt">,
   ): Promise<string> {
-    await this.delay(500);
-    const id = `fallback_driver_${Date.now()}`;
-
-    const driver: FirebaseDriver = {
-      ...driverData,
-      id,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-    };
-
-    this.mockUsers.set(driverData.email, { password: "temp123", driver });
-    return id;
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return await localDatabaseService.createDriver(driverData);
   }
 }
 

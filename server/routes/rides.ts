@@ -1,86 +1,39 @@
-import { Router, Request, Response } from "express";
-import { getAllRides, createRide } from "../database/databaseService";
+import { RequestHandler, Router } from "express";
 
 const router = Router();
 
-router.get("/", async (_req: Request, res: Response) => {
+const getAllRidesHandler: RequestHandler = async (req, res) => {
   try {
-    const rides = await getAllRides();
-    res.status(200).json({
-      success: true,
-      message: "Rides retrieved successfully",
-      data: rides,
+    res.status(501).json({
+      success: false,
+      error: "Rides data moved to Supabase. Please use client-side queries.",
     });
-  } catch (error: any) {
+  } catch (error) {
+    console.error("Rides error:", error);
     res.status(500).json({
       success: false,
-      message: "Error fetching rides",
-      error: error.message,
+      error: "Internal server error",
     });
   }
-});
+};
 
-// Create a new ride
-router.post("/", async (req: Request, res: Response) => {
+const createRideHandler: RequestHandler = async (req, res) => {
   try {
-    const { userId, pickup, destination, carType, purpose, pricing } = req.body;
-    console.log(`🚗 Creating ride for userId: ${userId}`);
-    console.log(`📍 From: ${pickup?.address} To: ${destination?.address}`);
-
-    // Validate required fields
-    if (
-      !userId ||
-      !pickup ||
-      !destination ||
-      !carType ||
-      !purpose ||
-      !pricing
-    ) {
-      console.log("❌ Missing required fields for ride creation");
-      return res.status(400).json({
-        success: false,
-        message:
-          "Missing required fields: userId, pickup, destination, carType, purpose, pricing",
-      });
-    }
-
-    // Create ride data
-    const rideData = {
-      userId,
-      from: pickup.address,
-      to: destination.address,
-      amount: pricing.finalPrice,
-      carType,
-      purpose,
-      distance: pricing.distance,
-      estimatedTime: pricing.estimatedTime,
-    };
-
-    console.log(`💾 Saving ride data:`, rideData);
-    const newRide = await createRide(rideData);
-
-    if (!newRide) {
-      console.log("❌ Failed to create ride in database");
-      return res.status(500).json({
-        success: false,
-        message: "Failed to create ride",
-      });
-    }
-
-    console.log(`✅ Ride created successfully with ID: ${newRide.id}`);
-    res.status(201).json({
-      success: true,
-      message: "Ride created successfully",
-      data: newRide,
+    res.status(501).json({
+      success: false,
+      error:
+        "Ride creation moved to Supabase. Please use client-side operations.",
     });
-  } catch (error: any) {
-    console.error("Error creating ride:", error);
+  } catch (error) {
+    console.error("Create ride error:", error);
     res.status(500).json({
       success: false,
-      message: "Error creating ride",
-      error: error.message,
+      error: "Internal server error",
     });
   }
-});
+};
+
+router.get("/", getAllRidesHandler);
+router.post("/", createRideHandler);
 
 export default router;

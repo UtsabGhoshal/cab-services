@@ -1,19 +1,4 @@
-import {
-  collection,
-  doc,
-  onSnapshot,
-  updateDoc,
-  addDoc,
-  query,
-  where,
-  orderBy,
-  limit,
-  Timestamp,
-  DocumentData,
-  QuerySnapshot,
-  DocumentSnapshot,
-} from "firebase/firestore";
-import { db } from "@/firebase/config";
+import { supabase } from "@/supabase/config";
 
 // Types
 export interface DriverLocation {
@@ -36,419 +21,238 @@ export interface RideRequest {
     lat: number;
     lng: number;
   };
-  estimatedEarnings: number;
-  distance: number;
-  duration: number;
-  timestamp: Date;
-  rideType: "economy" | "premium" | "luxury";
-  status: "pending" | "accepted" | "rejected" | "cancelled";
-  driverId?: string;
+  status: "pending" | "accepted" | "in_progress" | "completed" | "cancelled";
+  fare: number;
+  estimatedTime: number;
+  createdAt: Date;
 }
 
-export interface OngoingRide {
-  id: string;
-  passengerName: string;
-  passengerPhone: string;
-  pickup: {
-    address: string;
-    lat: number;
-    lng: number;
-  };
-  destination: {
-    address: string;
-    lat: number;
-    lng: number;
-  };
-  earnings: number;
-  status: "picking_up" | "en_route" | "arrived" | "completed";
-  startTime: Date;
-  estimatedArrival: Date;
-  driverId: string;
+export interface DriverStats {
+  totalEarnings: number;
+  totalRides: number;
+  averageRating: number;
+  hoursOnline: number;
+  completionRate: number;
 }
 
-export interface DriverStatus {
-  id: string;
-  isOnline: boolean;
-  location?: DriverLocation;
-  lastUpdate: Date;
-}
-
-export class DriverService {
-  private driverId: string;
-  private unsubscribeCallbacks: (() => void)[] = [];
-
-  constructor(driverId: string) {
-    this.driverId = driverId;
-  }
-
-  // Check if Firebase is properly initialized
-  private checkFirebaseConnection(): boolean {
-    try {
-      return !!db;
-    } catch (error) {
-      console.error("Firebase not properly initialized:", error);
-      return false;
-    }
-  }
-
-  // Update driver online status
-  async updateOnlineStatus(
-    isOnline: boolean,
-    location?: DriverLocation,
+class DriverService {
+  // Update driver location in Supabase
+  async updateDriverLocation(
+    driverId: string,
+    location: DriverLocation,
   ): Promise<void> {
-    if (!this.checkFirebaseConnection()) {
-      throw new Error("Firebase connection not available");
-    }
-
     try {
-      const driverRef = doc(db, "drivers", this.driverId);
-      await updateDoc(driverRef, {
-        isOnline,
-        location: location || null,
-        lastUpdate: Timestamp.now(),
-      });
+      const { error } = await supabase
+        .from("drivers")
+        .update({
+          current_location: {
+            lat: location.lat,
+            lng: location.lng,
+            timestamp: location.timestamp.toISOString(),
+          },
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", driverId);
+
+      if (error) {
+        console.error("Error updating driver location:", error);
+        throw new Error("Failed to update location");
+      }
     } catch (error) {
-      console.error("Error updating driver status:", error);
+      console.error("Driver location update error:", error);
       throw error;
     }
   }
 
-  // Listen to ride requests for this driver's area
-  subscribeToRideRequests(
+  // Get nearby ride requests
+  async getNearbyRides(
     driverLocation: DriverLocation,
-    radiusKm: number,
-    callback: (requests: RideRequest[]) => void,
-  ): () => void {
-    if (!this.checkFirebaseConnection()) {
-      console.warn("Firebase connection not available for ride requests");
-      callback([]); // Return empty array as fallback
-      return () => {}; // Return empty unsubscribe function
-    }
-
+    radiusKm: number = 10,
+  ): Promise<RideRequest[]> {
     try {
-      const ridesRef = collection(db, "rideRequests");
-      // Simplified query to avoid index requirements
-      const q = query(ridesRef, where("status", "==", "pending"), limit(20));
+      // Note: For real implementation, you'd use PostGIS functions in Supabase for geo queries
+      // This is a simplified version
+      const { data, error } = await supabase
+        .from("rides")
+        .select("*")
+        .eq("status", "pending")
+        .limit(10);
 
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot: QuerySnapshot<DocumentData>) => {
-          const requests: RideRequest[] = [];
+      if (error) {
+        console.error("Error fetching nearby rides:", error);
+        return [];
+      }
 
-          snapshot.forEach((doc: DocumentSnapshot<DocumentData>) => {
-            const data = doc.data();
-            if (data) {
-              // Calculate distance to driver
-              const distance = this.calculateDistance(
-                driverLocation.lat,
-                driverLocation.lng,
-                data.pickup.lat,
-                data.pickup.lng,
-              );
-
-              // Only include requests within radius
-              if (distance <= radiusKm) {
-                requests.push({
-                  id: doc.id,
-                  passengerName: data.passengerName,
-                  passengerPhone: data.passengerPhone,
-                  pickup: data.pickup,
-                  destination: data.destination,
-                  estimatedEarnings: data.estimatedEarnings,
-                  distance: data.distance,
-                  duration: data.duration,
-                  timestamp: data.timestamp.toDate(),
-                  rideType: data.rideType,
-                  status: data.status,
-                  driverId: data.driverId,
-                });
-              }
-            }
-          });
-
-          callback(requests);
-        },
-      );
-
-      this.unsubscribeCallbacks.push(unsubscribe);
-      return unsubscribe;
+      // Transform Supabase data to RideRequest format
+      return data.map((ride) => ({
+        id: ride.id,
+        passengerName: ride.passenger_name || "Unknown",
+        passengerPhone: ride.passenger_phone || "",
+        pickup: ride.pickup_location || { address: "", lat: 0, lng: 0 },
+        destination: ride.destination || { address: "", lat: 0, lng: 0 },
+        status: ride.status,
+        fare: ride.fare || 0,
+        estimatedTime: ride.duration_minutes || 0,
+        createdAt: new Date(ride.created_at),
+      }));
     } catch (error) {
-      console.error("Error subscribing to ride requests:", error);
-      throw error;
+      console.error("Error fetching nearby rides:", error);
+      return [];
     }
   }
 
   // Accept a ride request
-  async acceptRideRequest(requestId: string): Promise<void> {
+  async acceptRide(rideId: string, driverId: string): Promise<boolean> {
     try {
-      const requestRef = doc(db, "rideRequests", requestId);
-      await updateDoc(requestRef, {
-        status: "accepted",
-        driverId: this.driverId,
-        acceptedAt: Timestamp.now(),
-      });
+      const { error } = await supabase
+        .from("rides")
+        .update({
+          driver_id: driverId,
+          status: "accepted",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", rideId)
+        .eq("status", "pending"); // Only accept if still pending
 
-      // Create ongoing ride record
-      const ongoingRideRef = collection(db, "ongoingRides");
-      const requestDoc = await requestRef.get();
-      const requestData = requestDoc.data();
-
-      if (requestData) {
-        await addDoc(ongoingRideRef, {
-          ...requestData,
-          driverId: this.driverId,
-          status: "picking_up",
-          startTime: Timestamp.now(),
-          estimatedArrival: Timestamp.fromDate(
-            new Date(Date.now() + requestData.duration * 60 * 1000),
-          ),
-        });
+      if (error) {
+        console.error("Error accepting ride:", error);
+        return false;
       }
+
+      return true;
     } catch (error) {
-      console.error("Error accepting ride request:", error);
-      throw error;
-    }
-  }
-
-  // Reject a ride request
-  async rejectRideRequest(requestId: string): Promise<void> {
-    try {
-      const requestRef = doc(db, "rideRequests", requestId);
-      await updateDoc(requestRef, {
-        status: "rejected",
-        rejectedBy: this.driverId,
-        rejectedAt: Timestamp.now(),
-      });
-    } catch (error) {
-      console.error("Error rejecting ride request:", error);
-      throw error;
-    }
-  }
-
-  // Listen to ongoing rides for this driver
-  subscribeToOngoingRides(
-    callback: (rides: OngoingRide[]) => void,
-  ): () => void {
-    if (!this.checkFirebaseConnection()) {
-      console.warn("Firebase connection not available for ongoing rides");
-      callback([]); // Return empty array as fallback
-      return () => {}; // Return empty unsubscribe function
-    }
-
-    try {
-      const ridesRef = collection(db, "ongoingRides");
-      // Simplified query to avoid index requirements
-      const q = query(
-        ridesRef,
-        where("driverId", "==", this.driverId),
-        limit(10),
-      );
-
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot: QuerySnapshot<DocumentData>) => {
-          const rides: OngoingRide[] = [];
-
-          snapshot.forEach((doc: DocumentSnapshot<DocumentData>) => {
-            const data = doc.data();
-            if (data) {
-              // Filter for active statuses in JavaScript
-              const activeStatuses = ["picking_up", "en_route", "arrived"];
-              if (activeStatuses.includes(data.status)) {
-                rides.push({
-                  id: doc.id,
-                  passengerName: data.passengerName,
-                  passengerPhone: data.passengerPhone,
-                  pickup: data.pickup,
-                  destination: data.destination,
-                  earnings: data.estimatedEarnings || data.earnings,
-                  status: data.status,
-                  startTime: data.startTime?.toDate() || new Date(),
-                  estimatedArrival:
-                    data.estimatedArrival?.toDate() || new Date(),
-                  driverId: data.driverId,
-                });
-              }
-            }
-          });
-
-          // Sort by start time in JavaScript
-          rides.sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
-          callback(rides);
-        },
-      );
-
-      this.unsubscribeCallbacks.push(unsubscribe);
-      return unsubscribe;
-    } catch (error) {
-      console.error("Error subscribing to ongoing rides:", error);
-      throw error;
+      console.error("Accept ride error:", error);
+      return false;
     }
   }
 
   // Update ride status
   async updateRideStatus(
     rideId: string,
-    status: OngoingRide["status"],
-  ): Promise<void> {
+    status: RideRequest["status"],
+  ): Promise<boolean> {
     try {
-      const rideRef = doc(db, "ongoingRides", rideId);
-      await updateDoc(rideRef, {
-        status,
-        [`${status}At`]: Timestamp.now(),
-      });
-    } catch (error) {
-      console.error("Error updating ride status:", error);
-      throw error;
-    }
-  }
+      const { error } = await supabase
+        .from("rides")
+        .update({
+          status,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", rideId);
 
-  // Complete a ride
-  async completeRide(rideId: string, finalEarnings: number): Promise<void> {
-    try {
-      const rideRef = doc(db, "ongoingRides", rideId);
-      const rideDoc = await rideRef.get();
-      const rideData = rideDoc.data();
-
-      if (rideData) {
-        // Update ongoing ride to completed
-        await updateDoc(rideRef, {
-          status: "completed",
-          completedAt: Timestamp.now(),
-          finalEarnings,
-        });
-
-        // Add to ride history
-        const historyRef = collection(db, "rideHistory");
-        await addDoc(historyRef, {
-          ...rideData,
-          finalEarnings,
-          completedAt: Timestamp.now(),
-          driverId: this.driverId,
-        });
-
-        // Update driver earnings
-        const driverRef = doc(db, "drivers", this.driverId);
-        const driverDoc = await driverRef.get();
-        const driverData = driverDoc.data();
-
-        if (driverData) {
-          await updateDoc(driverRef, {
-            totalEarnings: (driverData.totalEarnings || 0) + finalEarnings,
-            totalRides: (driverData.totalRides || 0) + 1,
-            lastRideCompletedAt: Timestamp.now(),
-          });
-        }
+      if (error) {
+        console.error("Error updating ride status:", error);
+        return false;
       }
+
+      return true;
     } catch (error) {
-      console.error("Error completing ride:", error);
-      throw error;
+      console.error("Update ride status error:", error);
+      return false;
     }
   }
 
-  // Get driver's ride history
-  subscribeToRideHistory(
-    limitCount: number = 50,
-    callback: (history: any[]) => void,
-  ): () => void {
-    if (!this.checkFirebaseConnection()) {
-      console.warn("Firebase connection not available for ride history");
-      callback([]); // Return empty array as fallback
-      return () => {}; // Return empty unsubscribe function
-    }
-
+  // Get driver statistics
+  async getDriverStats(driverId: string): Promise<DriverStats> {
     try {
-      const historyRef = collection(db, "rideHistory");
-      // Simplified query to avoid index requirements
-      const q = query(
-        historyRef,
-        where("driverId", "==", this.driverId),
-        limit(limitCount),
-      );
+      // Get completed rides count and total earnings
+      const { data: completedRides, error: ridesError } = await supabase
+        .from("rides")
+        .select("fare")
+        .eq("driver_id", driverId)
+        .eq("status", "completed");
 
-      const unsubscribe = onSnapshot(
-        q,
-        (snapshot: QuerySnapshot<DocumentData>) => {
-          const history: any[] = [];
+      if (ridesError) {
+        console.error("Error fetching driver stats:", ridesError);
+      }
 
-          snapshot.forEach((doc: DocumentSnapshot<DocumentData>) => {
-            const data = doc.data();
-            if (data) {
-              history.push({
-                id: doc.id,
-                ...data,
-                completedAt: data.completedAt?.toDate() || new Date(),
-                date: data.completedAt?.toDate() || new Date(), // Add date field for compatibility
-              });
+      const totalRides = completedRides?.length || 0;
+      const totalEarnings =
+        completedRides?.reduce((sum, ride) => sum + (ride.fare || 0), 0) || 0;
+
+      // Get driver info for rating and other stats
+      const { data: driver, error: driverError } = await supabase
+        .from("drivers")
+        .select("rating, total_rides")
+        .eq("id", driverId)
+        .single();
+
+      if (driverError) {
+        console.error("Error fetching driver info:", driverError);
+      }
+
+      return {
+        totalEarnings,
+        totalRides: driver?.total_rides || totalRides,
+        averageRating: driver?.rating || 5.0,
+        hoursOnline: 0, // TODO: Calculate from driver activity logs
+        completionRate: totalRides > 0 ? 100 : 0, // Simplified calculation
+      };
+    } catch (error) {
+      console.error("Error getting driver stats:", error);
+      return {
+        totalEarnings: 0,
+        totalRides: 0,
+        averageRating: 5.0,
+        hoursOnline: 0,
+        completionRate: 0,
+      };
+    }
+  }
+
+  // Subscribe to ride updates for a driver
+  subscribeToDriverRides(
+    driverId: string,
+    callback: (rides: RideRequest[]) => void,
+  ) {
+    const channel = supabase
+      .channel("driver_rides")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "rides",
+          filter: `driver_id=eq.${driverId}`,
+        },
+        async () => {
+          // Fetch updated rides when changes occur
+          try {
+            const { data, error } = await supabase
+              .from("rides")
+              .select("*")
+              .eq("driver_id", driverId)
+              .order("created_at", { ascending: false });
+
+            if (!error && data) {
+              const rides = data.map((ride) => ({
+                id: ride.id,
+                passengerName: ride.passenger_name || "Unknown",
+                passengerPhone: ride.passenger_phone || "",
+                pickup: ride.pickup_location || { address: "", lat: 0, lng: 0 },
+                destination: ride.destination || {
+                  address: "",
+                  lat: 0,
+                  lng: 0,
+                },
+                status: ride.status,
+                fare: ride.fare || 0,
+                estimatedTime: ride.duration_minutes || 0,
+                createdAt: new Date(ride.created_at),
+              }));
+              callback(rides);
             }
-          });
-
-          // Sort by completion date in JavaScript (most recent first)
-          history.sort(
-            (a, b) => b.completedAt.getTime() - a.completedAt.getTime(),
-          );
-          callback(history);
+          } catch (error) {
+            console.error("Error in ride subscription:", error);
+          }
         },
-      );
+      )
+      .subscribe();
 
-      this.unsubscribeCallbacks.push(unsubscribe);
-      return unsubscribe;
-    } catch (error) {
-      console.error("Error subscribing to ride history:", error);
-      throw error;
-    }
-  }
-
-  // Update driver location
-  async updateLocation(location: DriverLocation): Promise<void> {
-    try {
-      const driverRef = doc(db, "drivers", this.driverId);
-      await updateDoc(driverRef, {
-        location: {
-          lat: location.lat,
-          lng: location.lng,
-          timestamp: Timestamp.now(),
-        },
-        lastUpdate: Timestamp.now(),
-      });
-    } catch (error) {
-      console.error("Error updating driver location:", error);
-      throw error;
-    }
-  }
-
-  // Calculate distance between two points (Haversine formula)
-  private calculateDistance(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number,
-  ): number {
-    const R = 6371; // Radius of the Earth in kilometers
-    const dLat = this.deg2rad(lat2 - lat1);
-    const dLon = this.deg2rad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.deg2rad(lat1)) *
-        Math.cos(this.deg2rad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c; // Distance in kilometers
-    return d;
-  }
-
-  private deg2rad(deg: number): number {
-    return deg * (Math.PI / 180);
-  }
-
-  // Clean up all subscriptions
-  cleanup(): void {
-    this.unsubscribeCallbacks.forEach((unsubscribe) => unsubscribe());
-    this.unsubscribeCallbacks = [];
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }
 }
 
-// Export singleton factory
-export const createDriverService = (driverId: string) =>
-  new DriverService(driverId);
+export const driverService = new DriverService();
