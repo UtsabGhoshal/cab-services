@@ -665,19 +665,20 @@ export default function Booking() {
       const { driverMatchingService } = await import(
         "@/services/driverMatchingService"
       );
-      const { GeoPoint, Timestamp } = await import("firebase/firestore");
 
       // Create ride request with automatic driver matching
       const rideRequest = {
-        passengerId: user.id,
         passengerName: user.name,
-        pickup: {
+        passengerPhone: user.phone || '',
+        pickupLocation: {
           address: pickup.address,
-          coordinates: new GeoPoint(pickup.lat, pickup.lng),
+          lat: pickup.lat,
+          lng: pickup.lng,
         },
         destination: {
           address: destination.address,
-          coordinates: new GeoPoint(destination.lat, destination.lng),
+          lat: destination.lat,
+          lng: destination.lng,
         },
         rideType: carType as "economy" | "premium" | "luxury",
         purpose: purpose,
