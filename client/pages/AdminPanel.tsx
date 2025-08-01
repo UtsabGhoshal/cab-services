@@ -661,7 +661,7 @@ export default function AdminPanel() {
   const handleSuspendDriver = async (driverId: string, reason: string) => {
     try {
       setIsLoading(true);
-      // In a real app, call adminFirebaseService.suspendDriver
+      // In a real app, call supabaseDriverService.updateDriver
       
       // Update local state
       setDrivers(prev => prev.map(driver => 
