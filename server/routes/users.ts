@@ -1,58 +1,38 @@
-import express from "express";
-import { getUserDataHandler, getUserRidesHandler } from "./user";
-import {
-  getAllUsers,
-  createUser,
-  getUserById,
-} from "../database/databaseService";
+import { RequestHandler, Router } from "express";
 
-const router = express.Router();
+const router = Router();
 
-// Get all users
-router.get("/", async (_req, res) => {
+const getAllUsersHandler: RequestHandler = async (req, res) => {
   try {
-    const users = await getAllUsers();
-    res.json({ success: true, users });
+    res.status(501).json({
+      success: false,
+      error: "Users data moved to Supabase. Please use client-side queries.",
+    });
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ success: false, error: "Failed to fetch users" });
+    console.error("Users error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
-});
+};
 
-// Create a new user
-router.post("/", async (req, res) => {
+const createUserHandler: RequestHandler = async (req, res) => {
   try {
-    const user = await createUser(req.body);
-    res.status(201).json({ success: true, user });
+    res.status(501).json({
+      success: false,
+      error: "User creation moved to Supabase. Please use client-side operations.",
+    });
   } catch (error) {
-    if (error.name === "ValidationError") {
-      console.error("Validation error creating user:", error);
-      res.status(400).json({ success: false, error: error.message });
-    } else {
-      console.error("Error creating user:", error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          error: "Failed to create user",
-          details: error.message,
-        });
-    }
+    console.error("Create user error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
   }
-});
+};
 
-// Get user by ID
-router.get("/:userId", async (req, res) => {
-  try {
-    const user = await getUserById(req.params.userId);
-    if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
-    }
-    res.json({ success: true, user });
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ success: false, error: "Failed to fetch user" });
-  }
-});
+router.get("/", getAllUsersHandler);
+router.post("/", createUserHandler);
 
 export default router;
