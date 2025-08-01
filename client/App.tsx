@@ -53,11 +53,11 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <AuthProvider>
+      <SupabaseAuthProvider>
         <BrowserRouter>
           <AppContent />
         </BrowserRouter>
-      </AuthProvider>
+      </SupabaseAuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
