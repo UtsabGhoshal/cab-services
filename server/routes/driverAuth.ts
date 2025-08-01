@@ -32,3 +32,48 @@ export const driverSignupHandler: RequestHandler = async (req, res) => {
     });
   }
 };
+
+export const getDriverProfileHandler: RequestHandler = async (req, res) => {
+  try {
+    res.status(501).json({
+      success: false,
+      error: "Driver data moved to Supabase. Please use client-side queries.",
+    });
+  } catch (error) {
+    console.error("Driver profile error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+};
+
+export const updateDriverStatusHandler: RequestHandler = async (req, res) => {
+  try {
+    res.status(501).json({
+      success: false,
+      error: "Driver status moved to Supabase. Please use client-side updates.",
+    });
+  } catch (error) {
+    console.error("Driver status error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+};
+
+export const getDriversHandler: RequestHandler = async (req, res) => {
+  try {
+    res.status(501).json({
+      success: false,
+      error: "Driver data moved to Supabase. Please use client-side queries.",
+    });
+  } catch (error) {
+    console.error("Drivers list error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+};
