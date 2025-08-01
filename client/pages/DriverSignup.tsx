@@ -10,14 +10,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/config";
-import {
-  firebaseDriverService,
-  type FirebaseDriver,
-} from "@/services/firebaseDriverService";
+import { supabaseAuthService } from "@/services/supabaseAuthService";
+import { supabaseDriverService } from "@/services/supabaseDriverService";
 import { fallbackAuthService } from "@/services/fallbackAuthService";
-import { Timestamp } from "firebase/firestore";
 import {
   Car,
   User,
