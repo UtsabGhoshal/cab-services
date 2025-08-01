@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, X, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { checkFirebaseConnection } from "@/utils/firebaseCheck";
+import { FirebaseTroubleshooting } from "./FirebaseTroubleshooting";
 
 export const DevModeNotification: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
