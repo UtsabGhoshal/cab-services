@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase/config";
-import { firebaseDriverService } from "@/services/firebaseDriverService";
+import { supabaseAuthService } from "@/services/supabaseAuthService";
+import { supabaseDriverService } from "@/services/supabaseDriverService";
 import { fallbackAuthService } from "@/services/fallbackAuthService";
 import { DevModeNotification } from "@/components/DevModeNotification";
 import {
@@ -63,19 +62,22 @@ export default function DriverLogin() {
       let user, driver;
 
       try {
-        // Try Firebase Auth first
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
+        // Try Supabase Auth first
+        const { user: supabaseUser, session, error } = await supabaseAuthService.signInWithEmailAndPassword(
           formData.email,
           formData.password,
         );
 
-        user = userCredential.user;
-        driver = await firebaseDriverService.getDriverByEmail(formData.email);
-      } catch (firebaseError: any) {
+        if (error) {
+          throw error;
+        }
+
+        user = { uid: supabaseUser?.id, email: supabaseUser?.email, getIdToken: () => session?.access_token || '' };
+        driver = await supabaseDriverService.getDriverByEmail(formData.email);
+      } catch (supabaseError: any) {
         console.warn(
-          "Firebase auth failed, using fallback:",
-          firebaseError.message,
+          "Supabase auth failed, using fallback:",
+          supabaseError.message,
         );
 
         // Use fallback auth service
@@ -104,7 +106,7 @@ export default function DriverLogin() {
         return;
       }
 
-      if (driver.status !== "active") {
+      if (!driver.isApproved || !driver.isActive) {
         toast({
           title: "Account Inactive",
           description:
@@ -119,26 +121,22 @@ export default function DriverLogin() {
         id: driver.id,
         uid: user.uid,
         email: user.email,
-        name: driver.name,
-        phone: driver.phone,
-        driverType: driver.driverType,
-        status: driver.status,
-        vehicleNumber: driver.vehicleNumber,
-        vehicleModel: driver.vehicleModel,
+        name: driver.fullName,
+        phone: driver.phoneNumber,
         licenseNumber: driver.licenseNumber,
-        averageRating: driver.averageRating,
+        vehicleInfo: driver.vehicleInfo,
+        isApproved: driver.isApproved,
+        isActive: driver.isActive,
+        rating: driver.rating,
         totalRides: driver.totalRides,
-        totalEarnings: driver.totalEarnings,
-        totalKmDriven: driver.totalKmDriven,
-        acceptanceRate: driver.acceptanceRate,
-        completionRate: driver.completionRate,
-        onlineHours: driver.onlineHours,
-        joinDate: driver.joinDate,
+        status: driver.status,
+        currentLocation: driver.currentLocation,
         createdAt: driver.createdAt,
+        updatedAt: driver.updatedAt,
       };
 
       localStorage.setItem("uride_driver", JSON.stringify(driverSession));
-      localStorage.setItem("uride_driver_token", await user.getIdToken());
+      localStorage.setItem("uride_driver_token", typeof user.getIdToken === 'function' ? await user.getIdToken() : user.getIdToken);
 
       if (formData.rememberMe) {
         localStorage.setItem("uride_driver_remember", "true");
@@ -155,7 +153,8 @@ export default function DriverLogin() {
 
       if (
         error.code === "auth/user-not-found" ||
-        error.code === "auth/wrong-password"
+        error.code === "auth/wrong-password" ||
+        error.message?.includes("Invalid login credentials")
       ) {
         errorMessage = "Invalid email or password. Please try again.";
       } else if (error.code === "auth/too-many-requests") {
@@ -179,13 +178,13 @@ export default function DriverLogin() {
   const handleDemoLogin = async (type: "owner" | "fleet") => {
     const demoCredentials = {
       owner: {
-        email: "rajesh.driver@uride.com",
-        password: "demo123",
+        email: "driver1@example.com",
+        password: "password123",
         type: "Vehicle Owner Driver",
       },
       fleet: {
-        email: "amit.fleet@uride.com",
-        password: "demo123",
+        email: "driver2@example.com",
+        password: "password123",
         type: "Fleet Driver",
       },
     };
@@ -203,19 +202,22 @@ export default function DriverLogin() {
       let user, driver;
 
       try {
-        // Try Firebase Auth first
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
+        // Try Supabase Auth first
+        const { user: supabaseUser, session, error } = await supabaseAuthService.signInWithEmailAndPassword(
           demo.email,
           demo.password,
         );
 
-        user = userCredential.user;
-        driver = await firebaseDriverService.getDriverByEmail(demo.email);
-      } catch (firebaseError: any) {
+        if (error) {
+          throw error;
+        }
+
+        user = { uid: supabaseUser?.id, email: supabaseUser?.email, getIdToken: () => session?.access_token || '' };
+        driver = await supabaseDriverService.getDriverByEmail(demo.email);
+      } catch (supabaseError: any) {
         console.warn(
-          "Firebase demo login failed, using fallback:",
-          firebaseError.message,
+          "Supabase demo login failed, using fallback:",
+          supabaseError.message,
         );
 
         // Use fallback auth service
@@ -243,7 +245,7 @@ export default function DriverLogin() {
         return;
       }
 
-      if (driver.status !== "active") {
+      if (!driver.isApproved || !driver.isActive) {
         toast({
           title: "Demo Account Inactive",
           description:
@@ -258,26 +260,22 @@ export default function DriverLogin() {
         id: driver.id,
         uid: user.uid,
         email: user.email,
-        name: driver.name,
-        phone: driver.phone,
-        driverType: driver.driverType,
-        status: driver.status,
-        vehicleNumber: driver.vehicleNumber,
-        vehicleModel: driver.vehicleModel,
+        name: driver.fullName,
+        phone: driver.phoneNumber,
         licenseNumber: driver.licenseNumber,
-        averageRating: driver.averageRating,
+        vehicleInfo: driver.vehicleInfo,
+        isApproved: driver.isApproved,
+        isActive: driver.isActive,
+        rating: driver.rating,
         totalRides: driver.totalRides,
-        totalEarnings: driver.totalEarnings,
-        totalKmDriven: driver.totalKmDriven,
-        acceptanceRate: driver.acceptanceRate,
-        completionRate: driver.completionRate,
-        onlineHours: driver.onlineHours,
-        joinDate: driver.joinDate,
+        status: driver.status,
+        currentLocation: driver.currentLocation,
         createdAt: driver.createdAt,
+        updatedAt: driver.updatedAt,
       };
 
       localStorage.setItem("uride_driver", JSON.stringify(driverSession));
-      localStorage.setItem("uride_driver_token", await user.getIdToken());
+      localStorage.setItem("uride_driver_token", typeof user.getIdToken === 'function' ? await user.getIdToken() : user.getIdToken);
 
       toast({
         title: "Demo Login Successful! 🚗",
@@ -294,7 +292,8 @@ export default function DriverLogin() {
 
       if (
         error.code === "auth/user-not-found" ||
-        error.code === "auth/wrong-password"
+        error.code === "auth/wrong-password" ||
+        error.message?.includes("Invalid login credentials")
       ) {
         errorMessage =
           "Demo user not found. Please contact support to set up demo accounts.";
