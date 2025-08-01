@@ -132,7 +132,7 @@ interface Driver {
   };
 }
 
-interface FirebaseVehicle {
+interface Vehicle {
   id: string;
   make: string;
   model: string;
