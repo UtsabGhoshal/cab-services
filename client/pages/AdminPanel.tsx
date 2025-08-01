@@ -189,8 +189,8 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [selectedDriver, setSelectedDriver] = useState<FirebaseDriver | null>(null);
-  const [selectedVehicle, setSelectedVehicle] = useState<FirebaseVehicle | null>(null);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [suspensionReason, setSuspensionReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
