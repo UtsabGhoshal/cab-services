@@ -214,7 +214,7 @@ export default function AdminPanel() {
     ],
   });
 
-  // Initialize Firebase admin service and set up real-time listeners
+  // Initialize Supabase admin service and set up real-time listeners
   useEffect(() => {
     let driversUnsubscribe: (() => void) | null = null;
     let vehiclesUnsubscribe: (() => void) | null = null;
