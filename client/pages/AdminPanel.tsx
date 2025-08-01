@@ -632,7 +632,7 @@ export default function AdminPanel() {
   const handleRejectDriver = async (driverId: string, reason: string) => {
     try {
       setIsLoading(true);
-      // In a real app, call adminFirebaseService.rejectDriver
+      // In a real app, call supabaseDriverService.updateDriver
       
       // Update local state
       setDrivers(prev => prev.map(driver => 
