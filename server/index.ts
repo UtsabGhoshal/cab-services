@@ -18,27 +18,11 @@ import ridesRouter from "./routes/rides";
 import usersRouter from "./routes/users";
 import { getMapsConfigHandler } from "./routes/maps";
 import { addSampleRidesHandler } from "./routes/test";
-import { initializeDatabase } from "./firebase/firebaseDatabase";
 
 export async function createServer() {
   const app = express();
 
-  // Initialize database (Firebase with fallback to mock)
-  try {
-    console.log("🔥 Initializing Firebase database...");
-    await initializeDatabase();
-    console.log("✅ Firebase database initialized successfully");
-  } catch (error) {
-    console.warn(
-      "⚠️ Firebase not available, using mock database for development",
-    );
-    console.log("🔧 Error:", error.message);
-    // Initialize mock database
-    const { initializeDatabase: initMockDb } = await import(
-      "./database/mockDatabase"
-    );
-    initMockDb();
-  }
+  console.log("🚀 Server starting with Supabase backend...");
 
   // Middleware
   app.use(cors());
