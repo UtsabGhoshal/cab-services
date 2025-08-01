@@ -84,8 +84,8 @@ import {
   Timer,
 } from "lucide-react";
 
-// Firebase types from our service
-interface FirebaseDriver {
+// Driver types from our service
+interface Driver {
   id: string;
   name: string;
   email: string;
