@@ -42,6 +42,23 @@ export const DevModeNotification: React.FC = () => {
               Firebase is unavailable. Using local fallback authentication for
               development. Demo accounts are available for testing.
             </AlertDescription>
+            <div className="mt-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-orange-100 border-orange-300 text-orange-800 hover:bg-orange-200"
+                  >
+                    <Settings className="h-3 w-3 mr-1" />
+                    Troubleshoot
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                  <FirebaseTroubleshooting />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
           <Button
             variant="ghost"
