@@ -346,7 +346,7 @@ export default function AdminPanel() {
           },
         ];
 
-        const mockVehiclesData: FirebaseVehicle[] = [
+        const mockVehiclesData: Vehicle[] = [
           {
             id: "v1",
             make: "Honda",
