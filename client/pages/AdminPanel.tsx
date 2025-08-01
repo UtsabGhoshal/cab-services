@@ -605,7 +605,7 @@ export default function AdminPanel() {
   const handleApproveDriver = async (driverId: string) => {
     try {
       setIsLoading(true);
-      // In a real app, call adminFirebaseService.approveDriver
+      // In a real app, call supabaseDriverService.updateDriver
       
       // Update local state
       setDrivers(prev => prev.map(driver => 
