@@ -24,7 +24,7 @@ import {
   Map,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/SupabaseAuthContext";
 import { MapsConfigResponse, BookingLocation, PricingInfo } from "@shared/maps";
 import { SimpleFallbackMap } from "@/components/SimpleFallbackMap";
 
