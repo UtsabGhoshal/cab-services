@@ -107,11 +107,11 @@ export default function DriverDashboard() {
           status: online ? "online" : "offline",
         });
       }
-      
+
       toast({
         title: online ? "You're now online!" : "You're now offline",
-        description: online 
-          ? "You'll start receiving ride requests" 
+        description: online
+          ? "You'll start receiving ride requests"
           : "You won't receive any ride requests",
       });
     } catch (error) {
@@ -214,28 +214,41 @@ export default function DriverDashboard() {
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Status Banner */}
         <div className="mb-8">
-          <Card className={`${isOnline ? 'border-green-200 bg-green-50' : 'border-orange-200 bg-orange-50'}`}>
+          <Card
+            className={`${isOnline ? "border-green-200 bg-green-50" : "border-orange-200 bg-orange-50"}`}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+                  <div
+                    className={`w-3 h-3 rounded-full ${isOnline ? "bg-green-500" : "bg-orange-500"}`}
+                  ></div>
                   <div>
-                    <h3 className={`font-semibold ${isOnline ? 'text-green-800' : 'text-orange-800'}`}>
-                      {isOnline ? 'You are online and ready for rides!' : 'You are currently offline'}
+                    <h3
+                      className={`font-semibold ${isOnline ? "text-green-800" : "text-orange-800"}`}
+                    >
+                      {isOnline
+                        ? "You are online and ready for rides!"
+                        : "You are currently offline"}
                     </h3>
-                    <p className={`text-sm ${isOnline ? 'text-green-600' : 'text-orange-600'}`}>
-                      {isOnline 
-                        ? 'Passengers can find and book rides with you' 
-                        : 'Go online to start receiving ride requests'
-                      }
+                    <p
+                      className={`text-sm ${isOnline ? "text-green-600" : "text-orange-600"}`}
+                    >
+                      {isOnline
+                        ? "Passengers can find and book rides with you"
+                        : "Go online to start receiving ride requests"}
                     </p>
                   </div>
                 </div>
                 <Button
                   onClick={() => handleStatusToggle(!isOnline)}
-                  className={isOnline ? 'bg-orange-600 hover:bg-orange-700' : 'bg-green-600 hover:bg-green-700'}
+                  className={
+                    isOnline
+                      ? "bg-orange-600 hover:bg-orange-700"
+                      : "bg-green-600 hover:bg-green-700"
+                  }
                 >
-                  {isOnline ? 'Go Offline' : 'Go Online'}
+                  {isOnline ? "Go Offline" : "Go Online"}
                 </Button>
               </div>
             </CardContent>
@@ -248,9 +261,15 @@ export default function DriverDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-600">Today's Earnings</p>
-                  <p className="text-2xl font-bold text-green-800">₹{stats.todayEarnings}</p>
-                  <p className="text-xs text-green-600">{stats.todayRides} rides completed</p>
+                  <p className="text-sm font-medium text-green-600">
+                    Today's Earnings
+                  </p>
+                  <p className="text-2xl font-bold text-green-800">
+                    ₹{stats.todayEarnings}
+                  </p>
+                  <p className="text-xs text-green-600">
+                    {stats.todayRides} rides completed
+                  </p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-full">
                   <IndianRupee className="w-6 h-6 text-green-600" />
@@ -264,8 +283,12 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-blue-600">This Week</p>
-                  <p className="text-2xl font-bold text-blue-800">₹{stats.weeklyEarnings}</p>
-                  <p className="text-xs text-blue-600">Average ₹{Math.round(stats.weeklyEarnings / 7)}/day</p>
+                  <p className="text-2xl font-bold text-blue-800">
+                    ₹{stats.weeklyEarnings}
+                  </p>
+                  <p className="text-xs text-blue-600">
+                    Average ₹{Math.round(stats.weeklyEarnings / 7)}/day
+                  </p>
                 </div>
                 <div className="p-3 bg-blue-100 rounded-full">
                   <BarChart3 className="w-6 h-6 text-blue-600" />
@@ -279,8 +302,12 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-purple-600">Rating</p>
-                  <p className="text-2xl font-bold text-purple-800">{stats.averageRating}★</p>
-                  <p className="text-xs text-purple-600">{stats.totalRides} total rides</p>
+                  <p className="text-2xl font-bold text-purple-800">
+                    {stats.averageRating}★
+                  </p>
+                  <p className="text-xs text-purple-600">
+                    {stats.totalRides} total rides
+                  </p>
                 </div>
                 <div className="p-3 bg-purple-100 rounded-full">
                   <Star className="w-6 h-6 text-purple-600" />
@@ -293,9 +320,15 @@ export default function DriverDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-orange-600">Completion Rate</p>
-                  <p className="text-2xl font-bold text-orange-800">{stats.completionRate}%</p>
-                  <p className="text-xs text-orange-600">Excellent performance</p>
+                  <p className="text-sm font-medium text-orange-600">
+                    Completion Rate
+                  </p>
+                  <p className="text-2xl font-bold text-orange-800">
+                    {stats.completionRate}%
+                  </p>
+                  <p className="text-xs text-orange-600">
+                    Excellent performance
+                  </p>
                 </div>
                 <div className="p-3 bg-orange-100 rounded-full">
                   <CheckCircle className="w-6 h-6 text-orange-600" />
@@ -326,12 +359,19 @@ export default function DriverDashboard() {
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Car className="w-8 h-8 text-gray-400" />
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">No active rides</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      No active rides
+                    </h3>
                     <p className="text-gray-600 mb-4">
-                      {isOnline ? 'Waiting for ride requests...' : 'Go online to receive ride requests'}
+                      {isOnline
+                        ? "Waiting for ride requests..."
+                        : "Go online to receive ride requests"}
                     </p>
                     {!isOnline && (
-                      <Button onClick={() => handleStatusToggle(true)} className="bg-yellow-600 hover:bg-yellow-700">
+                      <Button
+                        onClick={() => handleStatusToggle(true)}
+                        className="bg-yellow-600 hover:bg-yellow-700"
+                      >
                         Go Online Now
                       </Button>
                     )}

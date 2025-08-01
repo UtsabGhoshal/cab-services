@@ -669,7 +669,7 @@ export default function Booking() {
       // Create ride request with automatic driver matching
       const rideRequest = {
         passengerName: user.name,
-        passengerPhone: user.phone || '',
+        passengerPhone: user.phone || "",
         pickupLocation: {
           address: pickup.address,
           lat: pickup.lat,

@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import { supabaseAuthService } from "@/services/supabaseAuthService";
-import type { User, Session } from '@supabase/supabase-js';
+import type { User, Session } from "@supabase/supabase-js";
 
 export interface AuthUser {
   id: string;
@@ -31,12 +31,16 @@ interface SignupData {
   password: string;
 }
 
-const SupabaseAuthContext = createContext<AuthContextType | undefined>(undefined);
+const SupabaseAuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 export const useSupabaseAuth = () => {
   const context = useContext(SupabaseAuthContext);
   if (context === undefined) {
-    throw new Error("useSupabaseAuth must be used within a SupabaseAuthProvider");
+    throw new Error(
+      "useSupabaseAuth must be used within a SupabaseAuthProvider",
+    );
   }
   return context;
 };
@@ -45,7 +49,9 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const SupabaseAuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const SupabaseAuthProvider: React.FC<AuthProviderProps> = ({
+  children,
+}) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,11 +59,14 @@ export const SupabaseAuthProvider: React.FC<AuthProviderProps> = ({ children }) 
   // Transform Supabase user to our AuthUser format
   const transformUser = (supabaseUser: User | null): AuthUser | null => {
     if (!supabaseUser) return null;
-    
+
     return {
       id: supabaseUser.id,
-      name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
-      email: supabaseUser.email || '',
+      name:
+        supabaseUser.user_metadata?.name ||
+        supabaseUser.email?.split("@")[0] ||
+        "User",
+      email: supabaseUser.email || "",
       phone: supabaseUser.user_metadata?.phone,
     };
   };
@@ -72,14 +81,14 @@ export const SupabaseAuthProvider: React.FC<AuthProviderProps> = ({ children }) 
     });
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabaseAuthService.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session);
-        setSession(session);
-        setUser(transformUser(session?.user || null));
-        setIsLoading(false);
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabaseAuthService.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session);
+      setSession(session);
+      setUser(transformUser(session?.user || null));
+      setIsLoading(false);
+    });
 
     return () => subscription.unsubscribe();
   }, []);
@@ -87,8 +96,12 @@ export const SupabaseAuthProvider: React.FC<AuthProviderProps> = ({ children }) 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const { user: supabaseUser, session, error } = await supabaseAuthService.signInWithEmailAndPassword(email, password);
-      
+      const {
+        user: supabaseUser,
+        session,
+        error,
+      } = await supabaseAuthService.signInWithEmailAndPassword(email, password);
+
       if (error) {
         console.error("Login error:", error.message);
         setIsLoading(false);
@@ -114,11 +127,15 @@ export const SupabaseAuthProvider: React.FC<AuthProviderProps> = ({ children }) 
   const signup = async (userData: SignupData): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const { user: supabaseUser, session, error } = await supabaseAuthService.signUpWithEmailAndPassword(
-        userData.email, 
-        userData.password
+      const {
+        user: supabaseUser,
+        session,
+        error,
+      } = await supabaseAuthService.signUpWithEmailAndPassword(
+        userData.email,
+        userData.password,
       );
-      
+
       if (error) {
         console.error("Signup error:", error.message);
         setIsLoading(false);
@@ -133,12 +150,12 @@ export const SupabaseAuthProvider: React.FC<AuthProviderProps> = ({ children }) 
 
         // Note: For user metadata like name and phone, you might want to store them in a separate profiles table
         // This is a common pattern in Supabase applications
-        
+
         if (session) {
           setSession(session);
           setUser(transformUser(supabaseUser));
         }
-        
+
         setIsLoading(false);
         return true;
       } else {

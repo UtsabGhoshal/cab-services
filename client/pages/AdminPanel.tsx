@@ -102,7 +102,7 @@ interface Driver {
   vehicleNumber?: string;
   vehicleModel?: string;
   assignedVehicle?: string;
-  
+
   averageRating: number;
   totalRides: number;
   totalEarnings: number;
@@ -110,20 +110,20 @@ interface Driver {
   acceptanceRate: number;
   completionRate: number;
   onlineHours: number;
-  
+
   joinDate: Date;
   lastActive?: Date;
   approvedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-  
+
   isOnline: boolean;
   currentLocation?: {
     lat: number;
     lng: number;
     lastUpdated: Date;
   };
-  
+
   currentShift?: {
     startTime: Date;
     targetKm?: number;
@@ -141,23 +141,23 @@ interface Vehicle {
   registrationNumber: string;
   type: "company" | "driver_owned";
   status: "available" | "assigned" | "maintenance" | "out_of_service";
-  
+
   assignedDriverId?: string;
   assignedDriverName?: string;
-  
+
   mileage: number;
   fuelType: "petrol" | "diesel" | "cng" | "electric";
-  
+
   lastService: Date;
   nextService: Date;
   insuranceExpiry: Date;
   registrationExpiry: Date;
   pollutionExpiry: Date;
-  
+
   totalKmDriven: number;
   totalRides: number;
   averageRating: number;
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -203,16 +203,17 @@ export default function AdminPanel() {
   const [dashboardStats, setDashboardStats] = useState<any>({});
 
   // Commission settings
-  const [commissionSettings, setCommissionSettings] = useState<CommissionSettings>({
-    vehicleOwnerRate: 5,
-    fleetDriverSalaryRate: 12,
-    platformFee: 2,
-    bonusThresholds: [
-      { rides: 50, bonus: 500 },
-      { rides: 100, bonus: 1200 },
-      { rides: 200, bonus: 2500 },
-    ],
-  });
+  const [commissionSettings, setCommissionSettings] =
+    useState<CommissionSettings>({
+      vehicleOwnerRate: 5,
+      fleetDriverSalaryRate: 12,
+      platformFee: 2,
+      bonusThresholds: [
+        { rides: 50, bonus: 500 },
+        { rides: 100, bonus: 1200 },
+        { rides: 200, bonus: 2500 },
+      ],
+    });
 
   // Initialize Supabase admin service and set up real-time listeners
   useEffect(() => {
@@ -448,37 +449,72 @@ export default function AdminPanel() {
         const stats = {
           drivers: {
             total: mockDriversData.length,
-            active: mockDriversData.filter(d => d.status === "active").length,
-            pending: mockDriversData.filter(d => d.status === "pending").length,
-            suspended: mockDriversData.filter(d => d.status === "suspended").length,
-            online: mockDriversData.filter(d => d.isOnline).length,
-            vehicleOwners: mockDriversData.filter(d => d.driverType.type === "owner").length,
-            fleetDrivers: mockDriversData.filter(d => d.driverType.type === "fleet").length,
+            active: mockDriversData.filter((d) => d.status === "active").length,
+            pending: mockDriversData.filter((d) => d.status === "pending")
+              .length,
+            suspended: mockDriversData.filter((d) => d.status === "suspended")
+              .length,
+            online: mockDriversData.filter((d) => d.isOnline).length,
+            vehicleOwners: mockDriversData.filter(
+              (d) => d.driverType.type === "owner",
+            ).length,
+            fleetDrivers: mockDriversData.filter(
+              (d) => d.driverType.type === "fleet",
+            ).length,
           },
           vehicles: {
             total: mockVehiclesData.length,
-            available: mockVehiclesData.filter(v => v.status === "available").length,
-            assigned: mockVehiclesData.filter(v => v.status === "assigned").length,
-            maintenance: mockVehiclesData.filter(v => v.status === "maintenance").length,
-            company: mockVehiclesData.filter(v => v.type === "company").length,
-            driverOwned: mockVehiclesData.filter(v => v.type === "driver_owned").length,
+            available: mockVehiclesData.filter((v) => v.status === "available")
+              .length,
+            assigned: mockVehiclesData.filter((v) => v.status === "assigned")
+              .length,
+            maintenance: mockVehiclesData.filter(
+              (v) => v.status === "maintenance",
+            ).length,
+            company: mockVehiclesData.filter((v) => v.type === "company")
+              .length,
+            driverOwned: mockVehiclesData.filter(
+              (v) => v.type === "driver_owned",
+            ).length,
           },
           earnings: {
-            totalRevenue: mockDriversData.reduce((sum, d) => sum + d.totalEarnings, 0),
-            totalRides: mockDriversData.reduce((sum, d) => sum + d.totalRides, 0),
-            totalKmDriven: mockDriversData.reduce((sum, d) => sum + d.totalKmDriven, 0),
-            averageRating: mockDriversData.length > 0 
-              ? mockDriversData.reduce((sum, d) => sum + d.averageRating, 0) / mockDriversData.length 
-              : 0,
+            totalRevenue: mockDriversData.reduce(
+              (sum, d) => sum + d.totalEarnings,
+              0,
+            ),
+            totalRides: mockDriversData.reduce(
+              (sum, d) => sum + d.totalRides,
+              0,
+            ),
+            totalKmDriven: mockDriversData.reduce(
+              (sum, d) => sum + d.totalKmDriven,
+              0,
+            ),
+            averageRating:
+              mockDriversData.length > 0
+                ? mockDriversData.reduce((sum, d) => sum + d.averageRating, 0) /
+                  mockDriversData.length
+                : 0,
           },
           performance: {
-            averageAcceptanceRate: mockDriversData.length > 0 
-              ? mockDriversData.reduce((sum, d) => sum + d.acceptanceRate, 0) / mockDriversData.length 
-              : 0,
-            averageCompletionRate: mockDriversData.length > 0 
-              ? mockDriversData.reduce((sum, d) => sum + d.completionRate, 0) / mockDriversData.length 
-              : 0,
-            totalOnlineHours: mockDriversData.reduce((sum, d) => sum + d.onlineHours, 0),
+            averageAcceptanceRate:
+              mockDriversData.length > 0
+                ? mockDriversData.reduce(
+                    (sum, d) => sum + d.acceptanceRate,
+                    0,
+                  ) / mockDriversData.length
+                : 0,
+            averageCompletionRate:
+              mockDriversData.length > 0
+                ? mockDriversData.reduce(
+                    (sum, d) => sum + d.completionRate,
+                    0,
+                  ) / mockDriversData.length
+                : 0,
+            totalOnlineHours: mockDriversData.reduce(
+              (sum, d) => sum + d.onlineHours,
+              0,
+            ),
           },
         };
 
@@ -494,7 +530,10 @@ export default function AdminPanel() {
             action: "approve_driver",
             targetType: "driver",
             targetId: "d1",
-            details: { driverName: "Rajesh Kumar", approvedAt: new Date().toISOString() },
+            details: {
+              driverName: "Rajesh Kumar",
+              approvedAt: new Date().toISOString(),
+            },
             timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
           },
           {
@@ -504,7 +543,10 @@ export default function AdminPanel() {
             action: "assign_vehicle",
             targetType: "vehicle",
             targetId: "v3",
-            details: { vehicleNumber: "DL 03 EF 9012", driverName: "Amit Singh" },
+            details: {
+              vehicleNumber: "DL 03 EF 9012",
+              driverName: "Amit Singh",
+            },
             timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
           },
           {
@@ -514,13 +556,15 @@ export default function AdminPanel() {
             action: "suspend_driver",
             targetType: "driver",
             targetId: "d4",
-            details: { driverName: "Vikash Gupta", suspensionReason: "Multiple customer complaints" },
+            details: {
+              driverName: "Vikash Gupta",
+              suspensionReason: "Multiple customer complaints",
+            },
             timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
           },
         ];
 
         setAdminActivities(mockActivities);
-
       } catch (error) {
         console.error("Error initializing admin service:", error);
         toast({
@@ -606,13 +650,20 @@ export default function AdminPanel() {
     try {
       setIsLoading(true);
       // In a real app, call supabaseDriverService.updateDriver
-      
+
       // Update local state
-      setDrivers(prev => prev.map(driver => 
-        driver.id === driverId 
-          ? { ...driver, status: "active" as const, documentsVerified: true, approvedAt: new Date() }
-          : driver
-      ));
+      setDrivers((prev) =>
+        prev.map((driver) =>
+          driver.id === driverId
+            ? {
+                ...driver,
+                status: "active" as const,
+                documentsVerified: true,
+                approvedAt: new Date(),
+              }
+            : driver,
+        ),
+      );
 
       toast({
         title: "Driver Approved ✅",
@@ -633,13 +684,19 @@ export default function AdminPanel() {
     try {
       setIsLoading(true);
       // In a real app, call supabaseDriverService.updateDriver
-      
+
       // Update local state
-      setDrivers(prev => prev.map(driver => 
-        driver.id === driverId 
-          ? { ...driver, status: "inactive" as const, documentsVerified: false }
-          : driver
-      ));
+      setDrivers((prev) =>
+        prev.map((driver) =>
+          driver.id === driverId
+            ? {
+                ...driver,
+                status: "inactive" as const,
+                documentsVerified: false,
+              }
+            : driver,
+        ),
+      );
 
       toast({
         title: "Driver Rejected",
@@ -662,13 +719,15 @@ export default function AdminPanel() {
     try {
       setIsLoading(true);
       // In a real app, call supabaseDriverService.updateDriver
-      
+
       // Update local state
-      setDrivers(prev => prev.map(driver => 
-        driver.id === driverId 
-          ? { ...driver, status: "suspended" as const, isOnline: false }
-          : driver
-      ));
+      setDrivers((prev) =>
+        prev.map((driver) =>
+          driver.id === driverId
+            ? { ...driver, status: "suspended" as const, isOnline: false }
+            : driver,
+        ),
+      );
 
       toast({
         title: "Driver Suspended",
@@ -690,23 +749,35 @@ export default function AdminPanel() {
   const handleAssignVehicle = async (driverId: string, vehicleId: string) => {
     try {
       setIsLoading(true);
-      const vehicle = vehicles.find(v => v.id === vehicleId);
-      const driver = drivers.find(d => d.id === driverId);
-      
+      const vehicle = vehicles.find((v) => v.id === vehicleId);
+      const driver = drivers.find((d) => d.id === driverId);
+
       if (!vehicle || !driver) return;
 
       // Update local state
-      setVehicles(prev => prev.map(v => 
-        v.id === vehicleId 
-          ? { ...v, status: "assigned" as const, assignedDriverId: driverId, assignedDriverName: driver.name }
-          : v
-      ));
+      setVehicles((prev) =>
+        prev.map((v) =>
+          v.id === vehicleId
+            ? {
+                ...v,
+                status: "assigned" as const,
+                assignedDriverId: driverId,
+                assignedDriverName: driver.name,
+              }
+            : v,
+        ),
+      );
 
-      setDrivers(prev => prev.map(d => 
-        d.id === driverId 
-          ? { ...d, assignedVehicle: `${vehicle.make} ${vehicle.model} - ${vehicle.registrationNumber}` }
-          : d
-      ));
+      setDrivers((prev) =>
+        prev.map((d) =>
+          d.id === driverId
+            ? {
+                ...d,
+                assignedVehicle: `${vehicle.make} ${vehicle.model} - ${vehicle.registrationNumber}`,
+              }
+            : d,
+        ),
+      );
 
       toast({
         title: "Vehicle Assigned ✅",
@@ -785,7 +856,9 @@ export default function AdminPanel() {
                   <span className="text-gray-600">Live Data</span>
                 </div>
                 <span className="text-gray-400">•</span>
-                <span className="text-gray-500">Updated {formatRelativeTime(lastUpdated)}</span>
+                <span className="text-gray-500">
+                  Updated {formatRelativeTime(lastUpdated)}
+                </span>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -793,7 +866,9 @@ export default function AdminPanel() {
                   disabled={isLoading}
                   className="ml-2"
                 >
-                  <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw
+                    className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+                  />
                 </Button>
               </div>
 
@@ -917,7 +992,8 @@ export default function AdminPanel() {
                           </span>
                           <span className="text-orange-600 flex items-center">
                             <Wrench className="w-3 h-3 mr-1" />
-                            {dashboardStats.vehicles?.maintenance || 0} maintenance
+                            {dashboardStats.vehicles?.maintenance || 0}{" "}
+                            maintenance
                           </span>
                         </div>
                       </div>
@@ -942,7 +1018,10 @@ export default function AdminPanel() {
                           Total Revenue
                         </p>
                         <p className="text-3xl font-bold text-purple-700">
-                          ₹{(dashboardStats.earnings?.totalRevenue || 0).toLocaleString()}
+                          ₹
+                          {(
+                            dashboardStats.earnings?.totalRevenue || 0
+                          ).toLocaleString()}
                         </p>
                         <div className="flex items-center space-x-4 mt-2 text-sm">
                           <span className="text-purple-600 flex items-center">
@@ -951,7 +1030,10 @@ export default function AdminPanel() {
                           </span>
                           <span className="text-purple-600 flex items-center">
                             <Star className="w-3 h-3 mr-1" />
-                            {(dashboardStats.earnings?.averageRating || 0).toFixed(1)}★
+                            {(
+                              dashboardStats.earnings?.averageRating || 0
+                            ).toFixed(1)}
+                            ★
                           </span>
                         </div>
                       </div>
@@ -960,7 +1042,10 @@ export default function AdminPanel() {
                           <IndianRupee className="w-6 h-6 text-purple-600" />
                         </div>
                         <div className="text-xs text-purple-600">
-                          {(dashboardStats.earnings?.totalKmDriven || 0).toLocaleString()} km
+                          {(
+                            dashboardStats.earnings?.totalKmDriven || 0
+                          ).toLocaleString()}{" "}
+                          km
                         </div>
                       </div>
                     </div>
@@ -976,12 +1061,20 @@ export default function AdminPanel() {
                           Performance
                         </p>
                         <p className="text-3xl font-bold text-orange-700">
-                          {Math.round(dashboardStats.performance?.averageAcceptanceRate || 0)}%
+                          {Math.round(
+                            dashboardStats.performance?.averageAcceptanceRate ||
+                              0,
+                          )}
+                          %
                         </p>
                         <div className="flex items-center space-x-4 mt-2 text-sm">
                           <span className="text-orange-600 flex items-center">
                             <Target className="w-3 h-3 mr-1" />
-                            {Math.round(dashboardStats.performance?.averageCompletionRate || 0)}% completion
+                            {Math.round(
+                              dashboardStats.performance
+                                ?.averageCompletionRate || 0,
+                            )}
+                            % completion
                           </span>
                         </div>
                       </div>
@@ -990,7 +1083,8 @@ export default function AdminPanel() {
                           <Activity className="w-6 h-6 text-orange-600" />
                         </div>
                         <div className="text-xs text-orange-600">
-                          {dashboardStats.performance?.totalOnlineHours || 0}h online
+                          {dashboardStats.performance?.totalOnlineHours || 0}h
+                          online
                         </div>
                       </div>
                     </div>
@@ -1010,23 +1104,39 @@ export default function AdminPanel() {
                   <CardContent>
                     <div className="space-y-4">
                       {adminActivities.map((activity) => (
-                        <div key={activity.id} className="flex items-start space-x-4 p-3 bg-gray-50 rounded-lg">
+                        <div
+                          key={activity.id}
+                          className="flex items-start space-x-4 p-3 bg-gray-50 rounded-lg"
+                        >
                           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                            {activity.action.includes('approve') && <CheckCircle className="w-4 h-4 text-green-600" />}
-                            {activity.action.includes('reject') && <XCircle className="w-4 h-4 text-red-600" />}
-                            {activity.action.includes('suspend') && <Ban className="w-4 h-4 text-orange-600" />}
-                            {activity.action.includes('assign') && <Car className="w-4 h-4 text-blue-600" />}
+                            {activity.action.includes("approve") && (
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            )}
+                            {activity.action.includes("reject") && (
+                              <XCircle className="w-4 h-4 text-red-600" />
+                            )}
+                            {activity.action.includes("suspend") && (
+                              <Ban className="w-4 h-4 text-orange-600" />
+                            )}
+                            {activity.action.includes("assign") && (
+                              <Car className="w-4 h-4 text-blue-600" />
+                            )}
                           </div>
                           <div className="flex-1">
                             <p className="text-sm font-medium">
-                              {activity.action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              {activity.action
+                                .replace("_", " ")
+                                .replace(/\b\w/g, (l) => l.toUpperCase())}
                             </p>
                             <p className="text-xs text-gray-600">
-                              {activity.details.driverName && `Driver: ${activity.details.driverName}`}
-                              {activity.details.vehicleNumber && `Vehicle: ${activity.details.vehicleNumber}`}
+                              {activity.details.driverName &&
+                                `Driver: ${activity.details.driverName}`}
+                              {activity.details.vehicleNumber &&
+                                `Vehicle: ${activity.details.vehicleNumber}`}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {formatRelativeTime(activity.timestamp)} by {activity.adminName}
+                              {formatRelativeTime(activity.timestamp)} by{" "}
+                              {activity.adminName}
                             </p>
                           </div>
                         </div>
@@ -1049,7 +1159,8 @@ export default function AdminPanel() {
                           <AlertTriangle className="w-5 h-5 text-yellow-600" />
                           <div className="flex-1">
                             <p className="text-sm font-medium text-yellow-800">
-                              {dashboardStats.drivers.pending} pending driver applications
+                              {dashboardStats.drivers.pending} pending driver
+                              applications
                             </p>
                             <p className="text-xs text-yellow-700">
                               Review and approve new driver registrations
@@ -1065,12 +1176,18 @@ export default function AdminPanel() {
                         </div>
                       )}
 
-                      {vehicles.filter(v => v.status === "maintenance").length > 0 && (
+                      {vehicles.filter((v) => v.status === "maintenance")
+                        .length > 0 && (
                         <div className="flex items-center space-x-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
                           <Wrench className="w-5 h-5 text-orange-600" />
                           <div className="flex-1">
                             <p className="text-sm font-medium text-orange-800">
-                              {vehicles.filter(v => v.status === "maintenance").length} vehicles in maintenance
+                              {
+                                vehicles.filter(
+                                  (v) => v.status === "maintenance",
+                                ).length
+                              }{" "}
+                              vehicles in maintenance
                             </p>
                             <p className="text-xs text-orange-700">
                               Monitor vehicle maintenance status
@@ -1087,12 +1204,17 @@ export default function AdminPanel() {
                         </div>
                       )}
 
-                      {drivers.filter(d => d.status === "suspended").length > 0 && (
+                      {drivers.filter((d) => d.status === "suspended").length >
+                        0 && (
                         <div className="flex items-center space-x-4 p-3 bg-red-50 rounded-lg border border-red-200">
                           <Ban className="w-5 h-5 text-red-600" />
                           <div className="flex-1">
                             <p className="text-sm font-medium text-red-800">
-                              {drivers.filter(d => d.status === "suspended").length} suspended drivers
+                              {
+                                drivers.filter((d) => d.status === "suspended")
+                                  .length
+                              }{" "}
+                              suspended drivers
                             </p>
                             <p className="text-xs text-red-700">
                               Review suspended driver accounts
@@ -1113,7 +1235,11 @@ export default function AdminPanel() {
                         <Star className="w-5 h-5 text-green-600" />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-green-800">
-                            Platform rating: {(dashboardStats.earnings?.averageRating || 0).toFixed(1)}★
+                            Platform rating:{" "}
+                            {(
+                              dashboardStats.earnings?.averageRating || 0
+                            ).toFixed(1)}
+                            ★
                           </p>
                           <p className="text-xs text-green-700">
                             Excellent customer satisfaction
@@ -1182,10 +1308,14 @@ export default function AdminPanel() {
                     key={driver.id}
                     className="hover:shadow-md transition-all duration-200 border-l-4"
                     style={{
-                      borderLeftColor: 
-                        driver.status === "active" ? "#10b981" :
-                        driver.status === "pending" ? "#f59e0b" :
-                        driver.status === "suspended" ? "#ef4444" : "#6b7280"
+                      borderLeftColor:
+                        driver.status === "active"
+                          ? "#10b981"
+                          : driver.status === "pending"
+                            ? "#f59e0b"
+                            : driver.status === "suspended"
+                              ? "#ef4444"
+                              : "#6b7280",
                     }}
                   >
                     <CardContent className="p-6">
@@ -1257,7 +1387,12 @@ export default function AdminPanel() {
                               {driver.currentLocation && (
                                 <div className="flex items-center space-x-1 text-green-600">
                                   <MapPin className="w-3 h-3" />
-                                  <span>Last seen {formatRelativeTime(driver.currentLocation.lastUpdated)}</span>
+                                  <span>
+                                    Last seen{" "}
+                                    {formatRelativeTime(
+                                      driver.currentLocation.lastUpdated,
+                                    )}
+                                  </span>
                                 </div>
                               )}
                             </div>
@@ -1271,7 +1406,9 @@ export default function AdminPanel() {
                               Rating
                             </p>
                             <p className="font-semibold">
-                              {driver.averageRating > 0 ? `${driver.averageRating}★` : "New"}
+                              {driver.averageRating > 0
+                                ? `${driver.averageRating}★`
+                                : "New"}
                             </p>
                           </div>
                           <div>
@@ -1295,7 +1432,9 @@ export default function AdminPanel() {
                               <Navigation className="w-3 h-3 mr-1" />
                               Distance
                             </p>
-                            <p className="font-semibold">{driver.totalKmDriven} km</p>
+                            <p className="font-semibold">
+                              {driver.totalKmDriven} km
+                            </p>
                           </div>
                           <div>
                             <p className="text-gray-600 flex items-center">
@@ -1334,20 +1473,32 @@ export default function AdminPanel() {
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Reject Driver Application</AlertDialogTitle>
+                                    <AlertDialogTitle>
+                                      Reject Driver Application
+                                    </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Please provide a reason for rejecting {driver.name}'s application.
+                                      Please provide a reason for rejecting{" "}
+                                      {driver.name}'s application.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <Textarea
                                     placeholder="Enter rejection reason..."
                                     value={rejectionReason}
-                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    onChange={(e) =>
+                                      setRejectionReason(e.target.value)
+                                    }
                                   />
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
                                     <AlertDialogAction
-                                      onClick={() => handleRejectDriver(driver.id, rejectionReason)}
+                                      onClick={() =>
+                                        handleRejectDriver(
+                                          driver.id,
+                                          rejectionReason,
+                                        )
+                                      }
                                       className="bg-red-600 hover:bg-red-700"
                                     >
                                       Reject Application
@@ -1381,9 +1532,15 @@ export default function AdminPanel() {
                                             .join("")}
                                         </div>
                                         <div>
-                                          <span>Driver Details - {driver.name}</span>
+                                          <span>
+                                            Driver Details - {driver.name}
+                                          </span>
                                           <div className="flex items-center space-x-2 mt-1">
-                                            <Badge className={getStatusColor(driver.status)}>
+                                            <Badge
+                                              className={getStatusColor(
+                                                driver.status,
+                                              )}
+                                            >
                                               {driver.status}
                                             </Badge>
                                             {driver.isOnline && (
@@ -1396,7 +1553,7 @@ export default function AdminPanel() {
                                         </div>
                                       </DialogTitle>
                                     </DialogHeader>
-                                    
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                       {/* Personal Information */}
                                       <div className="space-y-4">
@@ -1406,20 +1563,36 @@ export default function AdminPanel() {
                                           </Label>
                                           <div className="space-y-2 mt-2 p-3 bg-gray-50 rounded-lg">
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">Email:</span>
-                                              <span className="text-sm font-medium">{driver.email}</span>
+                                              <span className="text-sm text-gray-600">
+                                                Email:
+                                              </span>
+                                              <span className="text-sm font-medium">
+                                                {driver.email}
+                                              </span>
                                             </div>
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">Phone:</span>
-                                              <span className="text-sm font-medium">{driver.phone}</span>
+                                              <span className="text-sm text-gray-600">
+                                                Phone:
+                                              </span>
+                                              <span className="text-sm font-medium">
+                                                {driver.phone}
+                                              </span>
                                             </div>
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">License:</span>
-                                              <span className="text-sm font-medium">{driver.licenseNumber}</span>
+                                              <span className="text-sm text-gray-600">
+                                                License:
+                                              </span>
+                                              <span className="text-sm font-medium">
+                                                {driver.licenseNumber}
+                                              </span>
                                             </div>
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">Joined:</span>
-                                              <span className="text-sm font-medium">{formatDate(driver.joinDate)}</span>
+                                              <span className="text-sm text-gray-600">
+                                                Joined:
+                                              </span>
+                                              <span className="text-sm font-medium">
+                                                {formatDate(driver.joinDate)}
+                                              </span>
                                             </div>
                                           </div>
                                         </div>
@@ -1431,50 +1604,93 @@ export default function AdminPanel() {
                                           </Label>
                                           <div className="space-y-2 mt-2 p-3 bg-gray-50 rounded-lg">
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">Type:</span>
-                                              <Badge className={
-                                                driver.driverType.type === "owner"
-                                                  ? "bg-yellow-100 text-yellow-800"
-                                                  : "bg-blue-100 text-blue-800"
-                                              }>
-                                                {driver.driverType.type === "owner" ? "Vehicle Owner" : "Fleet Driver"}
+                                              <span className="text-sm text-gray-600">
+                                                Type:
+                                              </span>
+                                              <Badge
+                                                className={
+                                                  driver.driverType.type ===
+                                                  "owner"
+                                                    ? "bg-yellow-100 text-yellow-800"
+                                                    : "bg-blue-100 text-blue-800"
+                                                }
+                                              >
+                                                {driver.driverType.type ===
+                                                "owner"
+                                                  ? "Vehicle Owner"
+                                                  : "Fleet Driver"}
                                               </Badge>
                                             </div>
-                                            {driver.driverType.type === "owner" ? (
+                                            {driver.driverType.type ===
+                                            "owner" ? (
                                               <>
                                                 <div className="flex justify-between">
-                                                  <span className="text-sm text-gray-600">Vehicle:</span>
-                                                  <span className="text-sm font-medium">{driver.vehicleModel}</span>
+                                                  <span className="text-sm text-gray-600">
+                                                    Vehicle:
+                                                  </span>
+                                                  <span className="text-sm font-medium">
+                                                    {driver.vehicleModel}
+                                                  </span>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                  <span className="text-sm text-gray-600">Number:</span>
-                                                  <span className="text-sm font-medium">{driver.vehicleNumber}</span>
+                                                  <span className="text-sm text-gray-600">
+                                                    Number:
+                                                  </span>
+                                                  <span className="text-sm font-medium">
+                                                    {driver.vehicleNumber}
+                                                  </span>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                  <span className="text-sm text-gray-600">Commission:</span>
-                                                  <span className="text-sm font-medium">{(driver.driverType.commissionRate || 0) * 100}%</span>
+                                                  <span className="text-sm text-gray-600">
+                                                    Commission:
+                                                  </span>
+                                                  <span className="text-sm font-medium">
+                                                    {(driver.driverType
+                                                      .commissionRate || 0) *
+                                                      100}
+                                                    %
+                                                  </span>
                                                 </div>
                                               </>
                                             ) : (
                                               <>
                                                 <div className="flex justify-between">
-                                                  <span className="text-sm text-gray-600">Assigned Vehicle:</span>
-                                                  <span className="text-sm font-medium">{driver.assignedVehicle}</span>
+                                                  <span className="text-sm text-gray-600">
+                                                    Assigned Vehicle:
+                                                  </span>
+                                                  <span className="text-sm font-medium">
+                                                    {driver.assignedVehicle}
+                                                  </span>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                  <span className="text-sm text-gray-600">Salary Rate:</span>
-                                                  <span className="text-sm font-medium">₹{driver.driverType.salaryPerKm}/km</span>
+                                                  <span className="text-sm text-gray-600">
+                                                    Salary Rate:
+                                                  </span>
+                                                  <span className="text-sm font-medium">
+                                                    ₹
+                                                    {
+                                                      driver.driverType
+                                                        .salaryPerKm
+                                                    }
+                                                    /km
+                                                  </span>
                                                 </div>
                                               </>
                                             )}
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">Documents:</span>
-                                              <Badge className={
-                                                driver.documentsVerified 
-                                                  ? "bg-green-100 text-green-800"
-                                                  : "bg-red-100 text-red-800"
-                                              }>
-                                                {driver.documentsVerified ? "Verified" : "Pending"}
+                                              <span className="text-sm text-gray-600">
+                                                Documents:
+                                              </span>
+                                              <Badge
+                                                className={
+                                                  driver.documentsVerified
+                                                    ? "bg-green-100 text-green-800"
+                                                    : "bg-red-100 text-red-800"
+                                                }
+                                              >
+                                                {driver.documentsVerified
+                                                  ? "Verified"
+                                                  : "Pending"}
                                               </Badge>
                                             </div>
                                           </div>
@@ -1492,25 +1708,33 @@ export default function AdminPanel() {
                                               <div className="text-2xl font-bold text-blue-600">
                                                 {driver.averageRating}★
                                               </div>
-                                              <div className="text-xs text-blue-700">Rating</div>
+                                              <div className="text-xs text-blue-700">
+                                                Rating
+                                              </div>
                                             </div>
                                             <div className="p-3 bg-green-50 rounded-lg text-center">
                                               <div className="text-2xl font-bold text-green-600">
                                                 {driver.totalRides}
                                               </div>
-                                              <div className="text-xs text-green-700">Total Rides</div>
+                                              <div className="text-xs text-green-700">
+                                                Total Rides
+                                              </div>
                                             </div>
                                             <div className="p-3 bg-purple-50 rounded-lg text-center">
                                               <div className="text-2xl font-bold text-purple-600">
                                                 {driver.acceptanceRate}%
                                               </div>
-                                              <div className="text-xs text-purple-700">Acceptance</div>
+                                              <div className="text-xs text-purple-700">
+                                                Acceptance
+                                              </div>
                                             </div>
                                             <div className="p-3 bg-orange-50 rounded-lg text-center">
                                               <div className="text-2xl font-bold text-orange-600">
                                                 {driver.completionRate}%
                                               </div>
-                                              <div className="text-xs text-orange-700">Completion</div>
+                                              <div className="text-xs text-orange-700">
+                                                Completion
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
@@ -1521,24 +1745,39 @@ export default function AdminPanel() {
                                           </Label>
                                           <div className="space-y-2 mt-2 p-3 bg-gray-50 rounded-lg">
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">Total Earnings:</span>
+                                              <span className="text-sm text-gray-600">
+                                                Total Earnings:
+                                              </span>
                                               <span className="text-sm font-bold text-green-600">
-                                                ₹{driver.totalEarnings.toLocaleString()}
+                                                ₹
+                                                {driver.totalEarnings.toLocaleString()}
                                               </span>
                                             </div>
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">Distance Driven:</span>
-                                              <span className="text-sm font-medium">{driver.totalKmDriven} km</span>
+                                              <span className="text-sm text-gray-600">
+                                                Distance Driven:
+                                              </span>
+                                              <span className="text-sm font-medium">
+                                                {driver.totalKmDriven} km
+                                              </span>
                                             </div>
                                             <div className="flex justify-between">
-                                              <span className="text-sm text-gray-600">Online Hours:</span>
-                                              <span className="text-sm font-medium">{driver.onlineHours}h</span>
+                                              <span className="text-sm text-gray-600">
+                                                Online Hours:
+                                              </span>
+                                              <span className="text-sm font-medium">
+                                                {driver.onlineHours}h
+                                              </span>
                                             </div>
                                             {driver.lastActive && (
                                               <div className="flex justify-between">
-                                                <span className="text-sm text-gray-600">Last Active:</span>
+                                                <span className="text-sm text-gray-600">
+                                                  Last Active:
+                                                </span>
                                                 <span className="text-sm font-medium">
-                                                  {formatRelativeTime(driver.lastActive)}
+                                                  {formatRelativeTime(
+                                                    driver.lastActive,
+                                                  )}
                                                 </span>
                                               </div>
                                             )}
@@ -1546,81 +1785,135 @@ export default function AdminPanel() {
                                         </div>
 
                                         {/* Current Shift (for fleet drivers) */}
-                                        {driver.driverType.type === "fleet" && driver.currentShift && (
-                                          <div>
-                                            <Label className="text-sm text-gray-600 font-semibold">
-                                              Current Shift
-                                            </Label>
-                                            <div className="space-y-2 mt-2 p-3 bg-blue-50 rounded-lg">
-                                              <div className="flex justify-between">
-                                                <span className="text-sm text-blue-700">Started:</span>
-                                                <span className="text-sm font-medium text-blue-800">
-                                                  {formatTime(driver.currentShift.startTime)}
-                                                </span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-sm text-blue-700">Target:</span>
-                                                <span className="text-sm font-medium text-blue-800">
-                                                  {driver.currentShift.targetKm} km
-                                                </span>
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-sm text-blue-700">Completed:</span>
-                                                <span className="text-sm font-medium text-blue-800">
-                                                  {driver.currentShift.completedKm} km
-                                                </span>
-                                              </div>
-                                              <div className="mt-2">
-                                                <Progress 
-                                                  value={((driver.currentShift.completedKm || 0) / (driver.currentShift.targetKm || 1)) * 100} 
-                                                  className="h-2"
-                                                />
-                                              </div>
-                                              <div className="flex justify-between">
-                                                <span className="text-sm text-blue-700">Shift Earnings:</span>
-                                                <span className="text-sm font-bold text-blue-800">
-                                                  ₹{driver.currentShift.earnings}
-                                                </span>
+                                        {driver.driverType.type === "fleet" &&
+                                          driver.currentShift && (
+                                            <div>
+                                              <Label className="text-sm text-gray-600 font-semibold">
+                                                Current Shift
+                                              </Label>
+                                              <div className="space-y-2 mt-2 p-3 bg-blue-50 rounded-lg">
+                                                <div className="flex justify-between">
+                                                  <span className="text-sm text-blue-700">
+                                                    Started:
+                                                  </span>
+                                                  <span className="text-sm font-medium text-blue-800">
+                                                    {formatTime(
+                                                      driver.currentShift
+                                                        .startTime,
+                                                    )}
+                                                  </span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                  <span className="text-sm text-blue-700">
+                                                    Target:
+                                                  </span>
+                                                  <span className="text-sm font-medium text-blue-800">
+                                                    {
+                                                      driver.currentShift
+                                                        .targetKm
+                                                    }{" "}
+                                                    km
+                                                  </span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                  <span className="text-sm text-blue-700">
+                                                    Completed:
+                                                  </span>
+                                                  <span className="text-sm font-medium text-blue-800">
+                                                    {
+                                                      driver.currentShift
+                                                        .completedKm
+                                                    }{" "}
+                                                    km
+                                                  </span>
+                                                </div>
+                                                <div className="mt-2">
+                                                  <Progress
+                                                    value={
+                                                      ((driver.currentShift
+                                                        .completedKm || 0) /
+                                                        (driver.currentShift
+                                                          .targetKm || 1)) *
+                                                      100
+                                                    }
+                                                    className="h-2"
+                                                  />
+                                                </div>
+                                                <div className="flex justify-between">
+                                                  <span className="text-sm text-blue-700">
+                                                    Shift Earnings:
+                                                  </span>
+                                                  <span className="text-sm font-bold text-blue-800">
+                                                    ₹
+                                                    {
+                                                      driver.currentShift
+                                                        .earnings
+                                                    }
+                                                  </span>
+                                                </div>
                                               </div>
                                             </div>
-                                          </div>
-                                        )}
+                                          )}
                                       </div>
                                     </div>
 
                                     {/* Vehicle Assignment for Fleet Drivers */}
-                                    {driver.driverType.type === "fleet" && driver.status === "active" && (
-                                      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                        <Label className="text-sm text-blue-700 font-semibold">
-                                          Vehicle Assignment
-                                        </Label>
-                                        <div className="flex items-center space-x-2 mt-2">
-                                          <Select
-                                            value={driver.assignedVehicle || ""}
-                                            onValueChange={(value) => handleAssignVehicle(driver.id, value)}
-                                          >
-                                            <SelectTrigger className="flex-1">
-                                              <SelectValue placeholder="Assign vehicle" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                              {vehicles
-                                                .filter(v => v.type === "company" && (v.status === "available" || v.assignedDriverId === driver.id))
-                                                .map((vehicle) => (
-                                                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                                                    {vehicle.make} {vehicle.model} - {vehicle.registrationNumber}
-                                                    {vehicle.assignedDriverId === driver.id && " (Current)"}
-                                                  </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                          </Select>
+                                    {driver.driverType.type === "fleet" &&
+                                      driver.status === "active" && (
+                                        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                          <Label className="text-sm text-blue-700 font-semibold">
+                                            Vehicle Assignment
+                                          </Label>
+                                          <div className="flex items-center space-x-2 mt-2">
+                                            <Select
+                                              value={
+                                                driver.assignedVehicle || ""
+                                              }
+                                              onValueChange={(value) =>
+                                                handleAssignVehicle(
+                                                  driver.id,
+                                                  value,
+                                                )
+                                              }
+                                            >
+                                              <SelectTrigger className="flex-1">
+                                                <SelectValue placeholder="Assign vehicle" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                {vehicles
+                                                  .filter(
+                                                    (v) =>
+                                                      v.type === "company" &&
+                                                      (v.status ===
+                                                        "available" ||
+                                                        v.assignedDriverId ===
+                                                          driver.id),
+                                                  )
+                                                  .map((vehicle) => (
+                                                    <SelectItem
+                                                      key={vehicle.id}
+                                                      value={vehicle.id}
+                                                    >
+                                                      {vehicle.make}{" "}
+                                                      {vehicle.model} -{" "}
+                                                      {
+                                                        vehicle.registrationNumber
+                                                      }
+                                                      {vehicle.assignedDriverId ===
+                                                        driver.id &&
+                                                        " (Current)"}
+                                                    </SelectItem>
+                                                  ))}
+                                              </SelectContent>
+                                            </Select>
+                                          </div>
                                         </div>
-                                      </div>
-                                    )}
+                                      )}
                                   </DialogContent>
                                 </Dialog>
 
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   variant="outline"
                                   className="flex-1"
                                 >
@@ -1643,20 +1936,32 @@ export default function AdminPanel() {
                                   </AlertDialogTrigger>
                                   <AlertDialogContent>
                                     <AlertDialogHeader>
-                                      <AlertDialogTitle>Suspend Driver</AlertDialogTitle>
+                                      <AlertDialogTitle>
+                                        Suspend Driver
+                                      </AlertDialogTitle>
                                       <AlertDialogDescription>
-                                        Please provide a reason for suspending {driver.name}.
+                                        Please provide a reason for suspending{" "}
+                                        {driver.name}.
                                       </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <Textarea
                                       placeholder="Enter suspension reason..."
                                       value={suspensionReason}
-                                      onChange={(e) => setSuspensionReason(e.target.value)}
+                                      onChange={(e) =>
+                                        setSuspensionReason(e.target.value)
+                                      }
                                     />
                                     <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogCancel>
+                                        Cancel
+                                      </AlertDialogCancel>
                                       <AlertDialogAction
-                                        onClick={() => handleSuspendDriver(driver.id, suspensionReason)}
+                                        onClick={() =>
+                                          handleSuspendDriver(
+                                            driver.id,
+                                            suspensionReason,
+                                          )
+                                        }
                                         className="bg-orange-600 hover:bg-orange-700"
                                       >
                                         Suspend Driver
@@ -1763,7 +2068,9 @@ export default function AdminPanel() {
                           <div>
                             <p className="text-gray-600">Type</p>
                             <p className="font-semibold">
-                              {vehicle.type === "company" ? "Company" : "Driver Owned"}
+                              {vehicle.type === "company"
+                                ? "Company"
+                                : "Driver Owned"}
                             </p>
                           </div>
                           <div>
@@ -1783,7 +2090,8 @@ export default function AdminPanel() {
                                   Assigned to: {vehicle.assignedDriverName}
                                 </p>
                                 <p className="text-xs text-blue-600">
-                                  {vehicle.totalRides} rides • {vehicle.averageRating}★ rating
+                                  {vehicle.totalRides} rides •{" "}
+                                  {vehicle.averageRating}★ rating
                                 </p>
                               </div>
                             </div>
@@ -1794,21 +2102,27 @@ export default function AdminPanel() {
                         <div className="space-y-2">
                           <div className="flex items-center justify-between text-xs">
                             <span className="text-gray-600">Next Service:</span>
-                            <span className={
-                              vehicle.nextService < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                                ? "text-orange-600 font-medium"
-                                : "text-gray-800"
-                            }>
+                            <span
+                              className={
+                                vehicle.nextService <
+                                new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                                  ? "text-orange-600 font-medium"
+                                  : "text-gray-800"
+                              }
+                            >
                               {formatDate(vehicle.nextService)}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-xs">
                             <span className="text-gray-600">Insurance:</span>
-                            <span className={
-                              vehicle.insuranceExpiry < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                                ? "text-red-600 font-medium"
-                                : "text-gray-800"
-                            }>
+                            <span
+                              className={
+                                vehicle.insuranceExpiry <
+                                new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                                  ? "text-red-600 font-medium"
+                                  : "text-gray-800"
+                              }
+                            >
                               {formatDate(vehicle.insuranceExpiry)}
                             </span>
                           </div>
@@ -1831,7 +2145,10 @@ export default function AdminPanel() {
                               <DialogHeader>
                                 <DialogTitle className="flex items-center space-x-2">
                                   <Car className="w-6 h-6 text-blue-600" />
-                                  <span>Vehicle Details - {vehicle.make} {vehicle.model}</span>
+                                  <span>
+                                    Vehicle Details - {vehicle.make}{" "}
+                                    {vehicle.model}
+                                  </span>
                                 </DialogTitle>
                               </DialogHeader>
                               <div className="space-y-6">
@@ -1843,29 +2160,51 @@ export default function AdminPanel() {
                                       </Label>
                                       <div className="space-y-2 mt-2 p-3 bg-gray-50 rounded-lg">
                                         <div className="flex justify-between">
-                                          <span className="text-sm text-gray-600">Registration:</span>
-                                          <span className="text-sm font-medium">{vehicle.registrationNumber}</span>
+                                          <span className="text-sm text-gray-600">
+                                            Registration:
+                                          </span>
+                                          <span className="text-sm font-medium">
+                                            {vehicle.registrationNumber}
+                                          </span>
                                         </div>
                                         <div className="flex justify-between">
-                                          <span className="text-sm text-gray-600">Year:</span>
-                                          <span className="text-sm font-medium">{vehicle.year}</span>
+                                          <span className="text-sm text-gray-600">
+                                            Year:
+                                          </span>
+                                          <span className="text-sm font-medium">
+                                            {vehicle.year}
+                                          </span>
                                         </div>
                                         <div className="flex justify-between">
-                                          <span className="text-sm text-gray-600">Color:</span>
-                                          <span className="text-sm font-medium">{vehicle.color}</span>
+                                          <span className="text-sm text-gray-600">
+                                            Color:
+                                          </span>
+                                          <span className="text-sm font-medium">
+                                            {vehicle.color}
+                                          </span>
                                         </div>
                                         <div className="flex justify-between">
-                                          <span className="text-sm text-gray-600">Fuel Type:</span>
-                                          <span className="text-sm font-medium capitalize">{vehicle.fuelType}</span>
+                                          <span className="text-sm text-gray-600">
+                                            Fuel Type:
+                                          </span>
+                                          <span className="text-sm font-medium capitalize">
+                                            {vehicle.fuelType}
+                                          </span>
                                         </div>
                                         <div className="flex justify-between">
-                                          <span className="text-sm text-gray-600">Type:</span>
-                                          <Badge className={
-                                            vehicle.type === "company" 
-                                              ? "bg-blue-100 text-blue-800"
-                                              : "bg-yellow-100 text-yellow-800"
-                                          }>
-                                            {vehicle.type === "company" ? "Company" : "Driver Owned"}
+                                          <span className="text-sm text-gray-600">
+                                            Type:
+                                          </span>
+                                          <Badge
+                                            className={
+                                              vehicle.type === "company"
+                                                ? "bg-blue-100 text-blue-800"
+                                                : "bg-yellow-100 text-yellow-800"
+                                            }
+                                          >
+                                            {vehicle.type === "company"
+                                              ? "Company"
+                                              : "Driver Owned"}
                                           </Badge>
                                         </div>
                                       </div>
@@ -1880,19 +2219,25 @@ export default function AdminPanel() {
                                           <div className="text-lg font-bold text-blue-600">
                                             {vehicle.totalRides}
                                           </div>
-                                          <div className="text-xs text-blue-700">Rides</div>
+                                          <div className="text-xs text-blue-700">
+                                            Rides
+                                          </div>
                                         </div>
                                         <div className="p-2 bg-green-50 rounded text-center">
                                           <div className="text-lg font-bold text-green-600">
                                             {vehicle.averageRating || 0}★
                                           </div>
-                                          <div className="text-xs text-green-700">Rating</div>
+                                          <div className="text-xs text-green-700">
+                                            Rating
+                                          </div>
                                         </div>
                                         <div className="p-2 bg-purple-50 rounded text-center">
                                           <div className="text-lg font-bold text-purple-600">
                                             {vehicle.totalKmDriven.toLocaleString()}
                                           </div>
-                                          <div className="text-xs text-purple-700">KM</div>
+                                          <div className="text-xs text-purple-700">
+                                            KM
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
@@ -1905,47 +2250,89 @@ export default function AdminPanel() {
                                       </Label>
                                       <div className="space-y-2 mt-2 p-3 bg-gray-50 rounded-lg">
                                         <div className="flex justify-between">
-                                          <span className="text-sm text-gray-600">Last Service:</span>
-                                          <span className="text-sm font-medium">{formatDate(vehicle.lastService)}</span>
+                                          <span className="text-sm text-gray-600">
+                                            Last Service:
+                                          </span>
+                                          <span className="text-sm font-medium">
+                                            {formatDate(vehicle.lastService)}
+                                          </span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                          <span className="text-sm text-gray-600">Next Service:</span>
-                                          <span className={`text-sm font-medium ${
-                                            vehicle.nextService < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                                              ? "text-orange-600"
-                                              : ""
-                                          }`}>
+                                          <span className="text-sm text-gray-600">
+                                            Next Service:
+                                          </span>
+                                          <span
+                                            className={`text-sm font-medium ${
+                                              vehicle.nextService <
+                                              new Date(
+                                                Date.now() +
+                                                  30 * 24 * 60 * 60 * 1000,
+                                              )
+                                                ? "text-orange-600"
+                                                : ""
+                                            }`}
+                                          >
                                             {formatDate(vehicle.nextService)}
                                           </span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                          <span className="text-sm text-gray-600">Insurance Expiry:</span>
-                                          <span className={`text-sm font-medium ${
-                                            vehicle.insuranceExpiry < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                                              ? "text-red-600"
-                                              : ""
-                                          }`}>
-                                            {formatDate(vehicle.insuranceExpiry)}
+                                          <span className="text-sm text-gray-600">
+                                            Insurance Expiry:
+                                          </span>
+                                          <span
+                                            className={`text-sm font-medium ${
+                                              vehicle.insuranceExpiry <
+                                              new Date(
+                                                Date.now() +
+                                                  30 * 24 * 60 * 60 * 1000,
+                                              )
+                                                ? "text-red-600"
+                                                : ""
+                                            }`}
+                                          >
+                                            {formatDate(
+                                              vehicle.insuranceExpiry,
+                                            )}
                                           </span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                          <span className="text-sm text-gray-600">Registration Expiry:</span>
-                                          <span className={`text-sm font-medium ${
-                                            vehicle.registrationExpiry < new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
-                                              ? "text-orange-600"
-                                              : ""
-                                          }`}>
-                                            {formatDate(vehicle.registrationExpiry)}
+                                          <span className="text-sm text-gray-600">
+                                            Registration Expiry:
+                                          </span>
+                                          <span
+                                            className={`text-sm font-medium ${
+                                              vehicle.registrationExpiry <
+                                              new Date(
+                                                Date.now() +
+                                                  60 * 24 * 60 * 60 * 1000,
+                                              )
+                                                ? "text-orange-600"
+                                                : ""
+                                            }`}
+                                          >
+                                            {formatDate(
+                                              vehicle.registrationExpiry,
+                                            )}
                                           </span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                          <span className="text-sm text-gray-600">Pollution Expiry:</span>
-                                          <span className={`text-sm font-medium ${
-                                            vehicle.pollutionExpiry < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                                              ? "text-orange-600"
-                                              : ""
-                                          }`}>
-                                            {formatDate(vehicle.pollutionExpiry)}
+                                          <span className="text-sm text-gray-600">
+                                            Pollution Expiry:
+                                          </span>
+                                          <span
+                                            className={`text-sm font-medium ${
+                                              vehicle.pollutionExpiry <
+                                              new Date(
+                                                Date.now() +
+                                                  30 * 24 * 60 * 60 * 1000,
+                                              )
+                                                ? "text-orange-600"
+                                                : ""
+                                            }`}
+                                          >
+                                            {formatDate(
+                                              vehicle.pollutionExpiry,
+                                            )}
                                           </span>
                                         </div>
                                       </div>
@@ -1976,7 +2363,11 @@ export default function AdminPanel() {
                               </div>
                             </DialogContent>
                           </Dialog>
-                          <Button size="sm" variant="outline" className="flex-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1"
+                          >
                             <Edit className="w-4 h-4 mr-1" />
                             Edit
                           </Button>
@@ -2024,7 +2415,10 @@ export default function AdminPanel() {
                           Total Revenue
                         </p>
                         <p className="text-2xl font-bold text-green-700">
-                          ₹{(dashboardStats.earnings?.totalRevenue || 0).toLocaleString()}
+                          ₹
+                          {(
+                            dashboardStats.earnings?.totalRevenue || 0
+                          ).toLocaleString()}
                         </p>
                         <p className="text-xs text-green-600">This month</p>
                       </div>
@@ -2041,10 +2435,17 @@ export default function AdminPanel() {
                           Commission Earned
                         </p>
                         <p className="text-2xl font-bold text-yellow-700">
-                          ₹{Math.round(
+                          ₹
+                          {Math.round(
                             drivers
-                              .filter(d => d.driverType.type === "owner")
-                              .reduce((sum, d) => sum + d.totalEarnings * (d.driverType.commissionRate || 0), 0)
+                              .filter((d) => d.driverType.type === "owner")
+                              .reduce(
+                                (sum, d) =>
+                                  sum +
+                                  d.totalEarnings *
+                                    (d.driverType.commissionRate || 0),
+                                0,
+                              ),
                           ).toLocaleString()}
                         </p>
                         <p className="text-xs text-yellow-600">
@@ -2064,8 +2465,9 @@ export default function AdminPanel() {
                           Fleet Salaries
                         </p>
                         <p className="text-2xl font-bold text-blue-700">
-                          ₹{drivers
-                            .filter(d => d.driverType.type === "fleet")
+                          ₹
+                          {drivers
+                            .filter((d) => d.driverType.type === "fleet")
                             .reduce((sum, d) => sum + d.totalEarnings, 0)
                             .toLocaleString()}
                         </p>
@@ -2086,9 +2488,10 @@ export default function AdminPanel() {
                           Avg. per Driver
                         </p>
                         <p className="text-2xl font-bold text-purple-700">
-                          ₹{Math.round(
+                          ₹
+                          {Math.round(
                             (dashboardStats.earnings?.totalRevenue || 0) /
-                              Math.max(dashboardStats.drivers?.active || 1, 1)
+                              Math.max(dashboardStats.drivers?.active || 1, 1),
                           ).toLocaleString()}
                         </p>
                         <p className="text-xs text-purple-600">
@@ -2126,12 +2529,16 @@ export default function AdminPanel() {
                             <div>
                               <p className="font-semibold">{driver.name}</p>
                               <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                <Badge className={
-                                  driver.driverType.type === "owner"
-                                    ? "bg-yellow-100 text-yellow-800 text-xs"
-                                    : "bg-blue-100 text-blue-800 text-xs"
-                                }>
-                                  {driver.driverType.type === "owner" ? "Owner" : "Fleet"}
+                                <Badge
+                                  className={
+                                    driver.driverType.type === "owner"
+                                      ? "bg-yellow-100 text-yellow-800 text-xs"
+                                      : "bg-blue-100 text-blue-800 text-xs"
+                                  }
+                                >
+                                  {driver.driverType.type === "owner"
+                                    ? "Owner"
+                                    : "Fleet"}
                                 </Badge>
                                 <span>•</span>
                                 <span>{driver.totalRides} rides</span>
@@ -2182,7 +2589,7 @@ export default function AdminPanel() {
                           type="number"
                           value={commissionSettings.vehicleOwnerRate}
                           onChange={(e) =>
-                            setCommissionSettings(prev => ({
+                            setCommissionSettings((prev) => ({
                               ...prev,
                               vehicleOwnerRate: parseFloat(e.target.value),
                             }))
@@ -2205,7 +2612,7 @@ export default function AdminPanel() {
                           type="number"
                           value={commissionSettings.fleetDriverSalaryRate}
                           onChange={(e) =>
-                            setCommissionSettings(prev => ({
+                            setCommissionSettings((prev) => ({
                               ...prev,
                               fleetDriverSalaryRate: parseFloat(e.target.value),
                             }))
@@ -2226,7 +2633,7 @@ export default function AdminPanel() {
                           type="number"
                           value={commissionSettings.platformFee}
                           onChange={(e) =>
-                            setCommissionSettings(prev => ({
+                            setCommissionSettings((prev) => ({
                               ...prev,
                               platformFee: parseFloat(e.target.value),
                             }))
@@ -2260,53 +2667,69 @@ export default function AdminPanel() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {commissionSettings.bonusThresholds.map((threshold, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"
-                        >
-                          <div className="flex-1">
-                            <Label htmlFor={`rides-${index}`} className="text-sm">
-                              Rides Completed
-                            </Label>
-                            <Input
-                              id={`rides-${index}`}
-                              type="number"
-                              value={threshold.rides}
-                              onChange={(e) => {
-                                const newThresholds = [...commissionSettings.bonusThresholds];
-                                newThresholds[index].rides = parseInt(e.target.value);
-                                setCommissionSettings(prev => ({
-                                  ...prev,
-                                  bonusThresholds: newThresholds,
-                                }));
-                              }}
-                              min="10"
-                              step="10"
-                            />
+                      {commissionSettings.bonusThresholds.map(
+                        (threshold, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg"
+                          >
+                            <div className="flex-1">
+                              <Label
+                                htmlFor={`rides-${index}`}
+                                className="text-sm"
+                              >
+                                Rides Completed
+                              </Label>
+                              <Input
+                                id={`rides-${index}`}
+                                type="number"
+                                value={threshold.rides}
+                                onChange={(e) => {
+                                  const newThresholds = [
+                                    ...commissionSettings.bonusThresholds,
+                                  ];
+                                  newThresholds[index].rides = parseInt(
+                                    e.target.value,
+                                  );
+                                  setCommissionSettings((prev) => ({
+                                    ...prev,
+                                    bonusThresholds: newThresholds,
+                                  }));
+                                }}
+                                min="10"
+                                step="10"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <Label
+                                htmlFor={`bonus-${index}`}
+                                className="text-sm"
+                              >
+                                Bonus Amount (₹)
+                              </Label>
+                              <Input
+                                id={`bonus-${index}`}
+                                type="number"
+                                value={threshold.bonus}
+                                onChange={(e) => {
+                                  const newThresholds = [
+                                    ...commissionSettings.bonusThresholds,
+                                  ];
+                                  newThresholds[index].bonus = parseInt(
+                                    e.target.value,
+                                  );
+                                  setCommissionSettings((prev) => ({
+                                    ...prev,
+                                    bonusThresholds: newThresholds,
+                                  }));
+                                }}
+                                min="100"
+                                step="100"
+                              />
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <Label htmlFor={`bonus-${index}`} className="text-sm">
-                              Bonus Amount (₹)
-                            </Label>
-                            <Input
-                              id={`bonus-${index}`}
-                              type="number"
-                              value={threshold.bonus}
-                              onChange={(e) => {
-                                const newThresholds = [...commissionSettings.bonusThresholds];
-                                newThresholds[index].bonus = parseInt(e.target.value);
-                                setCommissionSettings(prev => ({
-                                  ...prev,
-                                  bonusThresholds: newThresholds,
-                                }));
-                              }}
-                              min="100"
-                              step="100"
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        ),
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -2326,10 +2749,12 @@ export default function AdminPanel() {
                       </h4>
                       <p className="text-sm text-yellow-700">
                         For a ₹500 ride, driver keeps ₹
-                        {500 - (500 * commissionSettings.vehicleOwnerRate) / 100}
+                        {500 -
+                          (500 * commissionSettings.vehicleOwnerRate) / 100}
                         <br />
                         <span className="text-xs">
-                          (₹{(500 * commissionSettings.vehicleOwnerRate) / 100} commission deducted)
+                          (₹{(500 * commissionSettings.vehicleOwnerRate) / 100}{" "}
+                          commission deducted)
                         </span>
                       </p>
                     </div>
@@ -2344,7 +2769,8 @@ export default function AdminPanel() {
                         {10 * commissionSettings.fleetDriverSalaryRate}
                         <br />
                         <span className="text-xs">
-                          (₹{commissionSettings.fleetDriverSalaryRate}/km salary rate)
+                          (₹{commissionSettings.fleetDriverSalaryRate}/km salary
+                          rate)
                         </span>
                       </p>
                     </div>

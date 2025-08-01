@@ -1,7 +1,11 @@
 // Local database service for storing driver information when Firebase is unavailable
 import { FirebaseDriver } from "./firebaseDriverService";
 
-interface LocalStorageDriver extends Omit<FirebaseDriver, 'joinDate' | 'licenseExpiry' | 'createdAt' | 'updatedAt' | 'currentShift'> {
+interface LocalStorageDriver
+  extends Omit<
+    FirebaseDriver,
+    "joinDate" | "licenseExpiry" | "createdAt" | "updatedAt" | "currentShift"
+  > {
   joinDate: string;
   licenseExpiry: string;
   createdAt: string;
@@ -15,16 +19,18 @@ interface LocalStorageDriver extends Omit<FirebaseDriver, 'joinDate' | 'licenseE
 }
 
 class LocalDatabaseService {
-  private readonly DRIVERS_KEY = 'uride_drivers_db';
-  private readonly RIDES_KEY = 'uride_rides_db';
-  private readonly VEHICLES_KEY = 'uride_vehicles_db';
+  private readonly DRIVERS_KEY = "uride_drivers_db";
+  private readonly RIDES_KEY = "uride_rides_db";
+  private readonly VEHICLES_KEY = "uride_vehicles_db";
 
   // Driver operations
-  async createDriver(driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt">): Promise<string> {
+  async createDriver(
+    driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt">,
+  ): Promise<string> {
     try {
       const drivers = this.getStoredDrivers();
       const driverId = `local_driver_${Date.now()}`;
-      
+
       const newDriver: LocalStorageDriver = {
         ...driverData,
         id: driverId,
@@ -32,15 +38,19 @@ class LocalDatabaseService {
         licenseExpiry: driverData.licenseExpiry.toDate().toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        currentShift: driverData.currentShift ? {
-          ...driverData.currentShift,
-          startTime: driverData.currentShift.startTime.toDate().toISOString(),
-        } : undefined,
+        currentShift: driverData.currentShift
+          ? {
+              ...driverData.currentShift,
+              startTime: driverData.currentShift.startTime
+                .toDate()
+                .toISOString(),
+            }
+          : undefined,
       };
 
       drivers[driverId] = newDriver;
       this.saveDrivers(drivers);
-      
+
       console.log(`✅ Driver stored locally: ${driverData.email}`);
       return driverId;
     } catch (error) {
@@ -52,8 +62,10 @@ class LocalDatabaseService {
   async getDriverByEmail(email: string): Promise<FirebaseDriver | null> {
     try {
       const drivers = this.getStoredDrivers();
-      const driver = Object.values(drivers).find(d => d.email.toLowerCase() === email.toLowerCase());
-      
+      const driver = Object.values(drivers).find(
+        (d) => d.email.toLowerCase() === email.toLowerCase(),
+      );
+
       if (!driver) return null;
 
       // Convert back to FirebaseDriver format
@@ -64,11 +76,14 @@ class LocalDatabaseService {
     }
   }
 
-  async updateDriver(driverId: string, updates: Partial<FirebaseDriver>): Promise<void> {
+  async updateDriver(
+    driverId: string,
+    updates: Partial<FirebaseDriver>,
+  ): Promise<void> {
     try {
       const drivers = this.getStoredDrivers();
       const existingDriver = drivers[driverId];
-      
+
       if (!existingDriver) {
         throw new Error(`Driver ${driverId} not found`);
       }
@@ -83,7 +98,9 @@ class LocalDatabaseService {
         localUpdates.joinDate = updates.joinDate.toDate().toISOString();
       }
       if (updates.licenseExpiry) {
-        localUpdates.licenseExpiry = updates.licenseExpiry.toDate().toISOString();
+        localUpdates.licenseExpiry = updates.licenseExpiry
+          .toDate()
+          .toISOString();
       }
       if (updates.currentShift) {
         localUpdates.currentShift = {
@@ -94,7 +111,7 @@ class LocalDatabaseService {
 
       drivers[driverId] = { ...existingDriver, ...localUpdates };
       this.saveDrivers(drivers);
-      
+
       console.log(`✅ Driver updated locally: ${driverId}`);
     } catch (error) {
       console.error("Error updating driver in local storage:", error);
@@ -105,7 +122,9 @@ class LocalDatabaseService {
   async getAllDrivers(): Promise<FirebaseDriver[]> {
     try {
       const drivers = this.getStoredDrivers();
-      return Object.values(drivers).map(driver => this.convertToFirebaseDriver(driver));
+      return Object.values(drivers).map((driver) =>
+        this.convertToFirebaseDriver(driver),
+      );
     } catch (error) {
       console.error("Error getting all drivers from local storage:", error);
       return [];
@@ -116,10 +135,14 @@ class LocalDatabaseService {
   async initializeDemoDrivers(): Promise<void> {
     try {
       const drivers = this.getStoredDrivers();
-      
+
       // Check if demo drivers already exist
-      const hasOwnerDemo = Object.values(drivers).some(d => d.email === "rajesh.driver@uride.com");
-      const hasFleetDemo = Object.values(drivers).some(d => d.email === "amit.fleet@uride.com");
+      const hasOwnerDemo = Object.values(drivers).some(
+        (d) => d.email === "rajesh.driver@uride.com",
+      );
+      const hasFleetDemo = Object.values(drivers).some(
+        (d) => d.email === "amit.fleet@uride.com",
+      );
 
       if (hasOwnerDemo && hasFleetDemo) {
         console.log("✅ Demo drivers already exist in local storage");
@@ -147,7 +170,9 @@ class LocalDatabaseService {
           vehicleNumber: "DL 01 AB 1234",
           vehicleModel: "Honda City 2022",
           licenseNumber: "DL1420110012345",
-          licenseExpiry: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000).toISOString(),
+          licenseExpiry: new Date(
+            Date.now() + 5 * 365 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
           documentsVerified: true,
           idProofType: "aadhar",
           idProofNumber: "1234-5678-9012",
@@ -181,7 +206,9 @@ class LocalDatabaseService {
           joinDate: new Date("2024-02-20").toISOString(),
           vehicleModel: "URide Fleet Vehicle",
           licenseNumber: "DL1420110054321",
-          licenseExpiry: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000).toISOString(),
+          licenseExpiry: new Date(
+            Date.now() + 5 * 365 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
           documentsVerified: true,
           idProofType: "aadhar",
           idProofNumber: "9876-5432-1098",
@@ -209,7 +236,7 @@ class LocalDatabaseService {
     try {
       const rides = this.getStoredRides();
       const rideId = `local_ride_${Date.now()}`;
-      
+
       rides[rideId] = {
         id: rideId,
         driverId,
@@ -218,10 +245,10 @@ class LocalDatabaseService {
       };
 
       this.saveRides(rides);
-      
+
       // Update driver stats
       await this.updateDriverStats(driverId, rideData);
-      
+
       console.log(`✅ Ride recorded locally: ${rideId}`);
     } catch (error) {
       console.error("Error recording ride:", error);
@@ -229,17 +256,22 @@ class LocalDatabaseService {
     }
   }
 
-  async updateDriverStats(driverId: string, rideData: { earnings: number; distance: number; rating: number }): Promise<void> {
+  async updateDriverStats(
+    driverId: string,
+    rideData: { earnings: number; distance: number; rating: number },
+  ): Promise<void> {
     try {
       const drivers = this.getStoredDrivers();
       const driver = drivers[driverId];
-      
+
       if (!driver) return;
 
       const newTotalRides = driver.totalRides + 1;
       const newTotalEarnings = driver.totalEarnings + rideData.earnings;
       const newTotalKmDriven = driver.totalKmDriven + rideData.distance;
-      const newAverageRating = (driver.averageRating * driver.totalRides + rideData.rating) / newTotalRides;
+      const newAverageRating =
+        (driver.averageRating * driver.totalRides + rideData.rating) /
+        newTotalRides;
 
       driver.totalRides = newTotalRides;
       driver.totalEarnings = newTotalEarnings;
@@ -292,17 +324,25 @@ class LocalDatabaseService {
     }
   }
 
-  private convertToFirebaseDriver(localDriver: LocalStorageDriver): FirebaseDriver {
+  private convertToFirebaseDriver(
+    localDriver: LocalStorageDriver,
+  ): FirebaseDriver {
     return {
       ...localDriver,
       joinDate: { toDate: () => new Date(localDriver.joinDate) } as any,
-      licenseExpiry: { toDate: () => new Date(localDriver.licenseExpiry) } as any,
+      licenseExpiry: {
+        toDate: () => new Date(localDriver.licenseExpiry),
+      } as any,
       createdAt: { toDate: () => new Date(localDriver.createdAt) } as any,
       updatedAt: { toDate: () => new Date(localDriver.updatedAt) } as any,
-      currentShift: localDriver.currentShift ? {
-        ...localDriver.currentShift,
-        startTime: { toDate: () => new Date(localDriver.currentShift!.startTime) } as any,
-      } : undefined,
+      currentShift: localDriver.currentShift
+        ? {
+            ...localDriver.currentShift,
+            startTime: {
+              toDate: () => new Date(localDriver.currentShift!.startTime),
+            } as any,
+          }
+        : undefined,
     };
   }
 

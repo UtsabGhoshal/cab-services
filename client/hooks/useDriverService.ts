@@ -3,7 +3,9 @@ import { driverService } from "@/services/driverService";
 
 export const useDriverService = ({ driverId, autoStart = true }) => {
   const [isOnline, setIsOnline] = useState(false);
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
   const [nearbyRides, setNearbyRides] = useState([]);
   const [activeRide, setActiveRide] = useState(null);
   const [stats, setStats] = useState({
@@ -11,7 +13,7 @@ export const useDriverService = ({ driverId, autoStart = true }) => {
     totalRides: 0,
     averageRating: 5.0,
     hoursOnline: 0,
-    completionRate: 100
+    completionRate: 100,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,7 @@ export const useDriverService = ({ driverId, autoStart = true }) => {
     if (autoStart && driverId) {
       initializeService();
     }
-    
+
     return () => {
       cleanup();
     };
@@ -59,32 +61,34 @@ export const useDriverService = ({ driverId, autoStart = true }) => {
     const watchOptions = {
       enableHighAccuracy: true,
       timeout: 10000,
-      maximumAge: 60000 // 1 minute
+      maximumAge: 60000, // 1 minute
     };
 
     locationWatchId.current = navigator.geolocation.watchPosition(
       (position) => {
         const newLocation = {
           lat: position.coords.latitude,
-          lng: position.coords.longitude
+          lng: position.coords.longitude,
         };
         setLocation(newLocation);
 
         // Update driver location in database
         if (driverId && isOnline) {
-          driverService.updateDriverLocation(driverId, {
-            ...newLocation,
-            timestamp: new Date()
-          }).catch(err => {
-            console.warn("Failed to update driver location:", err);
-          });
+          driverService
+            .updateDriverLocation(driverId, {
+              ...newLocation,
+              timestamp: new Date(),
+            })
+            .catch((err) => {
+              console.warn("Failed to update driver location:", err);
+            });
         }
       },
       (error) => {
         console.error("Geolocation error:", error);
         setError("Failed to get location");
       },
-      watchOptions
+      watchOptions,
     );
   }, [driverId, isOnline]);
 
@@ -106,7 +110,7 @@ export const useDriverService = ({ driverId, autoStart = true }) => {
           driverId,
           (rides) => {
             setNearbyRides(rides);
-          }
+          },
         );
       }
 
@@ -137,46 +141,59 @@ export const useDriverService = ({ driverId, autoStart = true }) => {
     }
   }, [stopLocationTracking]);
 
-  const acceptRide = useCallback(async (rideId: string) => {
-    try {
-      if (!driverId) throw new Error("Driver ID not available");
-      
-      const success = await driverService.acceptRide(rideId, driverId);
-      if (success) {
-        // Update local state
-        const acceptedRide = nearbyRides.find((ride: any) => ride.id === rideId);
-        if (acceptedRide) {
-          setActiveRide(acceptedRide);
-          setNearbyRides(rides => rides.filter((ride: any) => ride.id !== rideId));
-        }
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error("Failed to accept ride:", err);
-      setError("Failed to accept ride");
-      return false;
-    }
-  }, [driverId, nearbyRides]);
+  const acceptRide = useCallback(
+    async (rideId: string) => {
+      try {
+        if (!driverId) throw new Error("Driver ID not available");
 
-  const updateRideStatus = useCallback(async (rideId: string, status: string) => {
-    try {
-      const success = await driverService.updateRideStatus(rideId, status as any);
-      if (success && status === 'completed') {
-        setActiveRide(null);
-        // Refresh stats
-        if (driverId) {
-          const updatedStats = await driverService.getDriverStats(driverId);
-          setStats(updatedStats);
+        const success = await driverService.acceptRide(rideId, driverId);
+        if (success) {
+          // Update local state
+          const acceptedRide = nearbyRides.find(
+            (ride: any) => ride.id === rideId,
+          );
+          if (acceptedRide) {
+            setActiveRide(acceptedRide);
+            setNearbyRides((rides) =>
+              rides.filter((ride: any) => ride.id !== rideId),
+            );
+          }
+          return true;
         }
+        return false;
+      } catch (err) {
+        console.error("Failed to accept ride:", err);
+        setError("Failed to accept ride");
+        return false;
       }
-      return success;
-    } catch (err) {
-      console.error("Failed to update ride status:", err);
-      setError("Failed to update ride status");
-      return false;
-    }
-  }, [driverId]);
+    },
+    [driverId, nearbyRides],
+  );
+
+  const updateRideStatus = useCallback(
+    async (rideId: string, status: string) => {
+      try {
+        const success = await driverService.updateRideStatus(
+          rideId,
+          status as any,
+        );
+        if (success && status === "completed") {
+          setActiveRide(null);
+          // Refresh stats
+          if (driverId) {
+            const updatedStats = await driverService.getDriverStats(driverId);
+            setStats(updatedStats);
+          }
+        }
+        return success;
+      } catch (err) {
+        console.error("Failed to update ride status:", err);
+        setError("Failed to update ride status");
+        return false;
+      }
+    },
+    [driverId],
+  );
 
   const cleanup = useCallback(() => {
     stopLocationTracking();
@@ -192,7 +209,7 @@ export const useDriverService = ({ driverId, autoStart = true }) => {
     try {
       const rides = await driverService.getNearbyRides(
         { ...location, timestamp: new Date() },
-        10 // 10km radius
+        10, // 10km radius
       );
       setNearbyRides(rides);
     } catch (err) {

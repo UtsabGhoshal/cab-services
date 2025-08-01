@@ -21,7 +21,8 @@ const createUserHandler: RequestHandler = async (req, res) => {
   try {
     res.status(501).json({
       success: false,
-      error: "User creation moved to Supabase. Please use client-side operations.",
+      error:
+        "User creation moved to Supabase. Please use client-side operations.",
     });
   } catch (error) {
     console.error("Create user error:", error);

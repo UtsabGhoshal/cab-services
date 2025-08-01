@@ -43,7 +43,7 @@ class DriverMatchingService {
     lat1: number,
     lng1: number,
     lat2: number,
-    lng2: number
+    lng2: number,
   ): number {
     const R = 6371; // Earth's radius in kilometers
     const dLat = this.toRadians(lat2 - lat1);
@@ -65,37 +65,38 @@ class DriverMatchingService {
   // Find available drivers near pickup location
   async findNearbyDrivers(
     pickupLocation: { lat: number; lng: number },
-    radiusKm: number = 10
+    radiusKm: number = 10,
   ): Promise<Driver[]> {
     try {
       // Get all active and approved drivers
       const drivers = await supabaseDriverService.getAllDrivers();
-      
+
       // Filter for online, active, approved drivers with location
-      const availableDrivers = drivers.filter(driver => 
-        driver.isActive && 
-        driver.isApproved && 
-        driver.status === 'online' &&
-        driver.currentLocation
+      const availableDrivers = drivers.filter(
+        (driver) =>
+          driver.isActive &&
+          driver.isApproved &&
+          driver.status === "online" &&
+          driver.currentLocation,
       );
 
       // Calculate distances and filter by radius
       const nearbyDrivers = availableDrivers
-        .map(driver => ({
+        .map((driver) => ({
           ...driver,
           distance: this.calculateDistance(
             pickupLocation.lat,
             pickupLocation.lng,
             driver.currentLocation!.lat,
-            driver.currentLocation!.lng
-          )
+            driver.currentLocation!.lng,
+          ),
         }))
-        .filter(driver => driver.distance <= radiusKm)
+        .filter((driver) => driver.distance <= radiusKm)
         .sort((a, b) => a.distance - b.distance); // Sort by distance
 
       return nearbyDrivers;
     } catch (error) {
-      console.error('Error finding nearby drivers:', error);
+      console.error("Error finding nearby drivers:", error);
       return [];
     }
   }
@@ -104,7 +105,7 @@ class DriverMatchingService {
   async createRideRequest(rideData: RideRequest): Promise<string | null> {
     try {
       const { data, error } = await supabase
-        .from('rides')
+        .from("rides")
         .insert({
           pickup_location: rideData.pickupLocation,
           destination: rideData.destination,
@@ -114,20 +115,20 @@ class DriverMatchingService {
           fare: rideData.estimatedFare,
           distance_km: rideData.distance,
           duration_minutes: rideData.estimatedTime,
-          status: 'pending',
+          status: "pending",
           created_at: new Date().toISOString(),
         })
-        .select('id')
+        .select("id")
         .single();
 
       if (error) {
-        console.error('Error creating ride request:', error);
+        console.error("Error creating ride request:", error);
         return null;
       }
 
       return data.id;
     } catch (error) {
-      console.error('Error creating ride request:', error);
+      console.error("Error creating ride request:", error);
       return null;
     }
   }
@@ -143,13 +144,14 @@ class DriverMatchingService {
       // Find nearby drivers
       const nearbyDrivers = await this.findNearbyDrivers(
         rideRequest.pickupLocation,
-        15 // 15km radius
+        15, // 15km radius
       );
 
       if (nearbyDrivers.length === 0) {
         return {
           success: false,
-          message: 'No drivers available in your area at the moment. Please try again later.',
+          message:
+            "No drivers available in your area at the moment. Please try again later.",
         };
       }
 
@@ -158,7 +160,7 @@ class DriverMatchingService {
       if (!rideId) {
         return {
           success: false,
-          message: 'Failed to create ride request. Please try again.',
+          message: "Failed to create ride request. Please try again.",
         };
       }
 
@@ -167,7 +169,9 @@ class DriverMatchingService {
       const nearestDriver = nearbyDrivers[0];
 
       // Notify the driver (in a real app, this would send a push notification)
-      console.log(`🚗 Ride request ${rideId} sent to driver ${nearestDriver.fullName}`);
+      console.log(
+        `🚗 Ride request ${rideId} sent to driver ${nearestDriver.fullName}`,
+      );
 
       return {
         success: true,
@@ -176,10 +180,10 @@ class DriverMatchingService {
         message: `Found ${nearbyDrivers.length} nearby driver(s). Your ride request has been sent to the nearest driver.`,
       };
     } catch (error) {
-      console.error('Error matching ride with driver:', error);
+      console.error("Error matching ride with driver:", error);
       return {
         success: false,
-        message: 'Failed to process your ride request. Please try again.',
+        message: "Failed to process your ride request. Please try again.",
       };
     }
   }
@@ -188,19 +192,19 @@ class DriverMatchingService {
   async getRideStatus(rideId: string) {
     try {
       const { data, error } = await supabase
-        .from('rides')
-        .select('*')
-        .eq('id', rideId)
+        .from("rides")
+        .select("*")
+        .eq("id", rideId)
         .single();
 
       if (error) {
-        console.error('Error fetching ride status:', error);
+        console.error("Error fetching ride status:", error);
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error('Error fetching ride status:', error);
+      console.error("Error fetching ride status:", error);
       return null;
     }
   }
@@ -209,19 +213,19 @@ class DriverMatchingService {
   async cancelRideRequest(rideId: string): Promise<boolean> {
     try {
       const { error } = await supabase
-        .from('rides')
-        .update({ status: 'cancelled', updated_at: new Date().toISOString() })
-        .eq('id', rideId)
-        .eq('status', 'pending'); // Only cancel if still pending
+        .from("rides")
+        .update({ status: "cancelled", updated_at: new Date().toISOString() })
+        .eq("id", rideId)
+        .eq("status", "pending"); // Only cancel if still pending
 
       if (error) {
-        console.error('Error cancelling ride:', error);
+        console.error("Error cancelling ride:", error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error cancelling ride:', error);
+      console.error("Error cancelling ride:", error);
       return false;
     }
   }

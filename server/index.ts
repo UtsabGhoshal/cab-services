@@ -1,10 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
-import {
-  loginHandler,
-  signupHandler,
-} from "./routes/auth";
+import { loginHandler, signupHandler } from "./routes/auth";
 import {
   driverLoginHandler,
   driverSignupHandler,
@@ -55,7 +52,9 @@ export async function createServer() {
 
   // Admin/Security routes (deprecated)
   app.post("/api/auth/migrate-passwords", (req, res) => {
-    res.status(501).json({ success: false, error: "Migration moved to Supabase" });
+    res
+      .status(501)
+      .json({ success: false, error: "Migration moved to Supabase" });
   });
 
   // Maps configuration route (secure API key delivery)
@@ -79,7 +78,8 @@ export async function createServer() {
     try {
       res.status(501).json({
         success: false,
-        error: "Test rides moved to Supabase. Please use client-side operations.",
+        error:
+          "Test rides moved to Supabase. Please use client-side operations.",
       });
     } catch (error) {
       console.error("Test rides error:", error);
@@ -105,7 +105,8 @@ export async function createServer() {
     try {
       res.status(501).json({
         success: false,
-        error: "Admin routes moved to Supabase. Please use client-side queries.",
+        error:
+          "Admin routes moved to Supabase. Please use client-side queries.",
       });
     } catch (error) {
       console.error("Error fetching all users:", error);
@@ -117,7 +118,8 @@ export async function createServer() {
     try {
       res.status(501).json({
         success: false,
-        error: "Admin routes moved to Supabase. Please use client-side queries.",
+        error:
+          "Admin routes moved to Supabase. Please use client-side queries.",
       });
     } catch (error) {
       console.error("Error fetching all rides:", error);

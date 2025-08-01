@@ -21,7 +21,8 @@ const createRideHandler: RequestHandler = async (req, res) => {
   try {
     res.status(501).json({
       success: false,
-      error: "Ride creation moved to Supabase. Please use client-side operations.",
+      error:
+        "Ride creation moved to Supabase. Please use client-side operations.",
     });
   } catch (error) {
     console.error("Create ride error:", error);

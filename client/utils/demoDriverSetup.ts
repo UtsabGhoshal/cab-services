@@ -29,23 +29,29 @@ export const createDemoDriversIfNeeded = async (): Promise<void> => {
         password: "password123",
       },
       {
-        email: "driver2@example.com", 
+        email: "driver2@example.com",
         password: "password123",
-      }
+      },
     ];
 
     for (const demo of demoDrivers) {
       try {
         // Try to create Supabase Auth user
-        const { user, error } = await supabaseAuthService.signUpWithEmailAndPassword(
-          demo.email,
-          demo.password
-        );
+        const { user, error } =
+          await supabaseAuthService.signUpWithEmailAndPassword(
+            demo.email,
+            demo.password,
+          );
 
         if (error && !error.message.includes("already registered")) {
-          console.warn(`Supabase Auth signup failed for ${demo.email}:`, error.message);
+          console.warn(
+            `Supabase Auth signup failed for ${demo.email}:`,
+            error.message,
+          );
         } else if (user) {
-          console.log(`✅ Supabase Auth user created/exists for: ${demo.email}`);
+          console.log(
+            `✅ Supabase Auth user created/exists for: ${demo.email}`,
+          );
         }
       } catch (authError) {
         console.warn(`Auth setup error for ${demo.email}:`, authError);

@@ -12,7 +12,10 @@ export const DevModeNotification: React.FC = () => {
     const checkConnection = async () => {
       try {
         // Test Supabase connection
-        const { error } = await supabase.from('drivers').select('count').limit(1);
+        const { error } = await supabase
+          .from("drivers")
+          .select("count")
+          .limit(1);
         if (error) {
           setIsSupabaseDown(true);
           setShowNotification(true);
@@ -43,8 +46,9 @@ export const DevModeNotification: React.FC = () => {
               Development Mode
             </AlertTitle>
             <AlertDescription className="text-orange-700 text-sm mt-1">
-              Supabase connection is unavailable. Using local fallback authentication for
-              development. Demo accounts are available for testing.
+              Supabase connection is unavailable. Using local fallback
+              authentication for development. Demo accounts are available for
+              testing.
             </AlertDescription>
           </div>
           <Button

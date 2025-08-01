@@ -56,7 +56,7 @@ export default function UserAvatar() {
           </div>
           <div className="hidden md:block text-left">
             <div className="text-sm font-semibold text-slate-800">
-            {user && user.name ? user.name.split(" ")[0] : ""}
+              {user && user.name ? user.name.split(" ")[0] : ""}
             </div>
             <div className="text-xs text-slate-500">View Dashboard</div>
           </div>
@@ -70,7 +70,9 @@ export default function UserAvatar() {
           <div className="text-sm font-medium text-slate-800 mb-1">
             {user && user.name ? user.name : ""}
           </div>
-          <div className="text-xs text-slate-500 mb-3">{user && user.email ? user.email : ""}</div>
+          <div className="text-xs text-slate-500 mb-3">
+            {user && user.email ? user.email : ""}
+          </div>
           <div className="text-xs text-blue-600 font-medium">
             Click to go to Dashboard →
           </div>

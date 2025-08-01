@@ -4,7 +4,8 @@ export const addSampleRidesHandler: RequestHandler = async (req, res) => {
   try {
     res.status(501).json({
       success: false,
-      error: "Test routes moved to Supabase. Please use client-side operations.",
+      error:
+        "Test routes moved to Supabase. Please use client-side operations.",
     });
   } catch (error) {
     console.error("Test route error:", error);

@@ -1,5 +1,5 @@
-import { supabase } from '@/supabase/config';
-import type { AuthError, User, Session } from '@supabase/supabase-js';
+import { supabase } from "@/supabase/config";
+import type { AuthError, User, Session } from "@supabase/supabase-js";
 
 export interface SupabaseAuthResult {
   user: User | null;
@@ -9,7 +9,10 @@ export interface SupabaseAuthResult {
 
 export class SupabaseAuthService {
   // Sign up with email and password
-  async signUpWithEmailAndPassword(email: string, password: string): Promise<SupabaseAuthResult> {
+  async signUpWithEmailAndPassword(
+    email: string,
+    password: string,
+  ): Promise<SupabaseAuthResult> {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -23,7 +26,10 @@ export class SupabaseAuthService {
   }
 
   // Sign in with email and password
-  async signInWithEmailAndPassword(email: string, password: string): Promise<SupabaseAuthResult> {
+  async signInWithEmailAndPassword(
+    email: string,
+    password: string,
+  ): Promise<SupabaseAuthResult> {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -44,18 +50,24 @@ export class SupabaseAuthService {
 
   // Get current user
   getCurrentUser(): User | null {
-    const { data: { user } } = supabase.auth.getUser();
+    const {
+      data: { user },
+    } = supabase.auth.getUser();
     return user;
   }
 
   // Get current session
   async getCurrentSession(): Promise<Session | null> {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     return session;
   }
 
   // Listen to auth state changes
-  onAuthStateChange(callback: (event: string, session: Session | null) => void) {
+  onAuthStateChange(
+    callback: (event: string, session: Session | null) => void,
+  ) {
     return supabase.auth.onAuthStateChange(callback);
   }
 
@@ -66,9 +78,12 @@ export class SupabaseAuthService {
   }
 
   // Update user profile
-  async updateProfile(updates: { email?: string; password?: string }): Promise<SupabaseAuthResult> {
+  async updateProfile(updates: {
+    email?: string;
+    password?: string;
+  }): Promise<SupabaseAuthResult> {
     const { data, error } = await supabase.auth.updateUser(updates);
-    
+
     return {
       user: data.user,
       session: null,

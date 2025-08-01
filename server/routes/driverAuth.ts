@@ -7,7 +7,8 @@ export const driverLoginHandler: RequestHandler = async (req, res) => {
   try {
     res.status(501).json({
       success: false,
-      error: "Driver authentication moved to Supabase. Please use client-side auth.",
+      error:
+        "Driver authentication moved to Supabase. Please use client-side auth.",
     });
   } catch (error) {
     console.error("Driver login error:", error);
@@ -22,7 +23,8 @@ export const driverSignupHandler: RequestHandler = async (req, res) => {
   try {
     res.status(501).json({
       success: false,
-      error: "Driver authentication moved to Supabase. Please use client-side auth.",
+      error:
+        "Driver authentication moved to Supabase. Please use client-side auth.",
     });
   } catch (error) {
     console.error("Driver signup error:", error);

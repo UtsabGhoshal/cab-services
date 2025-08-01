@@ -34,7 +34,7 @@ class FallbackAuthService {
             model: "Camry",
             year: 2020,
             color: "Blue",
-            licensePlate: "ABC-123"
+            licensePlate: "ABC-123",
           },
           isApproved: true,
           isActive: true,
@@ -60,7 +60,7 @@ class FallbackAuthService {
             model: "Civic",
             year: 2021,
             color: "Red",
-            licensePlate: "XYZ-789"
+            licensePlate: "XYZ-789",
           },
           isApproved: true,
           isActive: true,
@@ -86,7 +86,7 @@ class FallbackAuthService {
 
   async signInWithEmailAndPassword(
     email: string,
-    password: string
+    password: string,
   ): Promise<{ user: FallbackUser; driver?: FirebaseDriver }> {
     const userData = this.mockUsers.get(email);
 
@@ -110,7 +110,7 @@ class FallbackAuthService {
 
   async createUserWithEmailAndPassword(
     email: string,
-    password: string
+    password: string,
   ): Promise<{ user: FallbackUser }> {
     if (this.mockUsers.has(email)) {
       const error = new Error("Email already in use");
@@ -146,7 +146,9 @@ class FallbackAuthService {
     return await localDatabaseService.getDriverByEmail(email);
   }
 
-  async createDriver(driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt">): Promise<string> {
+  async createDriver(
+    driverData: Omit<FirebaseDriver, "id" | "createdAt" | "updatedAt">,
+  ): Promise<string> {
     return await localDatabaseService.createDriver(driverData);
   }
 }

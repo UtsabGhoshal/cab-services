@@ -31,18 +31,21 @@ export function useAuth() {
     }
 
     // If no stored session, listen to Firebase auth
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
-      if (firebaseUser) {
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          ...firebaseUser,
-        });
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (firebaseUser: User | null) => {
+        if (firebaseUser) {
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            ...firebaseUser,
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      },
+    );
 
     return () => unsubscribe();
   }, []);

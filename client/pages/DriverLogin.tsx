@@ -63,7 +63,11 @@ export default function DriverLogin() {
 
       try {
         // Try Supabase Auth first
-        const { user: supabaseUser, session, error } = await supabaseAuthService.signInWithEmailAndPassword(
+        const {
+          user: supabaseUser,
+          session,
+          error,
+        } = await supabaseAuthService.signInWithEmailAndPassword(
           formData.email,
           formData.password,
         );
@@ -72,7 +76,11 @@ export default function DriverLogin() {
           throw error;
         }
 
-        user = { uid: supabaseUser?.id, email: supabaseUser?.email, getIdToken: () => session?.access_token || '' };
+        user = {
+          uid: supabaseUser?.id,
+          email: supabaseUser?.email,
+          getIdToken: () => session?.access_token || "",
+        };
         driver = await supabaseDriverService.getDriverByEmail(formData.email);
       } catch (supabaseError: any) {
         console.warn(
@@ -136,7 +144,12 @@ export default function DriverLogin() {
       };
 
       localStorage.setItem("uride_driver", JSON.stringify(driverSession));
-      localStorage.setItem("uride_driver_token", typeof user.getIdToken === 'function' ? await user.getIdToken() : user.getIdToken);
+      localStorage.setItem(
+        "uride_driver_token",
+        typeof user.getIdToken === "function"
+          ? await user.getIdToken()
+          : user.getIdToken,
+      );
 
       if (formData.rememberMe) {
         localStorage.setItem("uride_driver_remember", "true");
@@ -203,7 +216,11 @@ export default function DriverLogin() {
 
       try {
         // Try Supabase Auth first
-        const { user: supabaseUser, session, error } = await supabaseAuthService.signInWithEmailAndPassword(
+        const {
+          user: supabaseUser,
+          session,
+          error,
+        } = await supabaseAuthService.signInWithEmailAndPassword(
           demo.email,
           demo.password,
         );
@@ -212,7 +229,11 @@ export default function DriverLogin() {
           throw error;
         }
 
-        user = { uid: supabaseUser?.id, email: supabaseUser?.email, getIdToken: () => session?.access_token || '' };
+        user = {
+          uid: supabaseUser?.id,
+          email: supabaseUser?.email,
+          getIdToken: () => session?.access_token || "",
+        };
         driver = await supabaseDriverService.getDriverByEmail(demo.email);
       } catch (supabaseError: any) {
         console.warn(
@@ -275,7 +296,12 @@ export default function DriverLogin() {
       };
 
       localStorage.setItem("uride_driver", JSON.stringify(driverSession));
-      localStorage.setItem("uride_driver_token", typeof user.getIdToken === 'function' ? await user.getIdToken() : user.getIdToken);
+      localStorage.setItem(
+        "uride_driver_token",
+        typeof user.getIdToken === "function"
+          ? await user.getIdToken()
+          : user.getIdToken,
+      );
 
       toast({
         title: "Demo Login Successful! 🚗",

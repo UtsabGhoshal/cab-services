@@ -4,15 +4,26 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { localDatabaseService } from "@/services/localDatabase";
 import { firebaseDriverService } from "@/services/firebaseDriverService";
-import { Database, Server, RefreshCw, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import {
+  Database,
+  Server,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
 
 interface DriverDataStatusProps {
   onlyWhenVisible?: boolean;
 }
 
-export function DriverDataStatus({ onlyWhenVisible = true }: DriverDataStatusProps) {
+export function DriverDataStatus({
+  onlyWhenVisible = true,
+}: DriverDataStatusProps) {
   const [localDriverCount, setLocalDriverCount] = useState(0);
-  const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "error" | "checking">("checking");
+  const [firebaseStatus, setFirebaseStatus] = useState<
+    "connected" | "error" | "checking"
+  >("checking");
   const [isVisible, setIsVisible] = useState(!onlyWhenVisible);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
@@ -38,7 +49,7 @@ export function DriverDataStatus({ onlyWhenVisible = true }: DriverDataStatusPro
 
   useEffect(() => {
     checkDataStatus();
-    
+
     // Check periodically if component is visible
     if (isVisible) {
       const interval = setInterval(checkDataStatus, 30000); // Every 30 seconds
@@ -122,14 +133,20 @@ export function DriverDataStatus({ onlyWhenVisible = true }: DriverDataStatusPro
               <span className="text-sm">Firebase</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge 
+              <Badge
                 variant={
-                  firebaseStatus === "connected" ? "default" : 
-                  firebaseStatus === "error" ? "destructive" : "secondary"
+                  firebaseStatus === "connected"
+                    ? "default"
+                    : firebaseStatus === "error"
+                      ? "destructive"
+                      : "secondary"
                 }
               >
-                {firebaseStatus === "connected" ? "Connected" : 
-                 firebaseStatus === "error" ? "Offline" : "Checking..."}
+                {firebaseStatus === "connected"
+                  ? "Connected"
+                  : firebaseStatus === "error"
+                    ? "Offline"
+                    : "Checking..."}
               </Badge>
               {firebaseStatus === "connected" ? (
                 <CheckCircle className="w-4 h-4 text-green-600" />
@@ -151,7 +168,9 @@ export function DriverDataStatus({ onlyWhenVisible = true }: DriverDataStatusPro
               <div className="mt-1 p-2 bg-green-50 rounded border border-green-200">
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-3 h-3 text-green-600" />
-                  <span className="text-green-700 font-medium">Driver data is being stored</span>
+                  <span className="text-green-700 font-medium">
+                    Driver data is being stored
+                  </span>
                 </div>
               </div>
             )}
@@ -159,7 +178,9 @@ export function DriverDataStatus({ onlyWhenVisible = true }: DriverDataStatusPro
               <div className="mt-1 p-2 bg-yellow-50 rounded border border-yellow-200">
                 <div className="flex items-center space-x-2">
                   <AlertCircle className="w-3 h-3 text-yellow-600" />
-                  <span className="text-yellow-700 font-medium">No drivers stored yet</span>
+                  <span className="text-yellow-700 font-medium">
+                    No drivers stored yet
+                  </span>
                 </div>
               </div>
             )}
