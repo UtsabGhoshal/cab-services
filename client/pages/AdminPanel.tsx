@@ -223,9 +223,9 @@ export default function AdminPanel() {
       try {
         setIsLoading(true);
 
-        // Import Firebase service dynamically (since it's a server module)
+        // Import Supabase service dynamically
         // In a real app, you'd create a client-side wrapper
-        const mockDriversData: FirebaseDriver[] = [
+        const mockDriversData: Driver[] = [
           {
             id: "d1",
             name: "Rajesh Kumar",
