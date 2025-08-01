@@ -4,7 +4,6 @@ import { handleDemo } from "./routes/demo";
 import {
   loginHandler,
   signupHandler,
-  migratePasswordsHandler,
 } from "./routes/auth";
 import {
   driverLoginHandler,
