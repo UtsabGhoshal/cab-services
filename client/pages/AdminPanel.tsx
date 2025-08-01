@@ -196,9 +196,9 @@ export default function AdminPanel() {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  // Real-time data from Firebase
-  const [drivers, setDrivers] = useState<FirebaseDriver[]>([]);
-  const [vehicles, setVehicles] = useState<FirebaseVehicle[]>([]);
+  // Real-time data from Supabase
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [adminActivities, setAdminActivities] = useState<AdminActivity[]>([]);
   const [dashboardStats, setDashboardStats] = useState<any>({});
 
