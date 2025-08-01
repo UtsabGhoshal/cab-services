@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, X, Settings } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { checkFirebaseConnection } from "@/utils/firebaseCheck";
-import { FirebaseTroubleshooting } from "./FirebaseTroubleshooting";
+import { supabase } from "@/supabase/config";
 
 export const DevModeNotification: React.FC = () => {
   const [showNotification, setShowNotification] = useState(false);
-  const [isFirebaseDown, setIsFirebaseDown] = useState(false);
+  const [isSupabaseDown, setIsSupabaseDown] = useState(false);
 
   useEffect(() => {
     const checkConnection = async () => {
-      const available = await checkFirebaseConnection();
-      if (!available) {
-        setIsFirebaseDown(true);
+      try {
+        // Test Supabase connection
+        const { error } = await supabase.from('drivers').select('count').limit(1);
+        if (error) {
+          setIsSupabaseDown(true);
+          setShowNotification(true);
+        }
+      } catch (error) {
+        setIsSupabaseDown(true);
         setShowNotification(true);
       }
     };
@@ -25,7 +29,7 @@ export const DevModeNotification: React.FC = () => {
     }
   }, []);
 
-  if (!showNotification || !isFirebaseDown) {
+  if (!showNotification || !isSupabaseDown) {
     return null;
   }
 
@@ -39,26 +43,9 @@ export const DevModeNotification: React.FC = () => {
               Development Mode
             </AlertTitle>
             <AlertDescription className="text-orange-700 text-sm mt-1">
-              Firebase is unavailable. Using local fallback authentication for
+              Supabase connection is unavailable. Using local fallback authentication for
               development. Demo accounts are available for testing.
             </AlertDescription>
-            <div className="mt-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-orange-100 border-orange-300 text-orange-800 hover:bg-orange-200"
-                  >
-                    <Settings className="h-3 w-3 mr-1" />
-                    Troubleshoot
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                  <FirebaseTroubleshooting />
-                </DialogContent>
-              </Dialog>
-            </div>
           </div>
           <Button
             variant="ghost"
